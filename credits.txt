@@ -1,0 +1,32 @@
+Sky to sea: NOAA website and Horizon app (student concept)
+Jennifer Roh, ArtCenter Graduate Studio 3
+
+Not an official NOAA website. All photographs are real and are credited below.
+
+Photo credits
+
+big-eye-binoculars.jpg             Photo: NOAA
+buoy-44008.jpg                     Photo: James Elliott, NOAA NDBC
+camp-microscope.jpg                Photo: NOAA Fisheries
+carysfort-lighthouse-close.jpg     Photo: Nancy Diersing/NOAA
+carysfort-lighthouse.jpg           Photo: Nancy Diersing/NOAA
+coral-replanting-carysfort.jpg     Photo: A. Neufeld/Coral Restoration Foundation
+fgb-diver-ring-of-fish.jpg         Photo: Emma Hickerson/NOAA
+humpback-flukes.jpg                Photo: E. Lyman, HIHWNMS/NOAA Permit #15240
+hurricane-hunter-wp3d-n43rf.jpg    Photo: NOAA (Jonathan Shannon)
+hydrophone-grays-reef.jpg          Photo: NOAA
+loggerhead-release.jpg             Photo: Will Sassorossi/NOAA
+mangroves-aerial.jpg               Photo: Jack Fishman, Florida Keys National Marine Sanctuary
+nws-radiosonde-yellow-balloon.jpg  Photo: Eric Kurth/NOAA
+octopus-zooplankton.jpg            Photo: Matt Wilson/Jay Clark, NOAA Fisheries
+ozonesonde-south-pole.jpg          Photo: Ross Burgener/NOAA
+science-camp-shoreline-net.jpg     Photo: NOAA Fisheries
+shelf-cloud-oklahoma.jpg           Photo: Sean Waugh/NOAA NSSL
+thomas-jefferson-side-scan.jpg     Photo: NOAA's National Ocean Service (CC BY 2.0)
+tide-station-baltimore.jpg         Photo: NOAA
+turtle-intake-exam.jpg             Photo: NOAA Fisheries
+turtle-rescue-st-joseph-bay.jpg    Photo: NOAA Fisheries
+
+The Horizon app screens (images/horizon-view.png, images/horizon-reef.png) use the photographs credited above.
+
+Fonts: Libre Franklin and Source Serif 4 (SIL Open Font License, see fonts/), Lato (SIL Open Font License).

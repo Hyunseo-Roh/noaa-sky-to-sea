@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sky to sea | NOAA (student concept)</title>
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/site.css">
+<style>
+
+.hero { position: relative; height: 860px; background: var(--c-ink); color: var(--c-ground); overflow: hidden; }
+.hero-media { position: absolute; inset: 0; }
+.hero-img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; }
+.hero-shade { position: absolute; z-index: 1; inset: 0 0 auto 36%; height: 600px; background: linear-gradient(180deg, var(--c-scrim) 0%, transparent 100%); opacity: .8; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 240px); mask-image: linear-gradient(90deg, transparent 0, #000 240px); }
+.hero-cap { position: absolute; z-index: 2; right: var(--margin); bottom: var(--s-5); max-width: 640px; }
+.hero-grid { position: relative; z-index: 2; height: 100%; padding-top: calc(var(--l-header-height) + var(--s-8)); align-content: start; }
+.hero-text { grid-column: 6 / 13; }
+.hero-text p { margin-top: var(--s-5); max-width: 30em; }
+.hero-actions { display: flex; align-items: center; gap: var(--s-6); margin-top: var(--s-6); }
+.hero-actions .link { color: var(--c-ground); }
+
+.ch1-head { align-items: end; margin-bottom: var(--s-7); }
+.ch1-head h2 { grid-column: 1 / 7; }
+.ch1-intro { grid-column: 8 / 13; }
+.ch1-intro .offices { margin-top: var(--s-4); }
+.ch1-main { align-items: start; }
+.ch1-fig { grid-column: 1 / 8; }
+.ch1-fig .ph { aspect-ratio: 4 / 3; }
+.ch1-fig img { object-position: 60% 50%; }
+.ch1-read { grid-column: 8 / 13; }
+.measures { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3) var(--s-5); margin-top: var(--s-4); }
+.measures li { font: var(--f-l3); color: var(--c-ink); }
+.ch1-read .t-lead { margin-top: var(--s-6); }
+.flight { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); margin-top: var(--s-7); }
+.flight h4 { display: flex; align-items: center; gap: var(--s-2); }
+.flight h4 svg { width: 20px; height: 20px; flex: none; }
+.flight p { margin-top: var(--s-2); color: var(--c-ink-2); }
+
+.ch-scene { padding-top: var(--s-8); }
+.ch2-scene { height: 720px; }
+.ch2-scene > img { object-position: 30% 40%; }
+.ch2-scene .over > div { grid-column: 1 / -1; }
+.ch2-scene .t-head { max-width: 737px; }
+.ch2-lead { padding-top: var(--s-7); }
+.ch2-lead p { grid-column: 1 / 8; }
+.ch2-two { margin-top: var(--s-8); align-items: start; }
+.ground { grid-column: 1 / 7; }
+.air { grid-column: 8 / 13; }
+.ground h4, .air h4 { margin-top: var(--s-5); }
+.ground > p.t-body { margin-top: var(--s-2); }
+.ww { width: 100%; margin-top: var(--s-5); border-collapse: collapse; }
+.ww th, .ww td { text-align: left; vertical-align: top; padding: var(--s-3) var(--s-4) var(--s-3) 0; border-bottom: 1px solid var(--c-rule); }
+.ww thead th { font: var(--f-item); color: var(--c-ink); padding-bottom: var(--s-2); }
+.ww tbody th { font: var(--f-meta-b); color: var(--c-ink-2); width: 22%; padding-top: 18px; }
+.ww td { font: var(--f-body); width: 39%; }
+.ground .office, .air .office { margin-top: var(--s-5); }
+.air figure { margin-top: var(--s-5); }
+.air .ph { aspect-ratio: 3 / 2; }
+.air img { object-position: 45% 52%; }
+.air p.t-body { margin-top: var(--s-4); }
+
+.ch3-scene { height: 820px; }
+.ch3-scene > img { object-position: 50% 52%; transform: rotate(-1deg) scale(1.04); }
+.ch3-scene .over > div { grid-column: 1 / -1; }
+.ch3-scene .t-head { max-width: 845px; }
+.ch3-lead { padding-top: var(--s-7); align-items: start; }
+.ch3-lead p { grid-column: 1 / 8; }
+.ch3-lead .offices { grid-column: 9 / 13; padding-top: var(--s-2); }
+.reef-lead { margin-top: var(--s-8); align-items: end; }
+.reef-lead figure { grid-column: 1 / 9; }
+.reef-lead .ph { aspect-ratio: 3 / 2; }
+.reef-lead .text { grid-column: 9 / 13; padding-bottom: var(--s-7); }
+.reef-lead .text .kicker { margin-bottom: var(--s-3); }
+.reef-lead .text p.t-body { margin-top: var(--s-4); }
+.reef-lead .text .office { margin-top: var(--s-5); }
+.reef-lead .text .link { display: inline-block; margin-top: var(--s-5); }
+.more { margin-top: var(--s-7); padding: var(--s-6) var(--s-6) var(--s-5); background: var(--c-data); }
+.entries { margin-top: var(--s-4); row-gap: var(--s-5); }
+.entries li { grid-column: span 4; }
+.entry { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: var(--s-4); align-items: start; text-decoration: none; color: inherit; }
+.entry .ph { aspect-ratio: 1 / 1; border-radius: var(--r-thumb); }
+.entry .kicker { display: block; }
+.entry .t-item { display: block; margin-top: var(--s-1); color: var(--c-brand); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.entry:hover .t-item { text-decoration-thickness: 2px; }
+.entry .t-body { display: block; margin-top: var(--s-2); }
+.more .credits { margin-top: var(--s-5); }
+.e-buoy img { object-position: 50% 58%; }
+.e-tide img { object-position: 40% 50%; }
+.e-sonar img { object-position: 46% 50%; }
+
+.ch.has-bridge { padding-top: var(--s-8); }
+.bridge { max-width: 30em; color: var(--c-ink); margin-bottom: var(--s-6); }
+
+.ch4-head { align-items: start; margin-bottom: var(--s-7); }
+.ch4-head .intro { padding-top: var(--s-2); }
+.ch4-head .t1 { grid-column: 1 / 7; }
+.ch4-head .intro { grid-column: 8 / 13; }
+.ch4-head .office { margin-top: var(--s-4); }
+.zoom { align-items: start; }
+.zoom .z1 { grid-column: 1 / 8; }
+.zoom .z1 .ph { aspect-ratio: 4 / 3; }
+.zoom .z2 { grid-column: 8 / 11; }
+.zoom .z2 .ph { aspect-ratio: 3 / 4; }
+.zoom .z2 img { object-position: 28% 50%; }
+.zoom .z3 { grid-column: 11 / 13; }
+.zoom .z3 .ph { aspect-ratio: 3 / 4; }
+.zoom .z3 img { object-position: 50% 40%; }
+.zoom .z3 p.t-body { margin-top: var(--s-3); }
+.zoom .cap .credit { white-space: normal; }
+
+.ch5-scene { height: 624px; }
+.ch5-scene > img { object-position: 50% 20%; }
+.ch5-scene .shade-b { position: absolute; z-index: 1; inset: auto 0 0 0; height: 240px; background: linear-gradient(0deg, var(--c-scrim) 0%, transparent 100%); opacity: .6; }
+.ch5-scene .over { align-content: end; padding-top: 0; padding-bottom: var(--s-8); }
+.ch5-scene .over > div { grid-column: 1 / -1; }
+.ch5-scene .t-head { max-width: 845px; }
+.ch5-scene .plate-row { top: var(--s-5); bottom: auto; }
+.ch5-under { padding-top: var(--s-6); align-items: start; }
+.ch5-text { grid-column: 1 / 7; }
+.ch5-text p + p { margin-top: var(--s-4); }
+.ch5-text .office { margin-top: var(--s-5); }
+.hydro { grid-column: 9 / 13; }
+.hydro .ph { aspect-ratio: 3 / 2; }
+.hydro img { object-position: 50% 40%; }
+
+.ch6-head h2 { grid-column: 1 / 9; margin-bottom: var(--s-5); }
+.ch6-intro { align-items: start; }
+.ch6-intro .text { grid-column: 1 / 8; }
+.ch6-intro .text p + p { margin-top: var(--s-4); }
+.ch6-intro .side { grid-column: 9 / 13; display: grid; gap: var(--s-4); justify-items: start; }
+.trio { margin-top: var(--s-6); row-gap: var(--s-6); }
+.trio li { grid-column: span 4; }
+.trio .step { display: flex; align-items: baseline; gap: var(--s-3); padding-top: var(--s-3); border-top: 1px solid var(--c-rule); margin-bottom: var(--s-4); }
+.trio .step .n { font: var(--f-meta-b); color: var(--c-ink-2); font-variant-numeric: tabular-nums; }
+.trio .ph { aspect-ratio: 5 / 6; }
+.t-rescue img { object-position: 50% 55%; }
+.t-intake img { object-position: 50% 60%; }
+.t-release img { object-position: 40% 50%; }
+
+.ch7 { overflow: hidden; }
+.ch7-main { align-items: start; }
+.ch7-left { grid-column: 1 / 7; }
+.ch7-left h2 { margin-bottom: var(--s-6); }
+.ch7-left p + p { margin-top: var(--s-4); }
+.ch7-left .offices { margin-top: var(--s-5); }
+.bigeye { margin-top: var(--s-6); max-width: 460px; }
+.bigeye .ph { aspect-ratio: 1000 / 784; }
+.flukes { grid-column: 8 / 13; margin-right: calc(-1 * var(--margin)); }
+.flukes .ph { aspect-ratio: 3 / 4; }
+.flukes img { object-position: 50% 62%; }
+.flukes .cap { padding-right: var(--margin); }
+
+.closing { padding: var(--s-9) 0 var(--s-10); background: var(--c-ground); }
+.closing .g { align-items: center; }
+.closing .left { grid-column: 1 / 7; }
+.closing .left p { margin-top: var(--s-5); max-width: 32em; }
+.closing .acts { display: flex; align-items: center; gap: var(--s-6); margin-top: var(--s-6); }
+.closing .shot { grid-column: 8 / 12; justify-self: center; }
+.closing .shot .ph { width: 320px; aspect-ratio: 390 / 844; border-radius: var(--r-pill); background: var(--c-ink); border: 1px solid var(--c-rule); }
+.closing .shot .cap { margin-top: var(--s-3); max-width: 320px; }
+
+@media (min-width: 761px) and (max-width: 1199px) {
+  .ch1-head h2, .ch1-intro { grid-column: 1 / -1; }
+  .ch1-intro { margin-top: var(--s-5); max-width: 36em; }
+  .measures li { font: var(--f-item); }
+  .entries li { grid-column: 1 / -1; }
+  .ch4-head .t1, .ch4-head .intro { grid-column: 1 / -1; }
+  .ch4-head .intro { margin-top: var(--s-5); max-width: 36em; }
+  .ch5-text { grid-column: 1 / 8; }
+  .hydro { grid-column: 8 / 13; }
+}
+@media (min-width: 761px) and (max-width: 1023px) {
+  .hero-text { grid-column: 5 / 13; }
+  .hero-actions { flex-wrap: wrap; gap: var(--s-4) var(--s-6); }
+  .hero-actions .btn { white-space: nowrap; }
+  .ch6-head h2 { grid-column: 1 / -1; }
+  .ch1-fig, .ch1-read { grid-column: 1 / -1; }
+  .ch1-read { margin-top: var(--s-6); }
+  .reef-lead figure, .reef-lead .text { grid-column: 1 / -1; }
+  .reef-lead .text { padding-bottom: 0; margin-top: var(--s-5); max-width: 36em; }
+  .zoom .z1 { grid-column: 1 / -1; }
+  .zoom .z2 { grid-column: 1 / 7; margin-top: var(--s-5); }
+  .zoom .z3 { grid-column: 7 / 13; margin-top: var(--s-5); }
+  .ch6-intro .text, .ch6-intro .side { grid-column: 1 / -1; }
+  .ch6-intro .side { margin-top: var(--s-5); }
+  .ground, .air { grid-column: 1 / -1; }
+  .air { margin-top: var(--s-8); }
+  .ch7-left { grid-column: 1 / 8; }
+  .flukes { grid-column: 8 / 13; }
+  .closing .left { grid-column: 1 / 8; }
+  .closing .shot { grid-column: 8 / 13; }
+  .closing .shot .ph { width: 240px; }
+}
+
+@media (max-width: 760px) {
+  .hero { height: auto; display: flex; flex-direction: column; background: var(--c-ground); color: var(--c-ink); }
+  .hero-media { position: relative; inset: auto; height: 380px; order: 0; }
+  .hero-img { object-position: 22% 40%; }
+  .hero-shade { inset: 0 0 auto 0; height: 160px; -webkit-mask-image: none; mask-image: none; }
+  .hero-grid { order: 1; height: auto; padding-top: var(--s-5); padding-bottom: var(--s-5); }
+  .hero-cap.plate { order: 2; position: static; max-width: none; margin: 0 var(--margin) var(--s-6); padding: 0; background: none; color: var(--c-ink-2); border-radius: 0; }
+  .hero-text { grid-column: 1 / -1; }
+  .hero .t-display { color: var(--c-ink); }
+  .hero-text p { margin-top: var(--s-3); }
+  .hero-actions { margin-top: var(--s-5); }
+  .hero-actions .link { display: none; }
+  .hero .btn.on-photo-btn { background: var(--c-brand); color: var(--c-ground); border-color: var(--c-brand); }
+
+  .ch1-head h2, .ch1-intro, .ch1-fig, .ch1-read { grid-column: 1 / -1; }
+  .ch1-head { margin-bottom: var(--s-6); }
+  .ch1-intro { margin-top: var(--s-4); }
+  .ch1-read { margin-top: var(--s-6); }
+  .measures li { font: var(--f-item); }
+  .flight { grid-template-columns: 1fr; gap: var(--s-4); margin-top: var(--s-6); }
+
+  .ch2-scene { height: 460px; }
+  .ch2-scene > img { object-position: 22% 40%; }
+  .ch2-scene .over > div, .ch3-scene .over > div, .ch5-scene .over > div { grid-column: 1 / -1; }
+  .ch2-lead { padding-top: var(--s-5); }
+  .ch2-lead p, .ground, .air { grid-column: 1 / -1; }
+  .ch2-two { margin-top: var(--s-7); }
+  .air { margin-top: var(--s-8); }
+  .ww th, .ww td { padding-right: var(--s-3); }
+  .ww tbody th { width: 26%; }
+  .ww td { font: var(--f-meta); width: 37%; padding-top: 14px; }
+  .ww tbody th { padding-top: 14px; }
+
+  .ch3-scene { height: 520px; }
+  .ch3-scene > img { object-position: 56% 52%; }
+  .ch3-lead { padding-top: var(--s-5); }
+  .ch3-lead p, .ch3-lead .offices { grid-column: 1 / -1; }
+  .ch3-lead .offices { margin-top: var(--s-4); padding-top: 0; }
+  .reef-lead { margin-top: var(--s-7); }
+  .reef-lead figure, .reef-lead .text { grid-column: 1 / -1; }
+  .reef-lead .text { padding-bottom: 0; margin-top: var(--s-4); }
+  .more { margin: var(--s-7) calc(-1 * var(--margin)) 0; padding: var(--s-5) var(--margin); }
+  .entries li { grid-column: 1 / -1; }
+  .entry { grid-template-columns: 88px minmax(0, 1fr); gap: var(--s-3); }
+
+  .ch.has-bridge { padding-top: var(--s-7); }
+  .bridge { margin-bottom: var(--s-6); }
+  .ch4-head { margin-bottom: var(--s-6); }
+  .ch4-head .t1, .ch4-head .intro { grid-column: 1 / -1; }
+  .ch4-head .intro { margin-top: var(--s-4); }
+  .zoom { row-gap: var(--s-5); }
+  .zoom .z1 { grid-column: 1 / -1; }
+  .zoom .z2 { grid-column: 1 / 3; }
+  .zoom .z3 { grid-column: 3 / 5; }
+
+  .ch5-scene { height: 480px; }
+  .ch5-scene .over { padding-bottom: var(--s-6); }
+  .ch5-under { padding-top: var(--s-5); }
+  .ch5-text, .hydro { grid-column: 1 / -1; }
+  .hydro { margin-top: var(--s-6); }
+
+  .ch6-head h2 { grid-column: 1 / -1; margin-bottom: var(--s-5); }
+  .ch6-intro .text, .ch6-intro .side { grid-column: 1 / -1; }
+  .ch6-intro .side { margin-top: var(--s-5); }
+  .trio { margin-top: var(--s-6); }
+  .trio li { grid-column: span 2; }
+  .trio li.t-rescue { grid-column: 1 / -1; }
+  .trio .t-rescue .ph { aspect-ratio: 4 / 5; }
+
+  .ch7-left, .flukes { grid-column: 1 / -1; }
+  .bigeye { margin-top: var(--s-6); }
+  .flukes { margin: var(--s-6) calc(-1 * var(--margin)) 0; }
+  .flukes .cap { padding: 0 var(--margin); }
+
+  .closing { padding: var(--s-8) 0 var(--s-8); }
+  .closing .left, .closing .shot { grid-column: 1 / -1; }
+  .closing .acts { flex-direction: column; align-items: flex-start; gap: var(--s-4); }
+  .closing .shot { margin-top: var(--s-7); justify-self: start; }
+  .closing .shot .ph { width: 240px; }
+}
+</style>
+</head>
+<body>
+
+<section class="hero on-photo" id="top" aria-labelledby="hero-t">
+  <header class="site-head over-photo">
+    <div class="wrap row">
+      <a class="brand" href="index.html" aria-label="NOAA home"><img src="images/logo/NOAA_Symbol_NOAA_White.svg" alt="NOAA"></a>
+      <nav class="primary" aria-label="Main">
+        <a href="#chapters">Chapters</a><a href="#">Stories</a><a href="#">Offices</a><a href="#">About NOAA</a>
+      </nav>
+      <button class="icon-btn" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg></button>
+      <button class="icon-btn menu-btn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    </div>
+  </header>
+  <div class="hero-media">
+    <img class="hero-img" src="images/ozonesonde-south-pole.jpg" alt="A person in a red parka lets go of a large clear balloon over the snow at the South Pole">
+    <div class="hero-shade"></div>
+  </div>
+  <div class="wrap g hero-grid">
+    <div class="hero-text opening">
+      <h1 id="hero-t" class="t-display">Know your world, from sky to sea</h1>
+      <p class="t-body">NOAA works from the air high above you to the water far below. Follow the work down, one chapter at a time.</p>
+      <div class="hero-actions">
+        <a class="btn on-photo-btn" href="#ch1">Start in the upper air</a>
+        <a class="link" href="#chapters">See all seven chapters</a>
+      </div>
+    </div>
+  </div>
+  <p class="hero-cap plate">Releasing an ozone balloon, South Pole Station, 2013. NOAA has launched one there every week since 1986. <span class="credit">Photo: Ross Burgener/NOAA</span></p>
+</section>
+
+<nav class="cnav" id="chapters" aria-label="Chapters, sky to sea">
+  <div class="wrap row">
+    <p class="cnav-title">Sky to sea</p>
+    <ol class="cnav-list">
+      <li><a href="#ch1" aria-current="location"><span class="n">1</span>Upper air</a></li>
+      <li><a href="#ch2"><span class="n">2</span>Storms</a></li>
+      <li><a href="#ch3"><span class="n">3</span>Ocean and sky</a></li>
+      <li class="sea"><a href="#ch4"><span class="n">4</span>Curiosity</a></li>
+      <li><a href="#ch5"><span class="n">5</span>Sanctuaries</a></li>
+      <li><a href="#ch6"><span class="n">6</span>Sea turtles</a></li>
+      <li><a href="#ch7"><span class="n">7</span>Whales</a></li>
+    </ol>
+    <p class="cnav-here"><span class="num">1 of 7</span><b>Upper air</b></p>
+    <div class="cnav-dir">
+      <a class="dir" aria-disabled="true" aria-label="Previous chapter, up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span>Up</span></a>
+      <a class="dir" href="#ch2" aria-label="Next chapter, down: Storms"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg><span>Storms</span></a>
+    </div>
+  </div>
+</nav>
+
+<main>
+<section class="ch" id="ch1" aria-labelledby="ch1-t">
+  <div class="wrap">
+    <div class="ch-top"><p class="kicker chno"><span class="n">1</span>Upper air</p><a class="btn secondary chlink" href="#" aria-label="Read the Upper air chapter">Read the chapter</a></div>
+    <div class="g ch1-head">
+      <h2 id="ch1-t" class="t-head">Twice a day, a balloon reads the sky</h2>
+      <div class="ch1-intro">
+        <p class="t-lead">National Weather Service offices send up weather balloons, usually twice a day.</p>
+        <div class="offices"><p class="office"><b>NOAA</b><i></i><span>National Weather Service</span></p><p class="office"><b>NOAA</b><i></i><span>Research</span></p></div>
+      </div>
+    </div>
+    <div class="g ch1-main">
+      <figure class="ch1-fig">
+        <div class="ph"><img src="images/nws-radiosonde-yellow-balloon.jpg" alt="A National Weather Service technician holds a radiosonde under a yellow weather balloon on open grassland"></div>
+        <figcaption class="cap">A radiosonde under its balloon, NWS Rapid City, South Dakota, 2004. <span class="credit">Photo: Eric Kurth/NOAA</span></figcaption>
+      </figure>
+      <div class="ch1-read">
+        <h3 class="kicker">Every second, the radiosonde sends</h3>
+        <ul class="measures">
+          <li>Pressure</li><li>Temperature</li><li>Humidity</li><li>GPS position</li>
+        </ul>
+        <p class="t-lead">The readings feed the computer models behind your forecast.</p>
+        <div class="flight">
+          <div>
+            <h4 class="t-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg><span class="num">Above 35 km</span></h4>
+            <p class="t-body">Balloons can rise this high before they burst.</p>
+          </div>
+          <div>
+            <h4 class="t-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>By parachute</h4>
+            <p class="t-body">After the burst, a small parachute slows the radiosonde on its way down.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ch ch-scene" id="ch2" aria-labelledby="ch2-t">
+  <div class="scene ch2-scene">
+    <img src="images/shelf-cloud-oklahoma.jpg" alt="A dark shelf cloud moves over open grassland in Oklahoma">
+    <div class="shade"></div>
+    <div class="wrap g over">
+      <div>
+        <div class="ch-top"><p class="kicker chno"><span class="n">2</span>Storms</p><a class="btn secondary chlink" href="#" aria-label="Read the Storms chapter">Read the chapter</a></div>
+        <h2 id="ch2-t" class="t-head">Storms are watched from the ground and from the air</h2>
+      </div>
+    </div>
+    <div class="plate-row"><div class="wrap"><p class="plate">Shelf cloud, Oklahoma, 2008. <span class="credit">Photo: Sean Waugh/NOAA NSSL</span></p></div></div>
+  </div>
+  <p class="cap scene-cap">Shelf cloud, Oklahoma, 2008. <span class="credit">Photo: Sean Waugh/NOAA NSSL</span></p>
+  <div class="wrap">
+    <div class="g ch2-lead">
+      <p class="t-lead">A shelf cloud moves over open land in Oklahoma. The National Weather Service issues the watches and warnings for storms like this.</p>
+    </div>
+    <div class="g ch2-two">
+      <div class="ground">
+        <h3 class="t-sub">From the ground</h3>
+        <h4 class="t-item">Watch or warning?</h4>
+        <p class="t-body">The two words come from different places, and they cover different areas.</p>
+        <table class="ww">
+          <caption class="visually-hidden">How a watch and a warning differ</caption>
+          <thead><tr><td></td><th scope="col">Watch</th><th scope="col">Warning</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Issued by</th><td>The Storm Prediction Center</td><td>Your local forecast office</td></tr>
+            <tr><th scope="row">Covers</th><td>Many counties, or even states</td><td>The place where you are</td></tr>
+          </tbody>
+        </table>
+        <p class="office"><b>NOAA</b><i></i><span>National Weather Service</span></p>
+      </div>
+      <div class="air">
+        <h3 class="t-sub">From the air</h3>
+        <figure>
+          <div class="ph"><img src="images/hurricane-hunter-wp3d-n43rf.jpg" alt="NOAA's WP-3D Orion Hurricane Hunter aircraft climbs after takeoff against cumulus clouds"></div>
+          <figcaption class="cap">WP-3D Orion N43RF takes off from Lakeland Linder International Airport, Florida. <span class="credit">Photo: NOAA (Jonathan Shannon)</span></figcaption>
+        </figure>
+        <h4 class="t-item">Hurricane Hunters</h4>
+        <p class="t-body">NOAA Corps pilots fly NOAA's Hurricane Hunters from their base in Lakeland, Florida. Their data go to the National Hurricane Center.</p>
+        <p class="office"><b>NOAA</b><i></i><span>Marine and Aviation Operations</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ch ch-scene" id="ch3" aria-labelledby="ch3-t">
+  <div class="scene ch3-scene">
+    <img src="images/carysfort-lighthouse.jpg" alt="Carysfort Lighthouse stands on a flat calm sea under a blue sky with small clouds, its reflection in the water">
+    <div class="shade"></div>
+    <div class="wrap g over">
+      <div>
+        <div class="ch-top"><p class="kicker chno"><span class="n">3</span>Ocean and sky</p><a class="btn secondary chlink" href="ocean-and-sky.html" aria-label="Read the Ocean and sky chapter">Read the chapter</a></div>
+        <h2 id="ch3-t" class="t-head">Where the sea meets the sky</h2>
+      </div>
+    </div>
+    <div class="plate-row"><div class="wrap"><p class="plate">Carysfort Lighthouse, Florida Keys National Marine Sanctuary, 2015. <span class="credit">Photo: Nancy Diersing/NOAA</span></p></div></div>
+  </div>
+  <p class="cap scene-cap">Carysfort Lighthouse, Florida Keys National Marine Sanctuary, 2015. <span class="credit">Photo: Nancy Diersing/NOAA</span></p>
+  <div class="wrap">
+    <div class="g ch3-lead">
+      <p class="t-lead">Ocean and atmosphere share one name: the National Oceanic and Atmospheric Administration. At the surface, NOAA reads both.</p>
+      <div class="offices"><p class="office"><b>NOAA</b><i></i><span>National Ocean Service</span></p><p class="office"><b>NOAA</b><i></i><span>National Weather Service</span></p></div>
+    </div>
+
+    <article class="g reef-lead" aria-labelledby="reef-lead-t">
+      <figure>
+        <div class="ph"><img src="images/coral-replanting-carysfort.jpg" alt="Two divers fix pieces of staghorn coral to the reef with their hands"></div>
+        <figcaption class="cap">Divers replant staghorn coral, Carysfort Reef, 2018. <span class="credit">Photo: A. Neufeld/Coral Restoration Foundation</span></figcaption>
+      </figure>
+      <div class="text">
+        <p class="kicker">Below the lighthouse in the photo above</p>
+        <h3 id="reef-lead-t" class="t-sec">Back to the reef</h3>
+        <p class="t-body">Carysfort Lighthouse stands over Carysfort Reef. Below the surface, nursery-grown corals go back onto Florida Keys reefs piece by piece, fixed in place with marine epoxy.</p>
+        <p class="t-body">In 2018, divers replanted staghorn coral here.</p>
+        <p class="office"><b>NOAA</b><i></i><span>National Ocean Service, with partners</span></p>
+        <a class="link" href="ocean-and-sky.html#reef">Read Back to the reef</a>
+      </div>
+    </article>
+
+    <div class="more">
+      <h3 class="kicker">Three more places in this chapter</h3>
+      <ol class="g entries">
+        <li class="e-buoy"><a class="entry" href="ocean-and-sky.html#buoy">
+          <span class="ph"><img src="images/buoy-44008.jpg" alt="A yellow NOAA weather buoy on grey open sea"></span>
+          <span><span class="kicker">Southeast of Nantucket</span><span class="t-item">A buoy that reports to everyone</span><span class="t-body">It reports wind, waves and water temperature, online for anyone to read.</span></span>
+        </a></li>
+        <li class="e-tide"><a class="entry" href="ocean-and-sky.html#tide">
+          <span class="ph"><img src="images/tide-station-baltimore.jpg" alt="A white NOAA tide station enclosure at the edge of a pier"></span>
+          <span><span class="kicker">Baltimore, Maryland</span><span class="t-item">The water level, every six minutes</span><span class="t-body">A tide station on a pier measures it, and NOAA publishes the station's predictions.</span></span>
+        </a></li>
+        <li class="e-sonar"><a class="entry" href="ocean-and-sky.html#charts">
+          <span class="ph"><img src="images/thomas-jefferson-side-scan.jpg" alt="A crew member on the stern of a NOAA ship, the Manhattan skyline behind"></span>
+          <span><span class="kicker">Hudson River, New York</span><span class="t-item">Charts start with sound</span><span class="t-body">Before a nautical chart is drawn, a ship surveys the seafloor with sonar.</span></span>
+        </a></li>
+      </ol>
+      <p class="cap credits">Photos, left to right: Buoy 44008, 2025, James Elliott, NOAA NDBC. Station 8574680, NOAA. NOAA Ship Thomas Jefferson, 2012, NOAA's National Ocean Service (CC BY 2.0).</p>
+    </div>
+  </div>
+</section>
+
+<section class="ch has-bridge" id="ch4" aria-labelledby="ch4-t">
+  <div class="wrap">
+    <p class="bridge t-lead">Buoys and tide stations read the water. A plankton net shows what lives in it.</p>
+    <div class="ch-top ruled"><p class="kicker chno"><span class="n">4</span>Curiosity</p><a class="btn secondary chlink" href="#" aria-label="Read the Curiosity chapter">Read the chapter</a></div>
+    <div class="g ch4-head">
+      <div class="t1"><h2 id="ch4-t" class="t-head">Curiosity starts at the shoreline</h2></div>
+      <div class="intro">
+        <p class="t-lead">At NOAA Fisheries' Aquaculture Science Camp, campers filter plankton from Puget Sound with their teacher, then identify algae under the microscope.</p>
+        <p class="office"><b>NOAA</b><i></i><span>Fisheries</span></p>
+      </div>
+    </div>
+    <div class="g zoom">
+      <figure class="z1">
+        <div class="ph"><img src="images/science-camp-shoreline-net.jpg" alt="Campers and a teacher hold a plankton net over buckets on a rocky Puget Sound shore"></div>
+        <figcaption class="cap">At the shore: filtering plankton from Puget Sound, Aquaculture Science Camp, 2026. <span class="credit">Photo: NOAA Fisheries</span></figcaption>
+      </figure>
+      <figure class="z2">
+        <div class="ph"><img src="images/camp-microscope.jpg" alt="A camper looks through a microscope"></div>
+        <figcaption class="cap">At the microscope: identifying algae. <span class="credit">Photo: NOAA Fisheries</span></figcaption>
+      </figure>
+      <figure class="z3">
+        <div class="ph"><img src="images/octopus-zooplankton.jpg" alt="A tiny translucent young octopus under the microscope"></div>
+        <figcaption>
+          <p class="t-body">A plankton net can bring up more than plankton: this young octopus came from one.</p>
+          <p class="cap"><span class="credit">Photo: Matt Wilson/Jay Clark, NOAA Fisheries</span></p>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="ch ch-scene has-bridge" id="ch5" aria-labelledby="ch5-t">
+  <div class="wrap"><p class="bridge t-lead">A net and a microscope are one way to learn what lives in the water. Listening is another.</p></div>
+  <div class="scene ch5-scene">
+    <img src="images/fgb-diver-ring-of-fish.jpg" alt="Seen from below, a diver swims inside a ring of fish near the surface">
+    <div class="shade-b"></div>
+    <div class="wrap g over">
+      <div>
+        <div class="ch-top"><p class="kicker chno"><span class="n">5</span>Sanctuaries</p><a class="btn secondary chlink" href="#" aria-label="Read the Sanctuaries chapter">Read the chapter</a></div>
+        <h2 id="ch5-t" class="t-head">Sanctuaries you can hear</h2>
+      </div>
+    </div>
+    <div class="plate-row"><div class="wrap"><p class="plate">A diver in a ring of fish, Flower Garden Banks National Marine Sanctuary. <span class="credit">Photo: Emma Hickerson/NOAA</span></p></div></div>
+  </div>
+  <p class="cap scene-cap">A diver in a ring of fish, Flower Garden Banks National Marine Sanctuary. <span class="credit">Photo: Emma Hickerson/NOAA</span></p>
+  <div class="wrap">
+    <div class="g ch5-under">
+      <div class="ch5-text">
+        <p class="t-lead">Flower Garden Banks National Marine Sanctuary lies about 100 miles off the Texas–Louisiana coast.</p>
+        <p class="t-body">Fish sounds are species-specific, so a hydrophone tells researchers who lives in a sanctuary.</p>
+        <p class="office"><b>NOAA</b><i></i><span>National Ocean Service</span></p>
+      </div>
+      <figure class="hydro">
+        <div class="ph"><img src="images/hydrophone-grays-reef.jpg" alt="A diver writes on a slate beside a hydrophone on its tripod, fish around them"></div>
+        <figcaption class="cap">A hydrophone on its tripod, Gray's Reef National Marine Sanctuary, 2016. <span class="credit">Photo: NOAA</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="ch has-bridge" id="ch6" aria-labelledby="ch6-t">
+  <div class="wrap">
+    <p class="bridge t-lead">Listening tells researchers who is there. Some animals also need a hand.</p>
+    <div class="ch-top ruled"><p class="kicker chno"><span class="n">6</span>Sea turtles</p><a class="btn secondary chlink" href="#" aria-label="Read the Sea turtles chapter">Read the chapter</a></div>
+    <div class="g ch6-head"><h2 id="ch6-t" class="t-head">A second start for cold-stunned turtles</h2></div>
+    <div class="g ch6-intro">
+      <div class="text">
+        <p class="t-lead">Cold-stunned green turtles were rescued in Florida in February 2026: one from St. Joseph Bay, another measured on arrival at the Gulf Specimen Marine Laboratory.</p>
+        <p class="t-body">Rehabilitated turtles, like this loggerhead in North Carolina in 2017, go back to the sea.</p>
+      </div>
+      <div class="side"><p class="office"><b>NOAA</b><i></i><span>Fisheries</span></p></div>
+    </div>
+    <ol class="g trio">
+      <li class="t-rescue">
+        <h3 class="step t-item"><span class="n">1</span>Rescue</h3>
+        <div class="ph"><img src="images/turtle-rescue-st-joseph-bay.jpg" alt="A biologist in waders stands in shallow water holding a small green turtle"></div>
+        <p class="cap">A NOAA affiliate biologist rescues a cold-stunned green turtle, St. Joseph Bay, Florida, February 2026. <span class="credit">Photo: NOAA Fisheries</span></p>
+      </li>
+      <li class="t-intake">
+        <h3 class="step t-item"><span class="n">2</span>Intake</h3>
+        <div class="ph"><img src="images/turtle-intake-exam.jpg" alt="A staff member measures a green turtle with large calipers on a towel"></div>
+        <p class="cap">Turtle B17 is measured with calipers on arrival, Gulf Specimen Marine Laboratory, February 2026. <span class="credit">Photo: NOAA Fisheries</span></p>
+      </li>
+      <li class="t-release">
+        <h3 class="step t-item"><span class="n">3</span>Release</h3>
+        <div class="ph"><img src="images/loggerhead-release.jpg" alt="A NOAA staff member on a boat holds a loggerhead turtle"></div>
+        <p class="cap">A rehabilitated loggerhead before its release, North Carolina, 2017. <span class="credit">Photo: Will Sassorossi/NOAA</span></p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="ch ch7 has-bridge" id="ch7" aria-labelledby="ch7-t">
+  <div class="wrap">
+    <p class="bridge t-lead">Turtles are carried back to the sea. Whales are given room.</p>
+    <div class="ch-top ruled"><p class="kicker chno"><span class="n">7</span>Whales</p><a class="btn secondary chlink" href="#" aria-label="Read the Whales chapter">Read the chapter</a></div>
+    <div class="g ch7-main">
+      <div class="ch7-left">
+        <h2 id="ch7-t" class="t-head">Whales, watched from a respectful distance</h2>
+        <p class="t-lead">In the Hawaiian Islands Humpback Whale National Marine Sanctuary, researchers watch humpbacks through big-eye binoculars from the boat.</p>
+        <p class="t-body">If you see whales, follow NOAA's viewing guidelines for marine mammals and give them room.</p>
+        <div class="offices"><p class="office"><b>NOAA</b><i></i><span>Fisheries</span></p><p class="office"><b>NOAA</b><i></i><span>National Ocean Service</span></p></div>
+        <figure class="bigeye">
+          <div class="ph"><img src="images/big-eye-binoculars.jpg" alt="A researcher on a boat looks through large mounted binoculars at the open sea"></div>
+          <figcaption class="cap">Big-eye binoculars, Hawaiian Islands Humpback Whale National Marine Sanctuary. <span class="credit">Photo: NOAA</span></figcaption>
+        </figure>
+      </div>
+      <figure class="flukes">
+        <div class="ph"><img src="images/humpback-flukes.jpg" alt="A humpback whale swims away into deep blue water, its flukes toward the camera"></div>
+        <figcaption class="cap">A humpback swims off into blue water. <span class="credit">Photo: E. Lyman, HIHWNMS/NOAA Permit #15240</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="closing" id="horizon" aria-labelledby="close-t">
+  <div class="wrap">
+    <div class="g">
+      <div class="left">
+        <h2 id="close-t" class="t-head">Find this work where you are</h2>
+        <p class="t-lead">Horizon, the NOAA app, shows the reef offshore, the weather above you and the sanctuary around you. Point your phone at the sky or the sea, and open what NOAA does there.</p>
+        <div class="acts">
+          <a class="btn" href="#">Get the Horizon app</a>
+          <a class="link" href="#ch1">Back up to the upper air</a>
+        </div>
+      </div>
+      <figure class="shot">
+        <div class="ph"><img src="images/horizon-view.png" alt="The Horizon app's view screen: a calm sea with Carysfort Lighthouse, three place labels over the scene"></div>
+        <figcaption class="cap">Horizon, facing east from Key Largo. Positions and distances are samples.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="site-foot" id="footer">
+  <div class="wrap">
+    <div class="g foot-top">
+      <div class="foot-brand">
+        <a class="brand" href="index.html" aria-label="NOAA home"><picture><source media="(max-width: 600px)" srcset="images/logo/NOAA_Symbol_NOAA_White.svg"><img src="images/logo/NOAA_Horizontal_White.svg" alt="NOAA, National Oceanic and Atmospheric Administration"></picture></a>
+        <p>From the upper air to the deep sea, in seven chapters.</p>
+      </div>
+      <div class="foot-col c1">
+        <h2>Chapters</h2>
+        <ul>
+          <li><a href="#ch1">Upper air</a></li><li><a href="#ch2">Storms</a></li><li><a href="ocean-and-sky.html">Ocean and sky</a></li><li><a href="#ch4">Curiosity</a></li><li><a href="#ch5">Sanctuaries</a></li><li><a href="#ch6">Sea turtles</a></li><li><a href="#ch7">Whales</a></li>
+        </ul>
+      </div>
+      <div class="foot-col c2">
+        <h2>Offices</h2>
+        <ul>
+          <li><a href="#">Satellites</a></li><li><a href="#">National Weather Service</a></li><li><a href="#">Research</a></li><li><a href="#">National Ocean Service</a></li><li><a href="#">Fisheries</a></li><li><a href="#">Marine and Aviation Operations</a></li>
+        </ul>
+      </div>
+      <div class="foot-col c3">
+        <h2>About</h2>
+        <ul>
+          <li><a href="#">About NOAA</a></li><li><a href="#">The Horizon app</a></li><li><a href="#">Photo credits</a></li><li><a href="#">Accessibility</a></li><li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-base">
+      <p>Student concept, not an official NOAA website. Photographs are credited where they appear.</p>
+      <p>Jennifer Roh, ArtCenter Graduate Studio 3</p>
+    </div>
+  </div>
+</footer>
+<script>
+/* Chapter bar: show the chapter in view and the way up and down. */
+(() => {
+  const names = ['Upper air', 'Storms', 'Ocean and sky', 'Curiosity', 'Sanctuaries', 'Sea turtles', 'Whales'];
+  const bar = document.getElementById('chapters');
+  const links = [...bar.querySelectorAll('.cnav-list a')];
+  const here = bar.querySelector('.cnav-here');
+  const [up, down] = bar.querySelectorAll('.cnav-dir .dir');
+  const secs = names.map((_, i) => document.getElementById('ch' + (i + 1)));
+  let cur = -1;
+  const set = (i) => {
+    if (i === cur) return; cur = i;
+    links.forEach((a, k) => k === i ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current'));
+    here.innerHTML = '<span class="num">' + (i + 1) + ' of 7</span><b>' + names[i] + '</b>';
+    if (i > 0) { up.href = '#ch' + i; up.removeAttribute('aria-disabled'); up.setAttribute('aria-label', 'Previous chapter, up: ' + names[i - 1]); up.querySelector('span').textContent = names[i - 1]; }
+    else { up.removeAttribute('href'); up.setAttribute('aria-disabled', 'true'); up.setAttribute('aria-label', 'Previous chapter, up'); up.querySelector('span').textContent = 'Up'; }
+    if (i < 6) { down.href = '#ch' + (i + 2); down.removeAttribute('aria-disabled'); down.setAttribute('aria-label', 'Next chapter, down: ' + names[i + 1]); down.querySelector('span').textContent = names[i + 1]; }
+    else { down.removeAttribute('href'); down.setAttribute('aria-disabled', 'true'); down.setAttribute('aria-label', 'Last chapter'); down.querySelector('span').textContent = 'Down'; }
+  };
+  const update = () => {
+    const line = bar.getBoundingClientRect().bottom + 2;
+    let i = 0;
+    secs.forEach((s, k) => { if (s.getBoundingClientRect().top <= line) i = k; });
+    set(i);
+  };
+  addEventListener('scroll', update, {passive: true});
+  update();
+})();
+</script>
+</body>
+</html>

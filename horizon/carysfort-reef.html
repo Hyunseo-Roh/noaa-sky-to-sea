@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" data-viewport="fixed">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390, initial-scale=1">
+<title>Horizon: Carysfort Reef selected (student concept)</title>
+<link rel="stylesheet" href="../css/tokens.css">
+<link rel="stylesheet" href="../css/app.css">
+<style>
+body { height: 844px; overflow: hidden; background: var(--c-ink); }
+.sheet { position: absolute; z-index: 5; left: 0; right: 0; bottom: 83px; background: var(--c-ground); color: var(--c-ink); border-radius: var(--r-pill) var(--r-pill) 0 0; padding: 10px 20px var(--s-5); box-shadow: inset 0 3px 0 var(--c-state); }
+.grab { width: 36px; height: 4px; border-radius: var(--r-round); background: var(--c-rule); margin: 0 auto var(--s-3); }
+.pv { display: grid; grid-template-columns: minmax(0, 1fr) 72px; gap: var(--s-4); align-items: start; padding-right: 36px; }
+.pv h1 { margin-top: 2px; }
+.pv .what { margin-top: var(--s-1); color: var(--c-ink); }
+.pv .dist { margin-top: 2px; color: var(--c-ink-2); }
+.pv img { width: 72px; height: 72px; object-fit: cover; border-radius: var(--r-thumb); }
+.sheet .btn { margin-top: var(--s-4); width: 100%; }
+.close { position: absolute; top: var(--s-3); right: 10px; width: 44px; height: 44px; border-radius: var(--r-round); display: inline-flex; align-items: center; justify-content: center; color: var(--c-ink-2); }
+.close svg { width: 18px; height: 18px; }
+</style>
+</head>
+<body>
+<div class="screen">
+  <img class="feed" src="../images/carysfort-lighthouse.jpg" alt="Live camera view: a calm sea with Carysfort Lighthouse on the horizon">
+  <div class="shade"></div>
+  <svg class="horizon" fill="none" viewBox="0 0 390 844" aria-hidden="true"><line x1="0" y1="397" x2="390" y2="405" stroke="currentColor" stroke-opacity=".75" stroke-width="1"/></svg>
+  <div class="status" data-audit="skip"><span class="num">9:41</span>
+    <span class="icons">
+      <svg viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+      <svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 4.2a9.5 9.5 0 0 1 13 0M4 7a6 6 0 0 1 8 0"/><circle cx="8" cy="10" r="1.2" fill="currentColor" stroke="none"/></svg>
+      <svg viewBox="0 0 27 12" fill="none"><rect x=".5" y=".5" width="23" height="11" rx="3" stroke="currentColor" stroke-opacity=".6"/><rect x="2" y="2" width="18" height="8" rx="1.6" fill="currentColor"/><rect x="24.5" y="4" width="2" height="4" rx="1" fill="currentColor" fill-opacity=".6"/></svg>
+    </span>
+  </div>
+  <div class="top">
+    <div class="where"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/></svg><div><b class="t-row">Key Largo, Florida</b><span class="t-meta">Facing east</span><span class="note t-meta b"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.3"/><path d="M8 7.2v4M8 4.8v.2" stroke-linecap="round"/></svg>Sample positions and distances</span></div></div>
+  </div>
+  <a class="mk" href="#" style="left: 112px; top: 166px;"><span class="pill t-meta">Weather for this sky</span><span class="lead" style="height: 48px"></span><span class="dot"></span></a>
+  <a class="mk on" href="carysfort-reef.html" aria-current="true" style="left: 232px; top: 220px;"><span class="pill t-meta b">Carysfort Reef</span><span class="lead" style="height: 136px"></span><span class="dot"></span></a>
+  <a class="mk" href="#" style="left: 100px; top: 318px;"><span class="pill t-meta">Florida Keys sanctuary</span><span class="lead" style="height: 64px"></span><span class="dot"></span></a>
+  <section class="sheet" aria-labelledby="pv-t">
+    <div class="grab"></div>
+    <a class="close" href="index.html" aria-label="Close preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+    <div class="pv">
+      <div>
+        <h1 id="pv-t" class="t-title">Carysfort Reef</h1>
+        <p class="what t-body b">Coral restoration</p>
+        <p class="dist t-meta">About 6 mi east, a sample distance</p>
+      </div>
+      <img src="../images/coral-replanting-carysfort.jpg" alt="Divers replanting coral on Carysfort Reef">
+    </div>
+    <a class="btn" href="back-to-the-reef.html">Open the story</a>
+  </section>
+  <nav class="tabs" aria-label="Horizon">
+    <a href="index.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.8l1.6-2.2h6.2L16.7 7h2.8A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="12.8" r="3.4"/></svg>View</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></svg>Nearby</a>
+    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M6.5 4h11v16l-5.5-4-5.5 4z"/></svg>Saved</a>
+  </nav>
+</div>
+</body>
+</html>
