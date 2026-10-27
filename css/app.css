@@ -93,6 +93,26 @@ ul { margin: 0; padding: 0; list-style: none; }
 .close { position: absolute; top: var(--s-3); right: 10px; width: 44px; height: 44px; border-radius: var(--r-round); display: inline-flex; align-items: center; justify-content: center; color: var(--c-ink-2); }
 .close svg { width: 18px; height: 18px; }
 
+/* Nearby: a list over the view, above the tab bar */
+.panel { position: absolute; z-index: 25; inset: 0 0 var(--tab-h) 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; user-select: text; -webkit-user-select: text; background: var(--c-ground); color: var(--c-ink); padding: calc(max(env(safe-area-inset-top), 20px) + var(--s-4)) 20px var(--s-6); }
+.panel[hidden] { display: none; }
+.panel h1 { outline: none; }
+.nb-sub { margin-top: var(--s-1); color: var(--c-ink-2); }
+.nb-rows { margin-top: var(--s-4); border-top: 1px solid var(--c-rule); }
+.nb-rows li { border-bottom: 1px solid var(--c-rule); }
+.row { width: 100%; display: grid; grid-template-columns: 56px minmax(0, 1fr) 20px; gap: 14px; align-items: center; padding: var(--s-3) 0; text-align: left; }
+.row img, .row .tile { width: 56px; height: 56px; border-radius: var(--r-thumb); object-fit: cover; }
+.row .tile { display: flex; align-items: center; justify-content: center; border: 1px solid var(--c-rule); color: var(--c-brand); }
+.row .tile svg { width: 28px; height: 28px; }
+.row b { display: block; color: var(--c-ink); }
+.row .t { display: block; color: var(--c-ink-2); }
+.row .now { color: var(--c-ink); }
+.row .chev { width: 20px; height: 20px; color: var(--c-brand); }
+.nb-state { margin-top: var(--s-4); color: var(--c-ink-2); }
+.nb-retry { margin-top: var(--s-3); }
+.nb-retry[hidden] { display: none; }
+.nb-source { margin-top: var(--s-6); color: var(--c-ink-2); }
+
 /* on a wide screen, the app sits in a phone-width column */
 @media (min-width: 600px) {
   .screen { box-shadow: 0 0 0 1px var(--c-rule-dark); }

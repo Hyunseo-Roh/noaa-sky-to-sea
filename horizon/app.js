@@ -2,14 +2,17 @@
 
 (() => {
   const G = window.HorizonGeo;
+  const NWS = window.HorizonNWS;
+  const SANCTUARIES = window.HorizonSanctuaries || [];
   const DEMO = G.DEMO;
 
   // bearing/elev in degrees. `follow` pins a place to the sky in front of you, whichever way you face.
   // `near` shows a place only when you are within `radius` miles of it.
+  // Places found around you (weather stations, radar, the nearest sanctuary) are added with `found: true`.
   const PLACES = {
-    'carysfort-reef': { lat: 25.2219472, lon: -80.21145, elev: 0, name: 'Carysfort Reef' },
-    'florida-keys-sanctuary': { bearing: 77, elev: -1.3, near: { lat: DEMO.lat, lon: DEMO.lon, radius: 40 } },
-    'weather': { follow: -6.5, elev: 11 },
+    'carysfort-reef': { lat: 25.2219472, lon: -80.21145, elev: 0, name: 'Carysfort Reef', short: 'Carysfort Reef', what: 'Coral restoration' },
+    'florida-keys-sanctuary': { bearing: 77, elev: -1.3, near: { lat: DEMO.lat, lon: DEMO.lon, radius: 40 }, name: 'Florida Keys sanctuary', short: 'Florida Keys sanctuary', what: 'Marine sanctuary' },
+    'weather': { follow: -6.5, elev: 11, name: 'Weather for this sky', short: 'Weather for this sky' },
   };
   const REEF = PLACES['carysfort-reef'];
   const REEF_FROM_DEMO = G.bearing(DEMO, REEF);
@@ -22,8 +25,8 @@
   const LIGHTHOUSE_OFFSET = 2.76; // the sample view opens with the lighthouse just right of centre
   const EDGE_IN = 16;       // a place's dot must be this far inside the screen to show
   const NEAR_MILES = 100;   // only places this close get a pill at the screen edge when out of view
-
-  const STATES = { AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California', CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', DC: 'District of Columbia', FL: 'Florida', GA: 'Georgia', HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland', MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri', MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey', NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio', OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont', VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming', PR: 'Puerto Rico', GU: 'Guam', VI: 'U.S. Virgin Islands', AS: 'American Samoa', MP: 'Northern Mariana Islands' };
+  const LABEL_MILES = 150;  // places found around you get a label in the view up to this far
+  const LADDER = [64, 112, 160, 208]; // leader-line heights for found places, nearest first
 
   const $ = (s) => document.querySelector(s);
   const screen = $('#screen');
@@ -37,12 +40,20 @@
   const startBtn = $('#start');
   const startLabel = $('#start-label');
   const edge = $('#edge');
+  const edgeLabel = $('#edge-label');
   const sheet = $('#sheet');
   const sheetBody = $('#sheet-body');
-  const markers = [...document.querySelectorAll('.mk')];
-  const leads = [...document.querySelectorAll('.lead[data-lead]')];
+  const panel = $('#nearby');
+  const nbSub = $('#nb-sub');
+  const nbState = $('#nb-state');
+  const nbList = $('#nb-list');
+  const nbRetry = $('#nb-retry');
+  const tabView = $('#tab-view');
+  const tabNearby = $('#tab-nearby');
   const topBlock = $('.top');
   const hintBlock = $('.hint');
+  let markers = [...document.querySelectorAll('.mk')];
+  let leads = [...document.querySelectorAll('.lead[data-lead]')];
 
   const wrap = (d) => ((d % 360) + 540) % 360 - 180;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -81,11 +92,14 @@
     }
   }
   function setViewer(v) {
+    const moved = !S.viewer || NWS.spot(S.viewer) !== NWS.spot(v);
     S.viewer = v;
+    if (moved) clearFound();
     refreshPlaces();
     G.saveViewer(v);
     updateText();
     if (!sheet.hidden) openSheet(sheet.dataset.place, false);
+    if (moved && (S.mode === 'live' || !panel.hidden)) loadNearby();
   }
 
   function geometry() {
@@ -116,6 +130,12 @@
     const lim = sampleLimits(geometry());
     return REEF_FROM_DEMO + clamp(wrap(th - REEF_FROM_DEMO), lim.min - REEF_FROM_DEMO, lim.max - REEF_FROM_DEMO);
   }
+  // Turn the view toward a place when there is no compass doing it for you.
+  function faceToward(id) {
+    const pl = PLACES[id];
+    if (S.compass || !pl || pl.follow != null || pl.bearing == null) return;
+    S.th = S.mode === 'sample' ? limitHeading(id === 'carysfort-reef' ? REEF_FROM_DEMO - LIGHTHOUSE_OFFSET : pl.bearing) : pl.bearing;
+  }
 
   let lastFacing = '';
   let lastScale = 0;
@@ -143,13 +163,14 @@
       lastScale = k;
     }
 
-    let reefX = null, reefY = null;
+    const at = {};
     for (const m of markers) {
       const id = m.dataset.place, pl = PLACES[id];
+      if (!pl) { m.hidden = true; continue; }
       const b = pl.follow != null ? S.h + pl.follow : pl.bearing;
       let x = g.cx + wrap(b - S.h) * g.ppd;
       let y = g.horizonY - pl.elev * g.ppd;
-      if (id === 'carysfort-reef') { reefX = x; reefY = y; }
+      at[id] = { x, y };
       // A place shows while its dot is on screen; its label slides to stay whole near the edges.
       let visible = !pl.away && x >= EDGE_IN && x <= g.W - EDGE_IN;
       if (visible) {
@@ -174,15 +195,22 @@
       m.hidden = !visible;
     }
 
-    // The way-finding pill only points to a place that is near you.
-    const off = reefX < EDGE_IN || reefX > g.W - EDGE_IN;
-    edge.hidden = !off || !sheet.hidden || REEF.miles > NEAR_MILES;
+    // The way-finding pill points to the place you opened, or to the reef when it is near you.
+    const open = !sheet.hidden ? sheet.dataset.place : null;
+    let target = null;
+    if (open && at[open] && PLACES[open].follow == null && !PLACES[open].away) target = open;
+    else if (!open && REEF.miles <= NEAR_MILES) target = 'carysfort-reef';
+    const t = target && at[target];
+    const off = t && (t.x < EDGE_IN || t.x > g.W - EDGE_IN);
+    edge.hidden = !off || !panel.hidden;
     if (off) {
-      const side = reefX < 0 ? 'left' : 'right';
+      const side = t.x < g.cx ? 'left' : 'right';
       edge.classList.toggle('left', side === 'left');
       edge.classList.toggle('right', side === 'right');
-      edge.style.top = `${clamp(reefY - 18, ceiling, floor - 36)}px`;
-      edge.setAttribute('aria-label', `Carysfort Reef is to your ${side}`);
+      edge.style.top = `${clamp(t.y - 18, ceiling, floor - 36)}px`;
+      edge.dataset.place = target;
+      if (edgeLabel.textContent !== PLACES[target].short) edgeLabel.textContent = PLACES[target].short;
+      edge.setAttribute('aria-label', `${PLACES[target].name} is to your ${side}`);
     }
 
     const f = `Facing ${G.dir8(S.h)}`;
@@ -212,6 +240,7 @@
     const needCompass = S.mode === 'live' && !S.compass && typeof window.DeviceOrientationEvent?.requestPermission === 'function';
     startBtn.hidden = !(canCamera && isTouch) || (S.mode === 'live' && !needCompass);
     startLabel.textContent = S.mode === 'live' ? 'Turn on the compass' : 'Turn on the camera';
+    nbSub.textContent = S.viewer.real ? `NOAA's work around ${S.viewer.name}` : `NOAA's work around ${S.viewer.name}, the demo location`;
   }
 
   function onOrient(e) {
@@ -264,7 +293,7 @@
     setViewer(v);
     if (c.name) return;
     try {
-      const pt = await points(v);
+      const pt = await NWS.points(v);
       if (pt.city && S.viewer === v) setViewer({ ...v, name: pt.city });
     } catch (_) { /* outside the NWS area: keep the coordinates */ }
   }
@@ -279,6 +308,7 @@
       const on = await startCamera(false);
       const c = await where;
       if (on && c) useLocation(c);
+      else if (on) loadNearby();
     }
     await motion;
     setTimeout(updateText, 1500);
@@ -286,7 +316,7 @@
 
   // Look around by dragging (sample view, or a camera without a compass).
   screen.addEventListener('pointerdown', (e) => {
-    if (S.compass || e.target.closest('button, a, .sheet, .tabs')) return;
+    if (S.compass || e.target.closest('button, a, .sheet, .tabs, .panel')) return;
     S.drag = { x: e.clientX, th: S.th, id: e.pointerId };
     screen.setPointerCapture(e.pointerId);
   });
@@ -303,16 +333,154 @@
     if (e.key === 'ArrowRight') { S.th = limitHeading(S.th + 5); e.preventDefault(); }
   });
 
-  // Place previews. The open place lives in the URL hash, so Back closes it.
+  // Places found around you: weather stations and radar (NWS) and the nearest marine sanctuary.
+  const NB = { key: null, status: 'idle', error: false, promise: null };
+
+  function clearFound() {
+    for (const id of Object.keys(PLACES)) if (PLACES[id].found) delete PLACES[id];
+    NB.key = null; NB.status = 'idle'; NB.error = false;
+    syncMarkers();
+    renderNearby();
+  }
+  function nearestSanctuary(v) {
+    if (!PLACES['florida-keys-sanctuary'].away) return null; // in the Keys, the water in front of you is the sanctuary
+    let best = null;
+    for (const s of SANCTUARIES) {
+      const mi = G.miles(v, s);
+      if (!best || mi < best.mi) best = { s, mi };
+    }
+    if (!best) return null;
+    const s = best.s;
+    return {
+      id: `sanctuary-${s.id}`, kind: 'sanctuary', lat: s.lat, lon: s.lon,
+      name: s.name, short: s.short, what: 'National marine sanctuary', office: 'National Ocean Service',
+      link: s.link || null, linkText: 'Visit the sanctuary',
+    };
+  }
+
+  async function loadNearby(force) {
+    const v = S.viewer, key = NWS.spot(v);
+    if (!force && NB.key === key && NB.status !== 'idle') return NB.promise;
+    NB.key = key; NB.status = 'loading'; NB.error = false;
+    renderNearby();
+    NB.promise = (async () => {
+      const found = [];
+      const sanct = nearestSanctuary(v);
+      if (sanct) found.push(sanct);
+      try { found.push(...await NWS.nearby(v)); } catch (_) { NB.error = true; }
+      if (NB.key !== key) return;
+      for (const id of Object.keys(PLACES)) if (PLACES[id].found) delete PLACES[id];
+      for (const p of found) PLACES[p.id] = { ...p, elev: 0, found: true };
+      refreshPlaces();
+      NB.status = 'ready';
+      syncMarkers();
+      renderNearby();
+      const id = decodeURIComponent(location.hash.slice(1));
+      if (id && PLACES[id] && sheet.hidden && panel.hidden) route();
+    })();
+    return NB.promise;
+  }
+
+  // One label in the view for each found place within reach, nearest with the shortest leader line.
+  function syncMarkers() {
+    for (const m of document.querySelectorAll('.mk[data-found]')) m.remove();
+    const found = Object.entries(PLACES)
+      .filter(([, p]) => p.found && p.miles <= LABEL_MILES)
+      .sort((a, b) => a[1].miles - b[1].miles);
+    found.forEach(([id, p], i) => {
+      const b = document.createElement('button');
+      b.className = 'mk'; b.type = 'button'; b.dataset.place = id; b.dataset.found = '';
+      b.setAttribute('aria-label', p.name);
+      const pill = document.createElement('span'); pill.className = 'pill t-meta'; pill.textContent = p.short;
+      const lead = document.createElement('span'); lead.className = 'lead'; lead.dataset.lead = String(LADDER[i % LADDER.length]);
+      const dot = document.createElement('span'); dot.className = 'dot';
+      b.append(pill, lead, dot);
+      b.addEventListener('click', () => select(id));
+      edge.before(b);
+    });
+    markers = [...document.querySelectorAll('.mk')];
+    leads = [...document.querySelectorAll('.lead[data-lead]')];
+    lastScale = 0;
+  }
+
+  const ICONS = {
+    weather: '<path d="M7 18h10.5a4 4 0 0 0 .4-8 6 6 0 0 0-11.6 1.6A3.2 3.2 0 0 0 7 18z"/>',
+    station: '<path d="M10 13.6V5a2 2 0 0 1 4 0v8.6a4 4 0 1 1-4 0z"/><path d="M12 9v6"/>',
+    radar: '<path d="M12 12l6.4-6.4"/><path d="M19.1 7.6A8.5 8.5 0 1 1 16.4 4.9"/><path d="M15.4 10.2A3.8 3.8 0 1 1 13.8 8.6"/>',
+    sanctuary: '<path d="M3 9.5c1.8 0 1.8-1.5 3.6-1.5s1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/><path d="M3 15c1.8 0 1.8-1.5 3.6-1.5S8.4 15 10.2 15s1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/>',
+  };
+  const PHOTOS = { 'carysfort-reef': '../images/coral-replanting-carysfort.jpg', 'florida-keys-sanctuary': '../images/mangroves-aerial.jpg' };
+  const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+
+  function row(id, title, line, live) {
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'row';
+    const kind = PLACES[id].found ? PLACES[id].kind : (id === 'weather' ? 'weather' : null);
+    const lead = PHOTOS[id] ? `<img src="${PHOTOS[id]}" alt="">` : `<span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[kind] || ICONS.sanctuary}</svg></span>`;
+    b.innerHTML = `${lead}<span><b class="t-row"></b><span class="t t-meta"></span>${live ? '<span class="t t-meta now"></span>' : ''}</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>`;
+    b.querySelector('b').textContent = title;
+    b.querySelector('.t').textContent = line;
+    if (live) b.querySelector('.now').textContent = live;
+    b.addEventListener('click', () => { faceToward(id); select(id); });
+    li.append(b);
+    return li;
+  }
+
+  function renderNearby() {
+    if (panel.hidden) return;
+    nbRetry.hidden = true;
+    if (NB.status === 'loading') { nbState.hidden = false; nbState.textContent = "Finding NOAA's work near you…"; }
+    else nbState.hidden = true;
+
+    const items = [];
+    items.push(row('weather', 'Weather for this sky', `Forecast for ${S.viewer.name}`, NB.forecast || null));
+    const places = Object.entries(PLACES)
+      .filter(([id, p]) => id !== 'weather' && !p.away && (p.found || id === 'carysfort-reef' || id === 'florida-keys-sanctuary'))
+      .sort((a, b) => (a[1].miles ?? 0) - (b[1].miles ?? 0));
+    for (const [id, p] of places) {
+      const where = p.miles != null ? lower(G.distanceText(S.viewer, p)) : 'the water in front of you';
+      const live = p.kind === 'station' ? (p.reading ? `${p.reading.text}${p.reading.age ? `, ${p.reading.age}` : ''}` : 'No recent reading') : null;
+      items.push(row(id, p.name, `${p.what}, ${where}`, live));
+    }
+    nbList.replaceChildren(...items);
+    if (NB.status === 'ready' && NB.error) {
+      nbState.hidden = false;
+      nbState.textContent = "Weather stations and radar didn't load.";
+      nbRetry.hidden = false;
+    }
+  }
+  nbRetry.addEventListener('click', () => loadNearby(true));
+
+  async function loadNearbyForecast() {
+    try {
+      const f = await NWS.forecast(S.viewer);
+      NB.forecast = `${f.short}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit}`;
+    } catch (_) { NB.forecast = null; }
+    renderNearby();
+  }
+
+  // Place previews and the Nearby list live in the URL hash, so Back closes them.
   function sheetIs(id) { return !sheet.hidden && sheet.dataset.place === id; }
 
   function openSheet(id, focus = true) {
-    const tpl = document.getElementById(`tpl-${id}`);
-    if (!tpl || (PLACES[id] && PLACES[id].away)) { closeSheet(); return; }
+    const pl = PLACES[id];
+    const tpl = document.getElementById(pl && pl.found ? 'tpl-place' : `tpl-${id}`);
+    if (!tpl || !pl || pl.away) { closeSheet(); return; }
     sheetBody.replaceChildren(tpl.content.cloneNode(true));
     sheet.dataset.place = id;
+    if (pl.found) {
+      sheetBody.querySelector('[data-name]').textContent = pl.name;
+      sheetBody.querySelector('[data-kind]').textContent = pl.what;
+      const r = sheetBody.querySelector('[data-reading]');
+      if (pl.kind === 'station') r.textContent = pl.reading ? `${pl.reading.text.charAt(0).toUpperCase()}${pl.reading.text.slice(1)}${pl.reading.age ? `, ${pl.reading.age}` : ''}` : 'No recent reading';
+      else r.remove();
+      sheetBody.querySelector('[data-office]').textContent = pl.office;
+      const a = sheetBody.querySelector('[data-link]');
+      if (pl.link) { a.href = pl.link; a.textContent = pl.linkText; } else a.remove();
+    }
     const d = sheetBody.querySelector('[data-distance]');
-    if (d && PLACES[id].lat != null) d.textContent = G.distanceText(S.viewer, PLACES[id]);
+    if (d && pl.lat != null) d.textContent = G.distanceText(S.viewer, pl);
     const when = sheetBody.querySelector('[data-period]');
     if (when) when.textContent = S.viewer.name;
     const link = sheetBody.querySelector('[data-forecast-link]');
@@ -337,14 +505,34 @@
     screen.classList.remove('has-sheet');
     for (const m of markers) { m.classList.remove('on'); m.setAttribute('aria-expanded', 'false'); }
   }
+  function showPanel(on) {
+    if (on === !panel.hidden) return;
+    panel.hidden = !on;
+    tabView.toggleAttribute('aria-current', !on);
+    tabNearby.toggleAttribute('aria-current', on);
+    if (on) {
+      tabNearby.setAttribute('aria-current', 'page');
+      renderNearby();
+      loadNearby();
+      loadNearbyForecast();
+      panel.scrollTop = 0;
+      $('#nb-t').focus({ preventScroll: true });
+    } else {
+      tabView.setAttribute('aria-current', 'page');
+    }
+  }
   function route() {
     const id = decodeURIComponent(location.hash.slice(1));
-    if (PLACES[id]) openSheet(id); else closeSheet();
+    if (id === 'nearby') { closeSheet(); showPanel(true); return; }
+    showPanel(false);
+    if (PLACES[id]) { openSheet(id); return; }
+    closeSheet();
+    if (/^(station|radar|sanctuary)-/.test(id)) loadNearby();
   }
   function dismiss() {
     if (S.pushed) { history.back(); return; }
     history.replaceState(null, '', location.pathname + location.search);
-    closeSheet();
+    route();
   }
   function select(id) {
     if (location.hash === `#${id}`) return;
@@ -354,57 +542,24 @@
 
   for (const m of markers) m.addEventListener('click', () => select(m.dataset.place));
   edge.addEventListener('click', () => {
-    if (!S.compass) S.th = S.mode === 'sample' ? limitHeading(REEF_FROM_DEMO - LIGHTHOUSE_OFFSET) : REEF.bearing;
-    select('carysfort-reef');
+    const id = edge.dataset.place || 'carysfort-reef';
+    faceToward(id);
+    if (!sheetIs(id)) select(id);
   });
   $('#close').addEventListener('click', dismiss);
-  $('#tab-view').addEventListener('click', (e) => { e.preventDefault(); if (!sheet.hidden) dismiss(); });
+  tabView.addEventListener('click', (e) => { e.preventDefault(); if (!sheet.hidden || !panel.hidden) dismiss(); });
+  tabNearby.addEventListener('click', (e) => { e.preventDefault(); if (panel.hidden) select('nearby'); });
   addEventListener('hashchange', () => { if (!location.hash) S.pushed = false; route(); });
-  addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) dismiss(); });
-
-  // National Weather Service: the town name and the forecast for where you stand.
-  async function getJSON(url) {
-    const r = await fetch(url, { headers: { Accept: 'application/geo+json' } });
-    if (!r.ok) throw new Error(String(r.status));
-    return r.json();
-  }
-  const cacheGet = (key, maxAge) => {
-    try {
-      const c = JSON.parse(sessionStorage.getItem(key) || 'null');
-      if (c && Date.now() - c.at < maxAge) return c.v;
-    } catch (_) { /* no storage */ }
-    return null;
-  };
-  const cacheSet = (key, v) => { try { sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), v })); } catch (_) { /* no storage */ } };
-  const spot = (v) => `${v.lat.toFixed(3)},${v.lon.toFixed(3)}`;
-
-  async function points(v) {
-    const key = `horizon:points:${spot(v)}`;
-    const hit = cacheGet(key, 24 * 60 * 60 * 1000);
-    if (hit) return hit;
-    const pt = await getJSON(`https://api.weather.gov/points/${v.lat.toFixed(4)},${v.lon.toFixed(4)}`);
-    const rl = pt.properties.relativeLocation && pt.properties.relativeLocation.properties;
-    const out = { forecast: pt.properties.forecast, city: rl && rl.city ? `${rl.city}, ${STATES[rl.state] || rl.state}` : null };
-    cacheSet(key, out);
-    return out;
-  }
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && (!sheet.hidden || !panel.hidden)) dismiss(); });
 
   async function loadForecast() {
     const what = sheetBody.querySelector('[data-forecast]');
     const when = sheetBody.querySelector('[data-period]');
     const v = S.viewer;
     try {
-      const key = `horizon:forecast:${spot(v)}`;
-      let f = cacheGet(key, 20 * 60 * 1000);
-      if (!f) {
-        const pt = await points(v);
-        const fc = await getJSON(pt.forecast);
-        const p = fc.properties.periods[0];
-        f = { name: p.name, temp: p.temperature, unit: p.temperatureUnit, short: p.shortForecast, day: p.isDaytime };
-        cacheSet(key, f);
-      }
+      const f = await NWS.forecast(v);
       if (!sheetIs('weather') || S.viewer !== v) return;
-      what.textContent = f.short.charAt(0).toUpperCase() + f.short.slice(1).toLowerCase();
+      what.textContent = f.short;
       when.textContent = `${f.name}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit} ${/^-?\d/.test(v.name) ? 'at' : 'in'} ${v.name}`;
     } catch (_) {
       if (!sheetIs('weather') || S.viewer !== v) return;
@@ -431,6 +586,7 @@
   if (wasLive && canCamera && returning) {
     startCamera(true).then((on) => {
       if (on && saved) useLocation(saved);
+      else if (on) loadNearby();
       setTimeout(updateText, 1500);
     });
   } else {
