@@ -350,9 +350,16 @@
     if (e.persisted && S.mode === 'live' && (!track || track.readyState === 'ended')) startCamera(true);
   });
 
-  let resume = false;
-  try { resume = sessionStorage.getItem('horizon:live') === '1'; } catch (_) { /* no storage */ }
-  if (resume && canCamera) startCamera(true).then(() => setTimeout(updateText, 1500));
+  // Opening or refreshing the app always starts on the sample view. The camera comes back on by itself
+  // only when you return from a story you opened from the camera.
+  let wasLive = false;
+  try { wasLive = sessionStorage.getItem('horizon:live') === '1'; } catch (_) { /* no storage */ }
+  const navType = performance.getEntriesByType('navigation')[0]?.type || 'navigate';
+  let fromStory = false;
+  try { fromStory = new URL(document.referrer).pathname.endsWith('/horizon/back-to-the-reef.html'); } catch (_) { /* no referrer */ }
+  const returning = navType === 'back_forward' || (navType === 'navigate' && fromStory);
+  if (wasLive && canCamera && returning) startCamera(true).then(() => setTimeout(updateText, 1500));
+  else { try { sessionStorage.removeItem('horizon:live'); } catch (_) { /* no storage */ } }
 
   updateText();
   route();
