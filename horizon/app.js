@@ -1,28 +1,34 @@
 'use strict';
 
 (() => {
-  // The viewer stands on the ocean side of north Key Largo (a demo location).
-  const VIEWER = { lat: 25.2156, lon: -80.3467 };
+  const G = window.HorizonGeo;
+  const DEMO = G.DEMO;
 
   // bearing/elev in degrees. `follow` pins a place to the sky in front of you, whichever way you face.
+  // `near` shows a place only when you are within `radius` miles of it.
   const PLACES = {
     'carysfort-reef': { lat: 25.2219472, lon: -80.21145, elev: 0, name: 'Carysfort Reef' },
-    'florida-keys-sanctuary': { bearing: 77, elev: -1.3 },
+    'florida-keys-sanctuary': { bearing: 77, elev: -1.3, near: { lat: DEMO.lat, lon: DEMO.lon, radius: 40 } },
     'weather': { follow: -6.5, elev: 11 },
   };
+  const REEF = PLACES['carysfort-reef'];
+  const REEF_FROM_DEMO = G.bearing(DEMO, REEF);
 
-  // The sample photo (2400 x 1800): where the lighthouse and the horizon sit in its pixels.
+  // The sample photo (2400 x 1800, taken from Key Largo): where the lighthouse and the horizon sit in its pixels.
   const PHOTO = { w: 2400, h: 1800, lighthouseX: 1314, horizonY: 1115, heightToScreen: 1180 / 844 };
   const SAMPLE_FOV = 63;   // degrees across the screen height in the sample view
   const CAMERA_FOV = 60;   // degrees across the long side of the camera image
   const SAMPLE_HORIZON = 401 / 844;
   const LIGHTHOUSE_OFFSET = 2.76; // the sample view opens with the lighthouse just right of centre
 
+  const STATES = { AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California', CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', DC: 'District of Columbia', FL: 'Florida', GA: 'Georgia', HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland', MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri', MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey', NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio', OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont', VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming', PR: 'Puerto Rico', GU: 'Guam', VI: 'U.S. Virgin Islands', AS: 'American Samoa', MP: 'Northern Mariana Islands' };
+
   const $ = (s) => document.querySelector(s);
   const screen = $('#screen');
   const feed = $('#feed');
   const video = $('#live');
   const hline = $('#hline');
+  const placeName = $('#place-name');
   const facing = $('#facing');
   const note = $('#note');
   const hint = $('#hint');
@@ -36,28 +42,10 @@
   const topBlock = $('.top');
   const hintBlock = $('.hint');
 
-  const rad = (d) => d * Math.PI / 180;
-  const deg = (r) => r * 180 / Math.PI;
   const wrap = (d) => ((d % 360) + 540) % 360 - 180;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
-  const DIRS = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
-  const dir8 = (b) => DIRS[Math.round((((b % 360) + 360) % 360) / 45) % 8];
-
-  function bearing(a, b) {
-    const p1 = rad(a.lat), p2 = rad(b.lat), dl = rad(b.lon - a.lon);
-    const y = Math.sin(dl) * Math.cos(p2);
-    const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
-    return (deg(Math.atan2(y, x)) + 360) % 360;
-  }
-  function miles(a, b) {
-    const p1 = rad(a.lat), p2 = rad(b.lat), dp = p2 - p1, dl = rad(b.lon - a.lon);
-    const h = Math.sin(dp / 2) ** 2 + Math.cos(p1) * Math.cos(p2) * Math.sin(dl / 2) ** 2;
-    return 2 * 6371.0088 * Math.asin(Math.sqrt(h)) / 1.609344;
-  }
-  for (const p of Object.values(PLACES)) {
-    if (p.lat != null) { p.bearing = bearing(VIEWER, p); p.miles = miles(VIEWER, p); }
-  }
-  const REEF = PLACES['carysfort-reef'];
+  const rad = (d) => d * Math.PI / 180;
+  const deg = (r) => r * 180 / Math.PI;
 
   // Heading of the back camera from absolute device orientation (Android).
   function compassFromEuler(alpha, beta, gamma) {
@@ -71,7 +59,8 @@
 
   const S = {
     mode: 'sample',        // 'sample' (photo) or 'live' (camera)
-    h: REEF.bearing - LIGHTHOUSE_OFFSET, th: REEF.bearing - LIGHTHOUSE_OFFSET,
+    viewer: DEMO,          // where you stand: the phone's location, or the Key Largo demo spot
+    h: REEF_FROM_DEMO - LIGHTHOUSE_OFFSET, th: REEF_FROM_DEMO - LIGHTHOUSE_OFFSET,
     p: 0, tp: 0,           // camera tilt: + is up
     compass: false,
     drag: null,
@@ -82,6 +71,20 @@
 
   const canCamera = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && window.isSecureContext;
   const isTouch = matchMedia('(pointer: coarse)').matches;
+
+  function refreshPlaces() {
+    for (const p of Object.values(PLACES)) {
+      if (p.lat != null) { p.bearing = G.bearing(S.viewer, p); p.miles = G.miles(S.viewer, p); }
+      p.away = p.near ? G.miles(S.viewer, p.near) > p.near.radius : false;
+    }
+  }
+  function setViewer(v) {
+    S.viewer = v;
+    refreshPlaces();
+    G.saveViewer(v);
+    updateText();
+    if (!sheet.hidden) openSheet(sheet.dataset.place, false);
+  }
 
   function geometry() {
     const W = screen.clientWidth, H = screen.clientHeight;
@@ -102,14 +105,14 @@
     const s = g.H * PHOTO.heightToScreen / PHOTO.h;
     return {
       s,
-      min: REEF.bearing + (g.cx - PHOTO.lighthouseX * s) / g.ppd,
-      max: REEF.bearing + (g.cx + (PHOTO.w - PHOTO.lighthouseX) * s - g.W) / g.ppd,
+      min: REEF_FROM_DEMO + (g.cx - PHOTO.lighthouseX * s) / g.ppd,
+      max: REEF_FROM_DEMO + (g.cx + (PHOTO.w - PHOTO.lighthouseX) * s - g.W) / g.ppd,
     };
   }
   function limitHeading(th) {
     if (S.mode !== 'sample') return th;
     const lim = sampleLimits(geometry());
-    return REEF.bearing + clamp(wrap(th - REEF.bearing), lim.min - REEF.bearing, lim.max - REEF.bearing);
+    return REEF_FROM_DEMO + clamp(wrap(th - REEF_FROM_DEMO), lim.min - REEF_FROM_DEMO, lim.max - REEF_FROM_DEMO);
   }
 
   let lastFacing = '';
@@ -119,7 +122,7 @@
 
     if (S.mode === 'sample') {
       const lim = sampleLimits(g);
-      const lx = g.cx + wrap(REEF.bearing - S.h) * g.ppd;
+      const lx = g.cx + wrap(REEF_FROM_DEMO - S.h) * g.ppd;
       feed.style.width = `${PHOTO.w * lim.s}px`;
       feed.style.height = `${PHOTO.h * lim.s}px`;
       feed.style.transform = `translate(${lx - PHOTO.lighthouseX * lim.s}px, ${g.horizonY - PHOTO.horizonY * lim.s}px)`;
@@ -142,15 +145,19 @@
     for (const m of markers) {
       const id = m.dataset.place, pl = PLACES[id];
       const b = pl.follow != null ? S.h + pl.follow : pl.bearing;
-      const x = g.cx + wrap(b - S.h) * g.ppd;
+      let x = g.cx + wrap(b - S.h) * g.ppd;
       let y = g.horizonY - pl.elev * g.ppd;
       if (id === 'carysfort-reef') { reefX = x; reefY = y; }
-      let visible = x > -40 && x < g.W + 40;
+      let visible = !pl.away && x > -40 && x < g.W + 40;
       if (visible) {
         m.hidden = false;
         const dot = m.querySelector('.dot');
         const anchor = dot.offsetTop + dot.offsetHeight / 2;
-        if (pl.follow != null) y = clamp(y, ceiling + anchor, floor);
+        if (pl.follow != null) {
+          const half = m.offsetWidth / 2;
+          x = clamp(x, half + 12, g.W - half - 12);
+          y = clamp(y, ceiling + anchor, floor);
+        }
         visible = y - anchor >= ceiling && y <= floor;
         if (visible) m.style.transform = `translate(${Math.round(x - m.offsetWidth / 2)}px, ${Math.round(y - anchor)}px)`;
       }
@@ -167,7 +174,7 @@
       edge.setAttribute('aria-label', `Carysfort Reef is to your ${side}`);
     }
 
-    const f = `Facing ${dir8(S.h)}`;
+    const f = `Facing ${G.dir8(S.h)}`;
     if (f !== lastFacing) { facing.textContent = f; lastFacing = f; }
   }
 
@@ -180,7 +187,10 @@
   }
 
   function updateText() {
-    note.textContent = S.mode === 'live' ? 'Demo location' : 'Demo location, sample view';
+    placeName.textContent = S.viewer.name;
+    if (S.mode === 'sample') note.textContent = 'Demo location, sample view';
+    else note.textContent = S.viewer.real ? 'Your location' : 'Demo location';
+
     let t;
     if (S.hintOverride) t = S.hintOverride;
     else if (S.mode === 'live' && S.compass) t = "Tap a place to see NOAA's work there.";
@@ -227,12 +237,38 @@
     }
   }
 
+  // The phone's location. If it is off or not allowed, you stay at the Key Largo demo spot.
+  function requestLocation() {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) { resolve(null); return; }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+        () => resolve(null),
+        { enableHighAccuracy: false, timeout: 15000, maximumAge: 5 * 60 * 1000 },
+      );
+    });
+  }
+  async function useLocation(c) {
+    const v = { lat: c.lat, lon: c.lon, real: true, name: c.name || G.coordsName(c) };
+    setViewer(v);
+    if (c.name) return;
+    try {
+      const pt = await points(v);
+      if (pt.city && S.viewer === v) setViewer({ ...v, name: pt.city });
+    } catch (_) { /* outside the NWS area: keep the coordinates */ }
+  }
+
   startBtn.addEventListener('click', async () => {
     const DOE = window.DeviceOrientationEvent;
     const motion = DOE && typeof DOE.requestPermission === 'function'
       ? DOE.requestPermission().catch(() => 'denied')
       : Promise.resolve('granted');
-    if (S.mode !== 'live') await startCamera(false);
+    if (S.mode !== 'live') {
+      const where = requestLocation();
+      const on = await startCamera(false);
+      const c = await where;
+      if (on && c) useLocation(c);
+    }
     await motion;
     setTimeout(updateText, 1500);
   });
@@ -259,13 +295,17 @@
   // Place previews. The open place lives in the URL hash, so Back closes it.
   function sheetIs(id) { return !sheet.hidden && sheet.dataset.place === id; }
 
-  function openSheet(id) {
+  function openSheet(id, focus = true) {
     const tpl = document.getElementById(`tpl-${id}`);
-    if (!tpl) { closeSheet(); return; }
+    if (!tpl || (PLACES[id] && PLACES[id].away)) { closeSheet(); return; }
     sheetBody.replaceChildren(tpl.content.cloneNode(true));
     sheet.dataset.place = id;
     const d = sheetBody.querySelector('[data-distance]');
-    if (d && PLACES[id].miles != null) d.textContent = `About ${Math.round(PLACES[id].miles)} mi ${dir8(PLACES[id].bearing)}`;
+    if (d && PLACES[id].lat != null) d.textContent = G.distanceText(S.viewer, PLACES[id]);
+    const when = sheetBody.querySelector('[data-period]');
+    if (when) when.textContent = S.viewer.name;
+    const link = sheetBody.querySelector('[data-forecast-link]');
+    if (link) link.href = `https://forecast.weather.gov/MapClick.php?lat=${S.viewer.lat.toFixed(4)}&lon=${S.viewer.lon.toFixed(4)}`;
     sheet.hidden = false;
     screen.classList.add('has-sheet');
     for (const m of markers) {
@@ -273,7 +313,7 @@
       m.classList.toggle('on', on);
       m.setAttribute('aria-expanded', String(on));
     }
-    sheetBody.querySelector('h2')?.focus({ preventScroll: true });
+    if (focus) sheetBody.querySelector('h2')?.focus({ preventScroll: true });
     if (id === 'weather') loadForecast();
   }
   function closeSheet() {
@@ -303,7 +343,7 @@
 
   for (const m of markers) m.addEventListener('click', () => select(m.dataset.place));
   edge.addEventListener('click', () => {
-    if (!S.compass) S.th = limitHeading(REEF.bearing - LIGHTHOUSE_OFFSET);
+    if (!S.compass) S.th = S.mode === 'sample' ? limitHeading(REEF_FROM_DEMO - LIGHTHOUSE_OFFSET) : REEF.bearing;
     select('carysfort-reef');
   });
   $('#close').addEventListener('click', dismiss);
@@ -311,36 +351,54 @@
   addEventListener('hashchange', () => { if (!location.hash) S.pushed = false; route(); });
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && !sheet.hidden) dismiss(); });
 
-  // Live forecast for the viewer's spot, from the National Weather Service.
-  const FORECAST_KEY = 'horizon:forecast';
+  // National Weather Service: the town name and the forecast for where you stand.
   async function getJSON(url) {
     const r = await fetch(url, { headers: { Accept: 'application/geo+json' } });
     if (!r.ok) throw new Error(String(r.status));
     return r.json();
   }
+  const cacheGet = (key, maxAge) => {
+    try {
+      const c = JSON.parse(sessionStorage.getItem(key) || 'null');
+      if (c && Date.now() - c.at < maxAge) return c.v;
+    } catch (_) { /* no storage */ }
+    return null;
+  };
+  const cacheSet = (key, v) => { try { sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), v })); } catch (_) { /* no storage */ } };
+  const spot = (v) => `${v.lat.toFixed(3)},${v.lon.toFixed(3)}`;
+
+  async function points(v) {
+    const key = `horizon:points:${spot(v)}`;
+    const hit = cacheGet(key, 24 * 60 * 60 * 1000);
+    if (hit) return hit;
+    const pt = await getJSON(`https://api.weather.gov/points/${v.lat.toFixed(4)},${v.lon.toFixed(4)}`);
+    const rl = pt.properties.relativeLocation && pt.properties.relativeLocation.properties;
+    const out = { forecast: pt.properties.forecast, city: rl && rl.city ? `${rl.city}, ${STATES[rl.state] || rl.state}` : null };
+    cacheSet(key, out);
+    return out;
+  }
+
   async function loadForecast() {
     const what = sheetBody.querySelector('[data-forecast]');
     const when = sheetBody.querySelector('[data-period]');
+    const v = S.viewer;
     try {
-      let f = null;
-      try {
-        const c = JSON.parse(sessionStorage.getItem(FORECAST_KEY) || 'null');
-        if (c && Date.now() - c.at < 20 * 60 * 1000) f = c.f;
-      } catch (_) { /* no storage */ }
+      const key = `horizon:forecast:${spot(v)}`;
+      let f = cacheGet(key, 20 * 60 * 1000);
       if (!f) {
-        const pt = await getJSON(`https://api.weather.gov/points/${VIEWER.lat.toFixed(4)},${VIEWER.lon.toFixed(4)}`);
-        const fc = await getJSON(pt.properties.forecast);
+        const pt = await points(v);
+        const fc = await getJSON(pt.forecast);
         const p = fc.properties.periods[0];
         f = { name: p.name, temp: p.temperature, unit: p.temperatureUnit, short: p.shortForecast, day: p.isDaytime };
-        try { sessionStorage.setItem(FORECAST_KEY, JSON.stringify({ at: Date.now(), f })); } catch (_) { /* no storage */ }
+        cacheSet(key, f);
       }
-      if (!sheetIs('weather')) return;
+      if (!sheetIs('weather') || S.viewer !== v) return;
       what.textContent = f.short.charAt(0).toUpperCase() + f.short.slice(1).toLowerCase();
-      when.textContent = `${f.name}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit}`;
+      when.textContent = `${f.name}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit} ${/^-?\d/.test(v.name) ? 'at' : 'in'} ${v.name}`;
     } catch (_) {
-      if (!sheetIs('weather')) return;
+      if (!sheetIs('weather') || S.viewer !== v) return;
       what.textContent = "The forecast didn't load";
-      when.textContent = 'Try again in a moment.';
+      when.textContent = 'National Weather Service forecasts cover the United States. Try again in a moment.';
     }
   }
 
@@ -358,9 +416,18 @@
   let fromStory = false;
   try { fromStory = new URL(document.referrer).pathname.endsWith('/horizon/back-to-the-reef.html'); } catch (_) { /* no referrer */ }
   const returning = navType === 'back_forward' || (navType === 'navigate' && fromStory);
-  if (wasLive && canCamera && returning) startCamera(true).then(() => setTimeout(updateText, 1500));
-  else { try { sessionStorage.removeItem('horizon:live'); } catch (_) { /* no storage */ } }
+  const saved = G.savedViewer();
+  if (wasLive && canCamera && returning) {
+    startCamera(true).then((on) => {
+      if (on && saved) useLocation(saved);
+      setTimeout(updateText, 1500);
+    });
+  } else {
+    try { sessionStorage.removeItem('horizon:live'); } catch (_) { /* no storage */ }
+    G.saveViewer(null);
+  }
 
+  refreshPlaces();
   updateText();
   route();
   requestAnimationFrame(tick);

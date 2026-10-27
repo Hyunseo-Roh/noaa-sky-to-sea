@@ -14,6 +14,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="stylesheet" href="../css/tokens.css">
 <link rel="stylesheet" href="../css/app.css">
+<script src="geo.js" defer></script>
 <script src="app.js" defer></script>
 </head>
 <body class="view-page">
@@ -24,7 +25,7 @@
   <div class="hline" id="hline"></div>
 
   <div class="top">
-    <div class="where"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/></svg><div><b class="t-row">Key Largo, Florida</b><span class="t-meta" id="facing">Facing east</span><span class="note t-meta b"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.3"/><path d="M8 7.2v4M8 4.8v.2" stroke-linecap="round"/></svg><span id="note">Demo location, sample view</span></span></div></div>
+    <div class="where"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/></svg><div><b class="t-row" id="place-name">Key Largo, Florida</b><span class="t-meta" id="facing">Facing east</span><span class="note t-meta b"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.3"/><path d="M8 7.2v4M8 4.8v.2" stroke-linecap="round"/></svg><span id="note">Demo location, sample view</span></span></div></div>
   </div>
 
   <button class="mk" type="button" data-place="weather" aria-label="Weather for this sky"><span class="pill t-meta">Weather for this sky</span><span class="lead" data-lead="48" style="height: 48px"></span><span class="dot"></span></button>
