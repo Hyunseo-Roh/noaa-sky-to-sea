@@ -20,6 +20,8 @@
   const CAMERA_FOV = 60;   // degrees across the long side of the camera image
   const SAMPLE_HORIZON = 401 / 844;
   const LIGHTHOUSE_OFFSET = 2.76; // the sample view opens with the lighthouse just right of centre
+  const EDGE_IN = 16;       // a place's dot must be this far inside the screen to show
+  const NEAR_MILES = 100;   // only places this close get a pill at the screen edge when out of view
 
   const STATES = { AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California', CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', DC: 'District of Columbia', FL: 'Florida', GA: 'Georgia', HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa', KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland', MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri', MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey', NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio', OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina', SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont', VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming', PR: 'Puerto Rico', GU: 'Guam', VI: 'U.S. Virgin Islands', AS: 'American Samoa', MP: 'Northern Mariana Islands' };
 
@@ -148,24 +150,33 @@
       let x = g.cx + wrap(b - S.h) * g.ppd;
       let y = g.horizonY - pl.elev * g.ppd;
       if (id === 'carysfort-reef') { reefX = x; reefY = y; }
-      let visible = !pl.away && x > -40 && x < g.W + 40;
+      // A place shows while its dot is on screen; its label slides to stay whole near the edges.
+      let visible = !pl.away && x >= EDGE_IN && x <= g.W - EDGE_IN;
       if (visible) {
         m.hidden = false;
         const dot = m.querySelector('.dot');
+        const pill = m.querySelector('.pill');
         const anchor = dot.offsetTop + dot.offsetHeight / 2;
+        const half = m.offsetWidth / 2;
+        let shift = 0;
         if (pl.follow != null) {
-          const half = m.offsetWidth / 2;
           x = clamp(x, half + 12, g.W - half - 12);
           y = clamp(y, ceiling + anchor, floor);
+        } else {
+          shift = clamp(x, half + 8, g.W - half - 8) - x;
         }
         visible = y - anchor >= ceiling && y <= floor;
-        if (visible) m.style.transform = `translate(${Math.round(x - m.offsetWidth / 2)}px, ${Math.round(y - anchor)}px)`;
+        if (visible) {
+          m.style.transform = `translate(${Math.round(x - half)}px, ${Math.round(y - anchor)}px)`;
+          pill.style.transform = shift ? `translateX(${Math.round(shift)}px)` : '';
+        }
       }
       m.hidden = !visible;
     }
 
-    const off = reefX < -40 || reefX > g.W + 40;
-    edge.hidden = !off || !sheet.hidden;
+    // The way-finding pill only points to a place that is near you.
+    const off = reefX < EDGE_IN || reefX > g.W - EDGE_IN;
+    edge.hidden = !off || !sheet.hidden || REEF.miles > NEAR_MILES;
     if (off) {
       const side = reefX < 0 ? 'left' : 'right';
       edge.classList.toggle('left', side === 'left');

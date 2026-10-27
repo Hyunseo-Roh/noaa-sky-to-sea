@@ -1,6 +1,6 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; }
-html { --tab-h: calc(57px + max(26px, env(safe-area-inset-bottom))); --app-w: 430px; background: var(--c-ink); }
+html { color-scheme: only light; --tab-h: calc(57px + max(26px, env(safe-area-inset-bottom))); --app-w: 430px; background: var(--c-ink); }
 body { --l-page-margin: 20px; width: 100%; max-width: var(--app-w); min-height: 100dvh; margin: 0 auto; font: var(--f-app-body); color: var(--c-ink); background: var(--c-ground); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
 ::selection { background: var(--c-state); color: var(--c-ground); }
 img { display: block; max-width: 100%; }
@@ -45,6 +45,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .shade { position: absolute; z-index: 1; inset: 0 0 auto 0; height: calc(220px + env(safe-area-inset-top)); background: linear-gradient(180deg, var(--c-scrim) 0%, transparent 100%); opacity: .7; pointer-events: none; }
 .shade-b { position: absolute; z-index: 1; inset: auto 0 var(--tab-h) 0; height: 200px; background: linear-gradient(0deg, var(--c-scrim) 0%, transparent 100%); opacity: .6; pointer-events: none; }
 .hline { position: absolute; z-index: 2; left: 0; right: 0; height: 1px; background: var(--c-ground); opacity: .75; pointer-events: none; }
+.screen[data-mode="live"] .hline { display: none; }
 .top { position: relative; z-index: 6; display: flex; align-items: center; gap: var(--s-3); padding: calc(max(env(safe-area-inset-top), 20px) + var(--s-2)) var(--s-4) 0 20px; pointer-events: none; }
 .where { display: flex; align-items: flex-start; gap: var(--s-2); }
 .where svg { width: 20px; height: 20px; margin-top: 3px; flex: none; }
