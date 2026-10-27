@@ -2,15 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=390, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Horizon">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Horizon: Back to the reef (student concept)</title>
 <link rel="stylesheet" href="../css/tokens.css">
 <link rel="stylesheet" href="../css/app.css">
 <style>
-body { padding-bottom: 83px; }
-.export body { padding-bottom: 0; }
-.status { color: var(--c-ink); }
-.nav { display: flex; align-items: center; justify-content: space-between; height: 52px; padding: 0 var(--s-2) 0 var(--s-1); }
+html { background: var(--c-ground); }
+body { padding-bottom: var(--tab-h); }
+.nav { display: flex; align-items: center; justify-content: space-between; height: calc(52px + max(env(safe-area-inset-top), 20px)); padding: max(env(safe-area-inset-top), 20px) var(--s-2) 0 var(--s-1); }
 .back { display: inline-flex; align-items: center; gap: 2px; height: 48px; padding: 0 var(--s-3) 0 6px; font: var(--f-app-body-b); color: var(--c-brand); text-decoration: none; }
 .back svg { width: 24px; height: 24px; }
 .acts { display: flex; }
@@ -22,7 +28,7 @@ body { padding-bottom: 83px; }
 .loc svg { width: 16px; height: 16px; flex: none; margin-top: 2px; color: var(--c-ink); }
 .head h1 { margin-top: var(--s-3); color: var(--c-ink); }
 .photo { margin: var(--s-4) 0 0; }
-.photo img { width: 390px; height: 260px; object-fit: cover; object-position: 50% 45%; }
+.photo img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; object-position: 50% 45%; }
 .photo figcaption { padding: var(--s-2) var(--l-page-margin) 0; color: var(--c-ink-2); }
 .lede { padding: var(--s-4) var(--l-page-margin) 0; }
 .lede p + p { margin-top: var(--s-3); }
@@ -45,16 +51,9 @@ body { padding-bottom: 83px; }
 </style>
 </head>
 <body>
-  <div class="status" data-audit="skip"><span class="num">9:41</span>
-    <span class="icons">
-      <svg viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
-      <svg viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 4.2a9.5 9.5 0 0 1 13 0M4 7a6 6 0 0 1 8 0"/><circle cx="8" cy="10" r="1.2" fill="currentColor" stroke="none"/></svg>
-      <svg viewBox="0 0 27 12" fill="none"><rect x=".5" y=".5" width="23" height="11" rx="3" stroke="currentColor" stroke-opacity=".5"/><rect x="2" y="2" width="18" height="8" rx="1.6" fill="currentColor"/><rect x="24.5" y="4" width="2" height="4" rx="1" fill="currentColor" fill-opacity=".5"/></svg>
-    </span>
-  </div>
 
   <nav class="nav" aria-label="Place">
-    <a class="back" href="carysfort-reef.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>View</a>
+    <a class="back" id="back" href="index.html#carysfort-reef"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>View</a>
     <div class="acts">
       <button class="ib" aria-label="Save place"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M6.5 4h11v16l-5.5-4-5.5 4z"/></svg></button>
       <button class="ib" aria-label="Share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M8 8l4-4 4 4M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg></button>
@@ -63,7 +62,7 @@ body { padding-bottom: 83px; }
 
   <main>
     <header class="head">
-      <p class="loc t-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/></svg><span><b>Carysfort Reef</b>About 6 mi east, a sample distance<br>Florida Keys National Marine Sanctuary</span></p>
+      <p class="loc t-meta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/></svg><span><b>Carysfort Reef</b>About 8 mi east<br>Florida Keys National Marine Sanctuary</span></p>
       <h1 class="t-title">Back to the reef</h1>
     </header>
 
@@ -85,12 +84,12 @@ body { padding-bottom: 83px; }
     <section class="also" aria-labelledby="also-t">
       <h2 id="also-t" class="t-row">Also in this view</h2>
       <ul class="rows">
-        <li><a href="#">
+        <li><a href="index.html#florida-keys-sanctuary">
           <img class="mangrove" src="../images/mangroves-aerial.jpg" alt="">
           <span><b class="t-row">Florida Keys sanctuary</b><span class="t t-meta">National Ocean Service</span></span>
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
         </a></li>
-        <li><a href="#">
+        <li><a href="index.html#weather">
           <span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M7 18h10.5a4 4 0 0 0 .4-8 6 6 0 0 0-11.6 1.6A3.2 3.2 0 0 0 7 18z"/></svg></span>
           <span><b class="t-row">Weather for this sky</b><span class="t t-meta">National Weather Service</span></span>
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
@@ -102,10 +101,19 @@ body { padding-bottom: 83px; }
     <p class="meta-end t-meta">Student concept, not an official NOAA app.</p>
   </main>
 
-  <nav class="tabs flow" aria-label="Horizon">
+  <nav class="tabs" aria-label="Horizon">
     <a href="index.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.8l1.6-2.2h6.2L16.7 7h2.8A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="12.8" r="3.4"/></svg>View</a>
     <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></svg>Nearby</a>
     <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><path d="M6.5 4h11v16l-5.5-4-5.5 4z"/></svg>Saved</a>
   </nav>
+<script>
+document.getElementById('back').addEventListener('click', (e) => {
+  try {
+    const from = new URL(document.referrer);
+    const fromView = from.pathname.endsWith('/horizon/index.html') || from.pathname.endsWith('/horizon/');
+    if (from.origin === location.origin && fromView) { e.preventDefault(); history.back(); }
+  } catch (_) { /* no referrer: follow the link */ }
+});
+</script>
 </body>
 </html>
