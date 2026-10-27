@@ -27,6 +27,7 @@
   const NEAR_MILES = 100;   // only places this close get a pill at the screen edge when out of view
   const LABEL_MILES = 150;  // places found around you get a label in the view up to this far
   const LADDER = [64, 112, 160, 208]; // leader-line heights for found places, nearest first
+  const LEAD_STACK = [64, 112, 160, 208]; // line lengths that set the drawing order: shorter on top
 
   const $ = (s) => document.querySelector(s);
   const screen = $('#screen');
@@ -39,6 +40,7 @@
   const hint = $('#hint');
   const startBtn = $('#start');
   const startLabel = $('#start-label');
+  const stopBtn = $('#stop');
   const edge = $('#edge');
   const edgeLabel = $('#edge-label');
   const sheet = $('#sheet');
@@ -159,11 +161,16 @@
     // The leader lines were drawn for an 844 px tall screen; keep the same spacing on other heights.
     const k = clamp(g.H / 844, 0.7, 1.15);
     if (k !== lastScale) {
-      for (const l of leads) l.style.height = `${Math.round(Number(l.dataset.lead) * k)}px`;
+      for (const l of leads) {
+        l.style.height = `${Math.round(Number(l.dataset.lead) * k)}px`;
+        // a label with a shorter line sits on top, so long lines pass behind the labels they cross
+        l.parentElement.style.zIndex = String(3 + LEAD_STACK.filter((n) => Number(l.dataset.lead) <= n).length);
+      }
       lastScale = k;
     }
 
     const at = {};
+    const pills = []; // where each shown label sits, to keep the weather label clear of the others
     for (const m of markers) {
       const id = m.dataset.place, pl = PLACES[id];
       if (!pl) { m.hidden = true; continue; }
@@ -190,9 +197,21 @@
         if (visible) {
           m.style.transform = `translate(${Math.round(x - half)}px, ${Math.round(y - anchor)}px)`;
           pill.style.transform = shift ? `translateX(${Math.round(shift)}px)` : '';
+          const pw = pill.offsetWidth / 2;
+          pills.push({ m, follow: pl.follow != null, x, half, anchor, l: x + shift - pw, r: x + shift + pw, t: y - anchor, b: y - anchor + pill.offsetHeight });
         }
       }
       m.hidden = !visible;
+    }
+    // The weather label can sit anywhere in the sky, so when it lands on another label it moves down below it.
+    for (const w of pills.filter((p) => p.follow)) {
+      let t = w.t;
+      for (let i = 0; i < 4; i++) {
+        const hit = pills.filter((p) => !p.follow && p.l < w.r + 8 && w.l < p.r + 8 && p.t < t + (w.b - w.t) + 8 && t < p.b + 8);
+        if (!hit.length) break;
+        t = Math.max(...hit.map((p) => p.b)) + 8;
+      }
+      if (t !== w.t && t + w.anchor <= floor) w.m.style.transform = `translate(${Math.round(w.x - w.half)}px, ${Math.round(t)}px)`;
     }
 
     // The way-finding pill points to the place you opened, or to the reef when it is near you.
@@ -240,6 +259,7 @@
     const needCompass = S.mode === 'live' && !S.compass && typeof window.DeviceOrientationEvent?.requestPermission === 'function';
     startBtn.hidden = !(canCamera && isTouch) || (S.mode === 'live' && !needCompass);
     startLabel.textContent = S.mode === 'live' ? 'Turn on the compass' : 'Turn on the camera';
+    stopBtn.hidden = S.mode !== 'live';
     nbSub.textContent = S.viewer.real ? `NOAA's work around ${S.viewer.name}` : `NOAA's work around ${S.viewer.name}, the demo location`;
   }
 
@@ -277,6 +297,27 @@
     }
   }
 
+  // Back to the sample photo: the camera stops and you return to the Key Largo demo spot the photo was taken from.
+  function stopCamera() {
+    if (S.stream) S.stream.getTracks().forEach((t) => t.stop());
+    S.stream = null;
+    video.srcObject = null;
+    S.mode = 'sample';
+    screen.dataset.mode = 'sample';
+    S.compass = false;
+    S.p = 0; S.tp = 0;
+    S.h = S.th = REEF_FROM_DEMO - LIGHTHOUSE_OFFSET;
+    S.hintOverride = '';
+    try { sessionStorage.removeItem('horizon:live'); } catch (_) { /* no storage */ }
+    if (location.hash) { history.replaceState(null, '', location.pathname + location.search); S.pushed = false; }
+    closeSheet();
+    showPanel(false);
+    setViewer(DEMO);
+    updateText();
+    startBtn.focus({ preventScroll: true });
+  }
+  stopBtn.addEventListener('click', stopCamera);
+
   // The phone's location. If it is off or not allowed, you stay at the Key Largo demo spot.
   function requestLocation() {
     return new Promise((resolve) => {
@@ -307,8 +348,8 @@
       const where = requestLocation();
       const on = await startCamera(false);
       const c = await where;
-      if (on && c) useLocation(c);
-      else if (on) loadNearby();
+      if (on && c && S.mode === 'live') useLocation(c);
+      else if (on && S.mode === 'live') loadNearby();
     }
     await motion;
     setTimeout(updateText, 1500);

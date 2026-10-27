@@ -46,12 +46,18 @@ ul { margin: 0; padding: 0; list-style: none; }
 .shade-b { position: absolute; z-index: 1; inset: auto 0 var(--tab-h) 0; height: 200px; background: linear-gradient(0deg, var(--c-scrim) 0%, transparent 100%); opacity: .6; pointer-events: none; }
 .hline { position: absolute; z-index: 2; left: 0; right: 0; height: 1px; background: var(--c-ground); opacity: .75; pointer-events: none; }
 .screen[data-mode="live"] .hline { display: none; }
-.top { position: relative; z-index: 6; display: flex; align-items: center; gap: var(--s-3); padding: calc(max(env(safe-area-inset-top), 20px) + var(--s-2)) var(--s-4) 0 20px; pointer-events: none; }
+.top { position: relative; z-index: 10; display: flex; align-items: center; gap: var(--s-3); padding: calc(max(env(safe-area-inset-top), 20px) + var(--s-2)) var(--s-4) 0 20px; pointer-events: none; }
 .where { display: flex; align-items: flex-start; gap: var(--s-2); }
 .where svg { width: 20px; height: 20px; margin-top: 3px; flex: none; }
 .where span { display: block; }
 .where .note { display: flex; align-items: center; gap: 6px; margin-top: var(--s-2); }
 .where .note svg { width: 14px; height: 14px; margin-top: 0; }
+.top { align-items: flex-start; }
+/* camera off: a round button at the top right, only while the camera is on */
+.round { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); }
+.round svg { width: 24px; height: 24px; }
+.round[hidden] { display: none; }
+.top .round { margin-left: auto; pointer-events: auto; flex: none; box-shadow: 0 1px 6px color-mix(in srgb, var(--c-ink) 35%, transparent); }
 
 .mk { position: absolute; z-index: 4; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; color: inherit; will-change: transform; }
 .mk[hidden] { display: none; }
@@ -62,14 +68,14 @@ ul { margin: 0; padding: 0; list-style: none; }
 .mk.on .dot { width: 16px; height: 16px; margin-top: -2px; background: var(--c-state); border: 3px solid var(--c-ground); }
 
 /* a place that is out of view: a pill at the edge pointing the way */
-.edge { position: absolute; z-index: 4; display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 var(--s-3); border-radius: var(--r-round); background: var(--c-scrim); color: var(--c-ground); font: var(--f-meta-b); white-space: nowrap; }
+.edge { position: absolute; z-index: 8; display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 var(--s-3); border-radius: var(--r-round); background: var(--c-scrim); color: var(--c-ground); font: var(--f-meta-b); white-space: nowrap; }
 .edge[hidden] { display: none; }
 .edge svg { width: 18px; height: 18px; flex: none; }
 .edge.left { left: var(--s-3); }
 .edge.right { right: var(--s-3); flex-direction: row-reverse; }
 .edge.right svg { transform: scaleX(-1); }
 
-.hint { position: absolute; z-index: 5; left: var(--s-4); right: var(--s-4); bottom: calc(var(--tab-h) + var(--s-4)); display: flex; flex-direction: column; align-items: center; gap: var(--s-3); pointer-events: none; }
+.hint { position: absolute; z-index: 9; left: var(--s-4); right: var(--s-4); bottom: calc(var(--tab-h) + var(--s-4)); display: flex; flex-direction: column; align-items: center; gap: var(--s-3); pointer-events: none; }
 .hint p { display: inline-flex; align-items: center; gap: var(--s-2); font: var(--f-app-body-b); color: var(--c-ground); text-align: center; }
 .hint svg { width: 20px; height: 20px; flex: none; }
 .hint .btn { pointer-events: auto; background: var(--c-ground); color: var(--c-brand); border-color: var(--c-ground); }

@@ -25,6 +25,12 @@ window.HorizonNWS = (() => {
   }
   const spot = (v) => `${v.lat.toFixed(3)},${v.lon.toFixed(3)}`;
   const titleCase = (s) => s.toLowerCase().replace(/\b([a-z])/g, (m) => m.toUpperCase());
+  // Station names sometimes come in capitals ("LOS ANGELES DOWNTOWN/USC"). Keep short codes like USC as they are.
+  const KEEP_CAPS = /^(USC|UCLA|AFB|ARB|ANGB|NAS|NAF|MCAS|AAF|USCG|NWS|RAWS|II|III|IV)$/;
+  const nameCase = (s) => (s === s.toUpperCase()
+    ? s.split(/(\s+|\/|-)/).map((w) => (KEEP_CAPS.test(w) ? w : titleCase(w))).join('')
+    : s);
+  const FRESH_MIN = 180; // a reading older than three hours counts as no recent reading
   const sentence = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
   async function points(v) {
@@ -66,18 +72,17 @@ window.HorizonNWS = (() => {
       parts.push(mph === 0 ? 'calm' : `wind ${mph} mph${from}`);
     }
     if (!parts.length) return null;
-    let age = '';
     const t = Date.parse(o.timestamp);
-    if (!Number.isNaN(t)) {
-      const min = Math.max(1, Math.round((Date.now() - t) / 60000));
-      age = min < 90 ? `${min} min ago` : `${Math.round(min / 60)} h ago`;
-    }
+    if (Number.isNaN(t)) return null;
+    const min = Math.max(1, Math.round((Date.now() - t) / 60000));
+    if (min > FRESH_MIN) return null;
+    const age = min < 90 ? `${min} min ago` : `${Math.round(min / 60)} h ago`;
     return { text: parts.join(', '), age };
   }
 
-  // Up to three weather stations closest to you, each with its latest reading, and the radar that covers you.
+  // The three closest weather stations that reported in the last three hours, and the radar that covers you.
   async function nearby(v) {
-    const key = `horizon:nearby:${spot(v)}`;
+    const key = `horizon:nearby2:${spot(v)}`;
     const hit = cacheGet(key, 10 * 60 * 1000);
     if (hit) return hit;
     const pt = await points(v);
@@ -92,21 +97,25 @@ window.HorizonNWS = (() => {
         const [lon, lat] = (f.geometry && f.geometry.coordinates) || [];
         const code = f.properties && f.properties.stationIdentifier;
         // a break chance after each slash, so "Burbank/Glendale/Pasadena Airport" can wrap
-        return typeof lat === 'number' && code ? { code, name: (f.properties.name || code).replace(/\//g, '/\u200B'), lat, lon } : null;
+        return typeof lat === 'number' && code ? { code, name: nameCase(f.properties.name || code).replace(/\//g, '/\u200B'), lat, lon } : null;
       })
       .filter((s) => s && !seen.has(s.code) && seen.add(s.code))
       .sort((a, b) => G.miles(v, a) - G.miles(v, b))
-      .slice(0, 3);
+      .slice(0, 6);
     await Promise.all(stations.map(async (s) => {
-      let r = null;
-      try { r = reading((await getJSON(`${API}/stations/${s.code}/observations/latest`)).properties); } catch (_) { /* no recent reading */ }
+      try { s.reading = reading((await getJSON(`${API}/stations/${s.code}/observations/latest`)).properties); } catch (_) { s.reading = null; }
+    }));
+    // Stations that are not reporting are left out; if none is, the closest one shows with "No recent reading".
+    let shown = stations.filter((s) => s.reading).slice(0, 3);
+    if (!shown.length && stations.length) shown = stations.slice(0, 1);
+    for (const s of shown) {
       out.push({
         id: `station-${s.code}`, kind: 'station', code: s.code, lat: s.lat, lon: s.lon,
-        name: s.name, short: `${s.name.split(/[/,]/)[0].trim()} station`,
+        name: s.name, short: `${s.name.split(/\s+-\s+|[/,]/)[0].trim()} station`,
         what: 'Weather station', office: 'National Weather Service',
-        reading: r, link: `https://www.weather.gov/wrh/timeseries?site=${s.code}`, linkText: "See this station's readings",
+        reading: s.reading, link: `https://www.weather.gov/wrh/timeseries?site=${s.code}`, linkText: "See this station's readings",
       });
-    }));
+    }
     if (rd && rd.geometry && rd.properties) {
       const [lon, lat] = rd.geometry.coordinates;
       const code = rd.properties.id || pt.radar;
