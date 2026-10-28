@@ -19,6 +19,7 @@
 <script src="nws.js" defer></script>
 <script src="sanctuaries.js" defer></script>
 <script src="sun.js" defer></script>
+<script src="icons.js" defer></script>
 <script src="app.js" defer></script>
 </head>
 <body class="view-page">
@@ -54,10 +55,10 @@
   <section class="panel" id="nearby" hidden aria-labelledby="nb-t">
     <h1 id="nb-t" class="t-title" tabindex="-1">Nearby</h1>
     <p class="nb-sub t-meta" id="nb-sub">NOAA's work around Key Largo, Florida, the demo location</p>
-    <ul class="nb-rows" id="nb-list"></ul>
+    <div class="nb-groups" id="nb-list"></div>
     <p class="nb-state t-meta" id="nb-state" role="status" hidden></p>
     <button class="btn secondary nb-retry" type="button" id="nb-retry" hidden>Try again</button>
-    <p class="nb-source t-meta">Weather stations, radar, forecasts and alerts come live from the National Weather Service, and tides from NOAA's tide stations. Sunrise and sunset use NOAA's solar calculator.</p>
+    <p class="nb-source t-meta">Live from the National Weather Service and NOAA's tide stations. Sunrise and sunset use NOAA's Solar Calculator.</p>
   </section>
 
   <section class="panel" id="saved" hidden aria-labelledby="sv-t">

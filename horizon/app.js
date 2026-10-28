@@ -12,7 +12,7 @@
   // `near` shows a place only when you are within `radius` miles of it.
   // Places found around you (weather stations, radar, the nearest sanctuary) are added with `found: true`.
   const PLACES = {
-    'carysfort-reef': { lat: 25.2219472, lon: -80.21145, elev: 0, name: 'Carysfort Reef', short: 'Carysfort Reef', what: 'Coral restoration' },
+    'carysfort-reef': { lat: 25.2219472, lon: -80.21145, elev: 0, name: 'Carysfort Reef', short: 'Carysfort Reef', what: 'Coral restoration', within: 100 },
     'florida-keys-sanctuary': { bearing: 77, elev: -1.3, near: { lat: DEMO.lat, lon: DEMO.lon, radius: 40 }, name: 'Florida Keys sanctuary', short: 'Florida Keys sanctuary', what: 'Marine sanctuary' },
     'weather': { follow: -6.5, elev: 11, name: 'Weather for this sky', short: 'Weather for this sky' },
   };
@@ -106,6 +106,7 @@
     for (const p of Object.values(PLACES)) {
       if (p.lat != null) { p.bearing = G.bearing(S.viewer, p); p.miles = G.miles(S.viewer, p); }
       p.away = p.near ? G.miles(S.viewer, p.near) > p.near.radius : false;
+      p.far = p.within != null && p.miles > p.within; // too far to label in the view or list nearby
     }
   }
   function setViewer(v) {
@@ -206,7 +207,7 @@
       let y = g.horizonY - pl.elev * g.ppd;
       at[id] = { x, y };
       // A place shows while its dot is on screen; its label slides to stay whole near the edges.
-      let visible = !pl.away && x >= EDGE_IN && x <= g.W - EDGE_IN;
+      let visible = !pl.away && !pl.far && x >= EDGE_IN && x <= g.W - EDGE_IN;
       if (visible) {
         m.hidden = false;
         const dot = m.querySelector('.dot');
@@ -255,7 +256,7 @@
     // The way-finding pill points to the place you opened, or to the reef when it is near you.
     const open = !sheet.hidden ? sheet.dataset.place : null;
     let target = null;
-    if (open && at[open] && PLACES[open].follow == null && !PLACES[open].away) target = open;
+    if (open && at[open] && PLACES[open].follow == null && !PLACES[open].away && !PLACES[open].far) target = open;
     else if (!open && REEF.miles <= NEAR_MILES) target = 'carysfort-reef';
     const t = target && at[target];
     const off = t && (t.x < EDGE_IN || t.x > g.W - EDGE_IN);
@@ -298,7 +299,7 @@
     startBtn.hidden = !(canCamera && isTouch) || (S.mode === 'live' && !needCompass);
     startLabel.textContent = S.mode === 'live' ? 'Turn on the compass' : 'Turn on the camera';
     stopBtn.hidden = S.mode !== 'live';
-    nbSub.textContent = S.viewer.real ? `NOAA's work around ${S.viewer.name}` : `NOAA's work around ${S.viewer.name}, the demo location`;
+    nbSub.textContent = S.viewer.real ? `Around ${S.viewer.name}` : `Around ${S.viewer.name}, the demo location`;
   }
 
   function onOrient(e) {
@@ -479,11 +480,13 @@
     return NB.promise;
   }
 
-  // One label in the view for each found place within reach, nearest with the shortest leader line.
+  // The view labels public information on the horizon: the sky (weather, sun) and the sea (tides, sanctuaries).
+  // Instruments (weather stations, radar) are listed in Nearby instead, to keep the view calm.
+  const SEA = new Set(['tide', 'sanctuary']);
   function syncMarkers() {
     for (const m of document.querySelectorAll('.mk[data-found]')) m.remove();
     const found = Object.entries(PLACES)
-      .filter(([, p]) => p.found && p.miles <= LABEL_MILES)
+      .filter(([, p]) => p.found && SEA.has(p.kind) && p.miles <= LABEL_MILES)
       .sort((a, b) => a[1].miles - b[1].miles);
     const sun = Object.entries(PLACES).filter(([, p]) => p.sun);
     // Labels near each other in direction get different line lengths, so they stack instead of overlapping.
@@ -500,7 +503,9 @@
       const b = document.createElement('button');
       b.className = 'mk'; b.type = 'button'; b.dataset.place = id; b.dataset.found = '';
       b.setAttribute('aria-label', p.name);
-      const pill = document.createElement('span'); pill.className = 'pill t-meta'; pill.textContent = p.short;
+      const pill = document.createElement('span'); pill.className = 'pill t-meta';
+      pill.innerHTML = svgOf(iconName(id, p));
+      pill.append(p.short);
       const lead = document.createElement('span'); lead.className = 'lead'; lead.dataset.lead = String(lineFor(p));
       const dot = document.createElement('span'); dot.className = 'dot';
       b.append(pill, lead, dot);
@@ -512,16 +517,18 @@
     lastScale = 0;
   }
 
-  const ICONS = {
-    weather: '<path d="M7 18h10.5a4 4 0 0 0 .4-8 6 6 0 0 0-11.6 1.6A3.2 3.2 0 0 0 7 18z"/>',
-    station: '<path d="M10 13.6V5a2 2 0 0 1 4 0v8.6a4 4 0 1 1-4 0z"/><path d="M12 9v6"/>',
-    radar: '<path d="M12 12l6.4-6.4"/><path d="M19.1 7.6A8.5 8.5 0 1 1 16.4 4.9"/><path d="M15.4 10.2A3.8 3.8 0 1 1 13.8 8.6"/>',
-    alert: '<path d="M12 4.2l8.6 15.3H3.4z"/><path d="M12 10v4.4M12 16.9v.2"/>',
-    sun: '<path d="M7.5 17a4.5 4.5 0 0 1 9 0"/><path d="M3 17h18"/><path d="M12 7.5v2M6.2 10.2l1.4 1.4M17.8 10.2l-1.4 1.4"/>',
-    tide: '<path d="M3 18c1.8 0 1.8-1.5 3.6-1.5s1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/><path d="M12 13V4.5M9 7.5l3-3 3 3"/>',
-    sanctuary: '<path d="M3 9.5c1.8 0 1.8-1.5 3.6-1.5s1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/><path d="M3 15c1.8 0 1.8-1.5 3.6-1.5S8.4 15 10.2 15s1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/>',
-  };
-  const PHOTOS = { 'carysfort-reef': '../images/coral-replanting-carysfort.jpg', 'florida-keys-sanctuary': '../images/mangroves-aerial.jpg', 'sanctuary-florida-keys': '../images/mangroves-aerial.jpg' };
+  // Icons follow the brand's two modes: outline for tools and science (stations, radar), solid for public information.
+  const ICONS = window.HorizonIcons;
+  function iconName(id, p) {
+    if (id === 'weather' || (p && p.kind === 'forecast')) return 'weather';
+    if (id === 'sunrise' || id === 'sunset') return id;
+    if (p && (p.alert || p.kind === 'alert')) return 'alert';
+    if (id === 'carysfort-reef' || (p && p.kind === 'reef')) return 'pin';
+    if (id === 'florida-keys-sanctuary') return 'care';
+    return { tide: 'tide', sanctuary: 'care', station: 'gauge', radar: 'radar' }[p && p.kind] || 'pin';
+  }
+  const svgOf = (name) => `<svg class="ic-${ICONS[name].mode}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${ICONS[name].svg}</svg>`;
+  const CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
   const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
   const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const readingText = (r) => `${r.text}${r.age ? `, ${r.age}` : ''}`;
@@ -575,14 +582,13 @@
   }
   setInterval(() => { if (!document.hidden) updateSun(); }, 60 * 1000);
 
-  function row(id, title, line, live, kind, face = true) {
+  // One row: the icon, what it is, one line about it, and a live reading when there is one.
+  function row(id, p, title, line, live, face = true) {
     const li = document.createElement('li');
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'row';
-    if (kind === undefined) kind = PLACES[id] && PLACES[id].found ? PLACES[id].kind : (id === 'weather' ? 'weather' : null);
-    if (kind === 'forecast') kind = 'weather';
-    const lead = PHOTOS[id] ? `<img src="${PHOTOS[id]}" alt="">` : `<span class="tile${kind === 'alert' ? ' is-alert' : ''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[kind] || ICONS.sanctuary}</svg></span>`;
-    b.innerHTML = `${lead}<span><b class="t-row"></b><span class="t t-meta"></span>${live ? '<span class="t t-meta now"></span>' : ''}</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>`;
+    const name = iconName(id, p);
+    b.innerHTML = `<span class="ic${name === 'alert' ? ' is-alert' : ''}">${svgOf(name)}</span><span class="tx"><b class="t-body b"></b><span class="t t-meta"></span>${live ? '<span class="t t-meta now"></span>' : ''}</span>${CHEV}`;
     b.querySelector('b').textContent = title;
     b.querySelector('.t').textContent = line;
     if (live) b.querySelector('.now').textContent = live;
@@ -595,33 +601,67 @@
     if (n) n.textContent = text;
   }
 
+  // A titled group of rows: Weather alerts, Sky, Sea, Instruments.
+  function group(key, title, note, rows, extra) {
+    if (!rows.length && !extra) return null;
+    const sec = document.createElement('section');
+    sec.className = 'nb-group';
+    sec.dataset.group = key;
+    sec.innerHTML = `<h2 class="nb-h t-row"></h2>${note ? '<p class="nb-note t-meta"></p>' : ''}${rows.length ? '<ul class="nb-rows"></ul>' : ''}`;
+    sec.querySelector('h2').textContent = title;
+    if (note) sec.querySelector('.nb-note').textContent = note;
+    if (rows.length) sec.querySelector('ul').append(...rows);
+    if (extra) sec.append(extra);
+    return sec;
+  }
   function renderNearby() {
     if (nbPanel.hidden) return;
-    nbRetry.hidden = true;
-    if (NB.status === 'loading') { nbState.hidden = false; nbState.textContent = "Finding NOAA's work near you…"; }
-    else nbState.hidden = true;
+    nbState.hidden = NB.status !== 'loading';
+    nbState.textContent = "Finding NOAA's work near you…";
+    const v = S.viewer;
+    const where = (p) => lower(G.distanceText(v, p));
+    const byMiles = (a, b) => (a[1].miles ?? 0) - (b[1].miles ?? 0);
+    const entries = Object.entries(PLACES);
 
-    const items = [];
-    for (const a of S.alerts) items.push(row(a.id, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, 'alert', false));
-    items.push(row('weather', 'Weather for this sky', `Forecast for ${S.viewer.name}`, NB.forecast || null));
+    const alerts = S.alerts.map((a) => row(a.id, PLACES[a.id] || a, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, false));
+
+    const sky = [row('weather', PLACES.weather, 'Weather for this sky', NB.forecast || `Forecast for ${v.name}`, null)];
     for (const id of ['sunrise', 'sunset'].filter((k) => PLACES[k]).sort((a, b) => PLACES[a].at - PLACES[b].at)) {
       const p = PLACES[id];
-      items.push(row(id, p.name, `${capital(dayWord(p.at, S.tz))} at ${clock(p.at, S.tz)}, toward the ${G.dir8(p.bearing)}`, null, 'sun'));
+      sky.push(row(id, p, p.name, `${capital(dayWord(p.at, S.tz))} at ${clock(p.at, S.tz)}, toward the ${G.dir8(p.bearing)}`, null));
     }
-    const places = Object.entries(PLACES)
-      .filter(([id, p]) => id !== 'weather' && !p.away && (p.found || id === 'carysfort-reef' || id === 'florida-keys-sanctuary'))
-      .sort((a, b) => (a[1].miles ?? 0) - (b[1].miles ?? 0));
-    for (const [id, p] of places) {
-      const where = p.miles != null ? lower(G.distanceText(S.viewer, p)) : 'the water in front of you';
-      const live = p.kind === 'station' ? (p.reading ? readingText(p.reading) : 'No recent reading') : p.kind === 'tide' ? tideText(p) : null;
-      items.push(row(id, p.name, `${p.what}, ${where}`, live));
-    }
-    nbList.replaceChildren(...items);
+
+    const sea = entries
+      .filter(([id, p]) => !p.away && !p.far && ((p.found && SEA.has(p.kind)) || id === 'carysfort-reef' || id === 'florida-keys-sanctuary'))
+      .sort(byMiles)
+      .map(([id, p]) => {
+        if (id === 'florida-keys-sanctuary') return row(id, p, p.name, 'Marine sanctuary, the water in front of you', null);
+        if (p.kind === 'tide') return row(id, p, p.name, `Tide station, ${where(p)}`, tideText(p) || 'No tide predictions right now');
+        if (p.kind === 'sanctuary') return row(id, p, p.name, `Marine sanctuary, ${where(p)}`, null);
+        return row(id, p, p.name, `${p.what}, ${where(p)}`, null);
+      });
+
+    const instruments = entries
+      .filter(([, p]) => p.found && (p.kind === 'station' || p.kind === 'radar'))
+      .sort(byMiles)
+      .map(([id, p]) => (p.kind === 'station'
+        ? row(id, p, p.name, `Weather station, ${where(p)}`, p.reading ? readingText(p.reading) : 'No recent reading')
+        : row(id, p, p.name, `${p.what}, ${where(p)}`, null)));
+    let failed = null;
     if (NB.status === 'ready' && NB.error) {
-      nbState.hidden = false;
-      nbState.textContent = "Weather stations and radar didn't load.";
+      failed = document.createElement('div');
+      failed.className = 'nb-failed';
+      failed.innerHTML = '<p class="t-meta">Weather stations and radar didn\'t load.</p>';
       nbRetry.hidden = false;
-    }
+      failed.append(nbRetry);
+    } else nbRetry.hidden = true;
+
+    nbList.replaceChildren(...[
+      group('alerts', 'Weather alerts', null, alerts),
+      group('sky', 'Sky', 'The forecast and the sun, for where you are', sky),
+      group('sea', 'Sea', "NOAA's work on the water closest to you", sea),
+      group('instruments', 'Instruments', 'Stations and radar measuring the weather near you', instruments, failed),
+    ].filter(Boolean));
   }
   nbRetry.addEventListener('click', () => loadNearby(true));
 
@@ -926,7 +966,7 @@
     svList.replaceChildren(...saved.map((x) => {
       const where = x.lat == null ? '' : isHere(x) ? 'where you are' : lower(G.distanceText(S.viewer, x));
       const live = x.kind === 'station' ? 'Loading the latest reading…' : x.kind === 'forecast' ? 'Loading the forecast…' : x.kind === 'tide' ? 'Loading the tides…' : null;
-      const li = row(x.id, x.name, where ? `${x.what}, ${where}` : x.what, live, x.kind, false);
+      const li = row(x.id, x, x.name, where ? `${x.what}, ${where}` : x.what, live, false);
       if (x.kind === 'station') NWS.latest(x.code).then((r) => setLive(li, r ? readingText(r) : 'No recent reading'));
       if (x.kind === 'forecast') NWS.forecast(x).then((f) => setLive(li, forecastText(f)), () => setLive(li, "The forecast didn't load"));
       if (x.kind === 'tide') NWS.tideStation(x.code).then((t) => setLive(li, tideText(t) || 'No tide predictions right now'), () => setLive(li, "The tides didn't load"));
@@ -1051,6 +1091,13 @@
     try { sessionStorage.removeItem('horizon:live'); } catch (_) { /* no storage */ }
     G.saveViewer(null);
   }
+
+  // The labels and the location line written in the page get the brand icons too.
+  for (const m of document.querySelectorAll('.mk:not([data-found])')) {
+    m.querySelector('.pill').insertAdjacentHTML('afterbegin', svgOf(iconName(m.dataset.place, PLACES[m.dataset.place])));
+  }
+  document.querySelector('.where > svg').outerHTML = svgOf('pin');
+  document.querySelector('.where .note > svg').outerHTML = svgOf('info');
 
   refreshPlaces();
   updateText();

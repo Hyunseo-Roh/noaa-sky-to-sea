@@ -71,7 +71,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 .mk { position: absolute; z-index: 4; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; color: inherit; will-change: transform; }
 .mk[hidden] { display: none; }
-.mk .pill { display: inline-flex; align-items: center; height: 36px; padding: 0 var(--s-4); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); white-space: nowrap; box-shadow: 0 1px 6px color-mix(in srgb, var(--c-ink) 35%, transparent); }
+.mk .pill { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--s-4) 0 var(--s-3); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); white-space: nowrap; box-shadow: 0 1px 6px color-mix(in srgb, var(--c-ink) 35%, transparent); }
+.mk .pill svg { width: 18px; height: 18px; flex: none; }
 .mk .lead { width: 2px; background: var(--c-ground); box-shadow: 0 0 2px color-mix(in srgb, var(--c-ink) 35%, transparent); }
 .mk .dot { width: 12px; height: 12px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-ground); border: 2px solid var(--c-brand); }
 .mk.on .pill { font: var(--f-meta-b); box-shadow: 0 0 0 3px var(--c-state), 0 1px 6px color-mix(in srgb, var(--c-ink) 35%, transparent); }
@@ -131,15 +132,22 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-sub { margin-top: var(--s-1); color: var(--c-ink-2); }
 .nb-rows { margin-top: var(--s-4); border-top: 1px solid var(--c-rule); }
 .nb-rows li { border-bottom: 1px solid var(--c-rule); }
-.row { width: 100%; display: grid; grid-template-columns: 56px minmax(0, 1fr) 20px; gap: 14px; align-items: center; padding: var(--s-3) 0; text-align: left; }
-.row img, .row .tile { width: 56px; height: 56px; border-radius: var(--r-thumb); object-fit: cover; }
-.row .tile { display: flex; align-items: center; justify-content: center; border: 1px solid var(--c-rule); color: var(--c-brand); }
-.row .tile svg { width: 28px; height: 28px; }
-.row .tile.is-alert { color: var(--c-alert); border-color: color-mix(in srgb, var(--c-alert) 45%, transparent); }
+/* Nearby comes in titled groups: Weather alerts, Sky, Sea, Instruments */
+.nb-group { margin-top: var(--s-6); }
+.nb-groups > .nb-group:first-child { margin-top: var(--s-5); }
+.nb-h { color: var(--c-ink); }
+.nb-note { margin-top: 2px; color: var(--c-ink-2); }
+.nb-group .nb-rows { margin-top: var(--s-3); }
+.nb-failed { margin-top: var(--s-3); color: var(--c-ink-2); }
+/* a row: the icon (outline for instruments, solid for public information), what it is, one line, a live reading */
+.row { width: 100%; display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; gap: var(--s-4); align-items: start; padding: 14px 0; text-align: left; }
+.row .ic { width: 24px; height: 24px; color: var(--c-brand); }
+.row .ic svg { display: block; width: 24px; height: 24px; }
+.row .ic.is-alert { color: var(--c-alert); }
 .row b { display: block; color: var(--c-ink); }
 .row .t { display: block; color: var(--c-ink-2); }
 .row .now { color: var(--c-ink); }
-.row .chev { width: 20px; height: 20px; color: var(--c-brand); }
+.row .chev { width: 20px; height: 20px; color: var(--c-ink-2); align-self: center; }
 .nb-state { margin-top: var(--s-4); color: var(--c-ink-2); }
 .nb-retry { margin-top: var(--s-3); }
 .nb-retry[hidden] { display: none; }
