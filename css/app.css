@@ -91,7 +91,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .hint .btn { pointer-events: auto; background: var(--c-ground); color: var(--c-brand); border-color: var(--c-ground); }
 .hint .btn svg { width: 22px; height: 22px; }
 .hint .btn[hidden] { display: none; }
-.screen.has-sheet .hint { display: none; }
+.screen.has-sheet .hint, .screen.has-intro .hint { display: none; }
 .screen .tabs { position: absolute; left: 0; transform: none; max-width: none; }
 
 /* place preview: a sheet over the view */
@@ -106,6 +106,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 .pv img { width: 72px; height: 72px; object-fit: cover; border-radius: var(--r-thumb); }
 .sheet .office { margin-top: var(--s-3); }
 .sheet .btn { margin-top: var(--s-4); width: 100%; }
+/* the first-run note: a sheet over the sample view */
+.intro { z-index: 22; }
+.intro h2, .intro h2:focus-visible { margin-top: 2px; outline: none; }
+.intro .in-text { margin-top: var(--s-2); }
+.intro .in-note { margin-top: var(--s-3); color: var(--c-ink-2); }
+
 /* Save and Share under the main button */
 .acts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); margin-top: var(--s-2); }
 .sheet .acts .btn { margin-top: 0; width: auto; padding: 0 var(--s-3); }

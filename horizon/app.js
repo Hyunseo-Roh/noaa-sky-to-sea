@@ -4,7 +4,9 @@
   const G = window.HorizonGeo;
   const NWS = window.HorizonNWS;
   const SANCTUARIES = window.HorizonSanctuaries || [];
+  const SUN = window.HorizonSun;
   const DEMO = G.DEMO;
+  const DEMO_TZ = 'America/New_York';
 
   // bearing/elev in degrees. `follow` pins a place to the sky in front of you, whichever way you face.
   // `near` shows a place only when you are within `radius` miles of it.
@@ -62,6 +64,7 @@
   const alertMore = $('#alert-more');
   const topBlock = $('.top');
   const hintBlock = $('.hint');
+  const intro = $('#intro');
   let markers = [...document.querySelectorAll('.mk')];
   let leads = [...document.querySelectorAll('.lead[data-lead]')];
 
@@ -92,6 +95,7 @@
     next: null,            // a tab to open once Back has returned to the view
     hintOverride: '',
     alerts: [], alertsKey: null, alertsFailed: false,
+    tz: DEMO_TZ,           // the time zone where you stand, for sunrise, sunset and tide times
   };
   const anyPanel = () => !nbPanel.hidden || !svPanel.hidden;
 
@@ -113,7 +117,17 @@
     updateText();
     if (!sheet.hidden) openSheet(sheet.dataset.place, false);
     if (moved && (S.mode === 'live' || !nbPanel.hidden)) loadNearby();
-    if (moved) loadAlerts();
+    if (moved) { loadAlerts(); loadTimeZone(v); }
+  }
+  function loadTimeZone(v) {
+    S.tz = v === DEMO ? DEMO_TZ : null;
+    updateSun();
+    if (v === DEMO) return;
+    NWS.points(v).then((pt) => {
+      if (NWS.spot(S.viewer) !== NWS.spot(v) || !pt.tz || pt.tz === S.tz) return;
+      S.tz = pt.tz;
+      updateSun(true);
+    }, () => { /* outside the NWS area: the phone's own time zone */ });
   }
 
   function geometry() {
@@ -168,7 +182,8 @@
     // Places stay between the location block at the top and the hint at the bottom.
     const box = screen.getBoundingClientRect();
     const ceiling = topBlock.getBoundingClientRect().bottom - box.top + 12;
-    const floor = (sheet.hidden ? hintBlock.getBoundingClientRect().top : sheet.getBoundingClientRect().top) - box.top - 12;
+    const below = !intro.hidden ? intro : !sheet.hidden ? sheet : hintBlock;
+    const floor = below.getBoundingClientRect().top - box.top - 12;
 
     // The leader lines were drawn for an 844 px tall screen; keep the same spacing on other heights.
     const k = clamp(g.H / 844, 0.7, 1.15);
@@ -445,7 +460,12 @@
       const found = [];
       const sanct = nearestSanctuary(v);
       if (sanct) found.push(sanct);
-      try { found.push(...await NWS.nearby(v)); } catch (_) { NB.error = true; }
+      const [near, tide] = await Promise.all([
+        NWS.nearby(v).catch(() => { NB.error = true; return []; }),
+        NWS.tides(v).catch(() => null),
+      ]);
+      found.push(...near);
+      if (tide && G.miles(v, tide) <= NEAR_MILES) found.push(tide);
       if (NB.key !== key) return;
       for (const id of Object.keys(PLACES)) if (PLACES[id].found) delete PLACES[id];
       for (const p of found) PLACES[p.id] = { ...p, elev: 0, found: true };
@@ -465,12 +485,23 @@
     const found = Object.entries(PLACES)
       .filter(([, p]) => p.found && p.miles <= LABEL_MILES)
       .sort((a, b) => a[1].miles - b[1].miles);
-    found.forEach(([id, p], i) => {
+    const sun = Object.entries(PLACES).filter(([, p]) => p.sun);
+    // Labels near each other in direction get different line lengths, so they stack instead of overlapping.
+    const taken = Object.entries(PLACES)
+      .filter(([id, p]) => !p.found && !p.sun && p.bearing != null && !p.away && document.querySelector(`.mk[data-place="${id}"] .lead`))
+      .map(([id, p]) => ({ b: p.bearing, len: Number(document.querySelector(`.mk[data-place="${id}"] .lead`).dataset.lead) }));
+    const lineFor = (p) => {
+      const near = taken.filter((t) => Math.abs(wrap(t.b - p.bearing)) < 24).map((t) => t.len);
+      const len = LADDER.find((l) => near.every((n) => Math.abs(n - l) >= 40)) ?? LADDER[near.length % LADDER.length];
+      taken.push({ b: p.bearing, len });
+      return len;
+    };
+    [...found, ...sun].forEach(([id, p]) => {
       const b = document.createElement('button');
       b.className = 'mk'; b.type = 'button'; b.dataset.place = id; b.dataset.found = '';
       b.setAttribute('aria-label', p.name);
       const pill = document.createElement('span'); pill.className = 'pill t-meta'; pill.textContent = p.short;
-      const lead = document.createElement('span'); lead.className = 'lead'; lead.dataset.lead = String(LADDER[i % LADDER.length]);
+      const lead = document.createElement('span'); lead.className = 'lead'; lead.dataset.lead = String(lineFor(p));
       const dot = document.createElement('span'); dot.className = 'dot';
       b.append(pill, lead, dot);
       b.addEventListener('click', () => select(id));
@@ -486,6 +517,8 @@
     station: '<path d="M10 13.6V5a2 2 0 0 1 4 0v8.6a4 4 0 1 1-4 0z"/><path d="M12 9v6"/>',
     radar: '<path d="M12 12l6.4-6.4"/><path d="M19.1 7.6A8.5 8.5 0 1 1 16.4 4.9"/><path d="M15.4 10.2A3.8 3.8 0 1 1 13.8 8.6"/>',
     alert: '<path d="M12 4.2l8.6 15.3H3.4z"/><path d="M12 10v4.4M12 16.9v.2"/>',
+    sun: '<path d="M7.5 17a4.5 4.5 0 0 1 9 0"/><path d="M3 17h18"/><path d="M12 7.5v2M6.2 10.2l1.4 1.4M17.8 10.2l-1.4 1.4"/>',
+    tide: '<path d="M3 18c1.8 0 1.8-1.5 3.6-1.5s1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/><path d="M12 13V4.5M9 7.5l3-3 3 3"/>',
     sanctuary: '<path d="M3 9.5c1.8 0 1.8-1.5 3.6-1.5s1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/><path d="M3 15c1.8 0 1.8-1.5 3.6-1.5S8.4 15 10.2 15s1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/>',
   };
   const PHOTOS = { 'carysfort-reef': '../images/coral-replanting-carysfort.jpg', 'florida-keys-sanctuary': '../images/mangroves-aerial.jpg', 'sanctuary-florida-keys': '../images/mangroves-aerial.jpg' };
@@ -493,6 +526,54 @@
   const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const readingText = (r) => `${r.text}${r.age ? `, ${r.age}` : ''}`;
   const forecastText = (f) => `${f.short}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit}`;
+
+  // Clock times in the time zone where you stand: "7:05 AM", or "7:05 AM PDT" with the zone.
+  function clock(date, tz, zone) {
+    const o = { hour: 'numeric', minute: '2-digit' };
+    if (zone) o.timeZoneName = 'short';
+    try { return new Intl.DateTimeFormat('en-US', { ...o, timeZone: tz || undefined }).format(date); } catch (_) { return new Intl.DateTimeFormat('en-US', o).format(date); }
+  }
+  // "today", "tomorrow" or the weekday, where you stand.
+  function dayWord(date, tz) {
+    const f = (x) => { try { return new Intl.DateTimeFormat('en-US', { timeZone: tz || undefined, year: 'numeric', month: 'numeric', day: 'numeric' }).format(x); } catch (_) { return x.toDateString(); } };
+    if (f(date) === f(new Date())) return 'today';
+    if (f(date) === f(new Date(Date.now() + 864e5))) return 'tomorrow';
+    try { return new Intl.DateTimeFormat('en-US', { timeZone: tz || undefined, weekday: 'long' }).format(date); } catch (_) { return ''; }
+  }
+  // "Rising. High tide 6.7 ft at 9:56 AM, then low tide 1.8 ft at 4:10 PM"
+  function tideText(p) {
+    const now = Date.now();
+    const next = (p.predictions || []).filter((x) => Date.parse(x.t) > now);
+    if (!next.length) return null;
+    const tz = p.tz || S.tz;
+    const zone = !!p.tz && p.tz !== S.tz; // a station in another time zone says which
+    const w = (x) => {
+      const d = new Date(x.t), dw = dayWord(d, tz);
+      return `${x.type === 'H' ? 'high' : 'low'} tide ${x.v} ft at ${clock(d, tz, zone)}${dw === 'today' ? '' : ` ${dw}`}`;
+    };
+    const [a, b] = next;
+    return `${a.type === 'H' ? 'Rising' : 'Falling'}. ${capital(w(a))}${b ? `, then ${w(b)}` : ''}`;
+  }
+
+  // Sunrise and sunset sit on the horizon in their real direction, with their time.
+  function updateSun(force) {
+    const v = S.viewer;
+    const n = SUN.next(new Date(), v.lat, v.lon);
+    let changed = !!force;
+    for (const [id, e, label] of [['sunrise', n.rise, 'Sunrise'], ['sunset', n.set, 'Sunset']]) {
+      if (!e) { if (PLACES[id]) { delete PLACES[id]; changed = true; } continue; }
+      const short = `${label} ${clock(e.at, S.tz)}`;
+      const old = PLACES[id];
+      if (!old || old.short !== short || Math.abs(old.bearing - e.az) > 0.05) changed = true;
+      PLACES[id] = { kind: 'sun', sun: true, bearing: e.az, elev: 0, name: label, short, at: e.at, daylight: e.daylight };
+    }
+    if (!changed) return;
+    syncMarkers();
+    const open = sheet.dataset.place;
+    if (!sheet.hidden && (open === 'sunrise' || open === 'sunset')) openSheet(open, false);
+    renderNearby();
+  }
+  setInterval(() => { if (!document.hidden) updateSun(); }, 60 * 1000);
 
   function row(id, title, line, live, kind, face = true) {
     const li = document.createElement('li');
@@ -523,12 +604,16 @@
     const items = [];
     for (const a of S.alerts) items.push(row(a.id, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, 'alert', false));
     items.push(row('weather', 'Weather for this sky', `Forecast for ${S.viewer.name}`, NB.forecast || null));
+    for (const id of ['sunrise', 'sunset'].filter((k) => PLACES[k]).sort((a, b) => PLACES[a].at - PLACES[b].at)) {
+      const p = PLACES[id];
+      items.push(row(id, p.name, `${capital(dayWord(p.at, S.tz))} at ${clock(p.at, S.tz)}, toward the ${G.dir8(p.bearing)}`, null, 'sun'));
+    }
     const places = Object.entries(PLACES)
       .filter(([id, p]) => id !== 'weather' && !p.away && (p.found || id === 'carysfort-reef' || id === 'florida-keys-sanctuary'))
       .sort((a, b) => (a[1].miles ?? 0) - (b[1].miles ?? 0));
     for (const [id, p] of places) {
       const where = p.miles != null ? lower(G.distanceText(S.viewer, p)) : 'the water in front of you';
-      const live = p.kind === 'station' ? (p.reading ? `${p.reading.text}${p.reading.age ? `, ${p.reading.age}` : ''}` : 'No recent reading') : null;
+      const live = p.kind === 'station' ? (p.reading ? readingText(p.reading) : 'No recent reading') : p.kind === 'tide' ? tideText(p) : null;
       items.push(row(id, p.name, `${p.what}, ${where}`, live));
     }
     nbList.replaceChildren(...items);
@@ -553,14 +638,25 @@
 
   function openSheet(id, focus = true) {
     const pl = PLACES[id];
-    const generic = pl && (pl.found || pl.kept);
+    const generic = pl && (pl.found || pl.kept || pl.sun);
     const tpl = document.getElementById(pl && pl.alert ? 'tpl-alert' : generic ? 'tpl-place' : `tpl-${id}`);
     if (!tpl || !pl || pl.away) { closeSheet(); return; }
     sheetBody.replaceChildren(tpl.content.cloneNode(true));
     sheet.dataset.place = id;
     sheet.dataset.kind = pl.alert ? 'alert' : (pl.kind || id);
     if (pl.alert) fillAlert(pl);
-    else if (generic) {
+    else if (pl.sun) {
+      const dw = dayWord(pl.at, S.tz);
+      const mins = Math.round(pl.daylight);
+      sheetBody.querySelector('[data-name]').textContent = pl.name;
+      sheetBody.querySelector('[data-kind]').textContent = `${capital(dw)} at ${clock(pl.at, S.tz, true)}`;
+      sheetBody.querySelector('[data-distance]').textContent = `Toward the ${G.dir8(pl.bearing)}, ${Math.round(pl.bearing)}°`;
+      sheetBody.querySelector('[data-reading]').textContent = `${Math.floor(mins / 60)} h ${mins % 60} min of daylight ${dw === 'today' || dw === 'tomorrow' ? dw : `on ${dw}`}`;
+      sheetBody.querySelector('[data-office]').textContent = 'Global Monitoring Laboratory';
+      const a = sheetBody.querySelector('[data-link]');
+      a.href = 'https://gml.noaa.gov/grad/solcalc/';
+      a.textContent = "Open NOAA's solar calculator";
+    } else if (generic) {
       sheetBody.querySelector('[data-name]').textContent = pl.name;
       sheetBody.querySelector('[data-kind]').textContent = pl.what;
       const r = sheetBody.querySelector('[data-reading]');
@@ -570,6 +666,16 @@
           r.textContent = 'Loading the latest reading…';
           NWS.latest(pl.code).then((x) => { if (sheetIs(id)) r.textContent = x ? capital(readingText(x)) : 'No recent reading'; });
         }
+      } else if (pl.kind === 'tide') {
+        const t = tideText(pl);
+        if (t) r.textContent = t;
+        else if (pl.kept) {
+          r.textContent = 'Loading the tides…';
+          NWS.tideStation(pl.code).then(
+            (x) => { pl.predictions = x.predictions; pl.tz = x.tz; if (sheetIs(id)) r.textContent = tideText(x) || 'No tide predictions right now'; },
+            () => { if (sheetIs(id)) r.textContent = "The tides didn't load. Try again in a moment."; },
+          );
+        } else r.textContent = 'No tide predictions right now';
       } else if (pl.kind === 'forecast') {
         r.textContent = 'Loading the forecast…';
         NWS.forecast(pl).then(
@@ -581,7 +687,7 @@
       const a = sheetBody.querySelector('[data-link]');
       if (pl.link) { a.href = pl.link; a.textContent = pl.linkText; } else a.remove();
     }
-    if (!pl.alert) { sheetBody.append(actions()); syncActs(); }
+    if (!pl.alert && !pl.sun) { sheetBody.append(actions()); syncActs(); }
     const d = sheetBody.querySelector('[data-distance]');
     if (d && pl.lat != null) d.textContent = isHere(pl) ? 'Where you are' : G.distanceText(S.viewer, pl);
     const when = sheetBody.querySelector('[data-period]');
@@ -633,6 +739,7 @@
   }
   function route() {
     S.at = location.hash;
+    closeIntro();
     const id = decodeURIComponent(location.hash.slice(1));
     if (id === 'nearby' || id === 'saved') { closeSheet(); showPanel(id); return; }
     showPanel(null);
@@ -693,10 +800,14 @@
   tabSaved.addEventListener('click', (e) => { e.preventDefault(); goTab('saved'); });
   addEventListener('popstate', nav);
   addEventListener('hashchange', nav);
-  addEventListener('keydown', (e) => { if (e.key === 'Escape' && (!sheet.hidden || anyPanel())) dismiss(); });
+  addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (!intro.hidden) closeIntro();
+    else if (!sheet.hidden || anyPanel()) dismiss();
+  });
 
   // A place you open from Saved or from a shared link, when it is not one of the places around you.
-  const LINKED = /^(station|radar|sanctuary|forecast)-(.+)$/;
+  const LINKED = /^(station|radar|sanctuary|forecast|tide)-(.+)$/;
   async function resolvePlace(id) {
     if (PLACES[id]) return PLACES[id];
     const m = id.match(LINKED);
@@ -719,6 +830,7 @@
       } else if (snap) p = { ...snap };
       else if (m[1] === 'station') p = await NWS.station(m[2]);
       else if (m[1] === 'radar') p = await NWS.radar(m[2]);
+      else if (m[1] === 'tide') p = await NWS.tideStation(m[2]);
     } catch (_) { p = null; }
     if (PLACES[id]) return PLACES[id];
     if (!p) return null;
@@ -813,10 +925,11 @@
     svList.hidden = saved.length === 0;
     svList.replaceChildren(...saved.map((x) => {
       const where = x.lat == null ? '' : isHere(x) ? 'where you are' : lower(G.distanceText(S.viewer, x));
-      const live = x.kind === 'station' ? 'Loading the latest reading…' : x.kind === 'forecast' ? 'Loading the forecast…' : null;
+      const live = x.kind === 'station' ? 'Loading the latest reading…' : x.kind === 'forecast' ? 'Loading the forecast…' : x.kind === 'tide' ? 'Loading the tides…' : null;
       const li = row(x.id, x.name, where ? `${x.what}, ${where}` : x.what, live, x.kind, false);
       if (x.kind === 'station') NWS.latest(x.code).then((r) => setLive(li, r ? readingText(r) : 'No recent reading'));
       if (x.kind === 'forecast') NWS.forecast(x).then((f) => setLive(li, forecastText(f)), () => setLive(li, "The forecast didn't load"));
+      if (x.kind === 'tide') NWS.tideStation(x.code).then((t) => setLive(li, tideText(t) || 'No tide predictions right now'), () => setLive(li, "The tides didn't load"));
       return li;
     }));
   }
@@ -879,6 +992,24 @@
   }
   setInterval(() => { if (!document.hidden) loadAlerts(); }, 5 * 60 * 1000);
 
+  // The first time you open Horizon, a short note says what it does. It is remembered on the phone.
+  const INTRO_KEY = 'horizon:intro';
+  function openIntro() {
+    intro.hidden = false;
+    screen.classList.add('has-intro');
+    $('#in-t').focus({ preventScroll: true });
+  }
+  function closeIntro() {
+    if (intro.hidden) return;
+    intro.hidden = true;
+    screen.classList.remove('has-intro');
+    try { localStorage.setItem(INTRO_KEY, '1'); } catch (_) { /* no storage */ }
+  }
+  $('#intro-go').addEventListener('click', () => {
+    closeIntro();
+    (startBtn.hidden ? screen : startBtn).focus({ preventScroll: true });
+  });
+
   async function loadForecast() {
     const what = sheetBody.querySelector('[data-forecast]');
     const when = sheetBody.querySelector('[data-period]');
@@ -923,7 +1054,11 @@
 
   refreshPlaces();
   updateText();
+  updateSun(true);
   route();
   loadAlerts();
+  let introSeen = false;
+  try { introSeen = localStorage.getItem(INTRO_KEY) === '1'; } catch (_) { /* no storage */ }
+  if (!introSeen && !location.hash && !(wasLive && canCamera && returning)) openIntro();
   requestAnimationFrame(tick);
 })();

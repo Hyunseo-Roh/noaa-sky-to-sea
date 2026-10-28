@@ -18,6 +18,7 @@
 <script src="geo.js" defer></script>
 <script src="nws.js" defer></script>
 <script src="sanctuaries.js" defer></script>
+<script src="sun.js" defer></script>
 <script src="app.js" defer></script>
 </head>
 <body class="view-page">
@@ -56,7 +57,7 @@
     <ul class="nb-rows" id="nb-list"></ul>
     <p class="nb-state t-meta" id="nb-state" role="status" hidden></p>
     <button class="btn secondary nb-retry" type="button" id="nb-retry" hidden>Try again</button>
-    <p class="nb-source t-meta">Weather stations, radar, forecasts and alerts come live from the National Weather Service.</p>
+    <p class="nb-source t-meta">Weather stations, radar, forecasts and alerts come live from the National Weather Service, and tides from NOAA's tide stations. Sunrise and sunset use NOAA's solar calculator.</p>
   </section>
 
   <section class="panel" id="saved" hidden aria-labelledby="sv-t">
@@ -64,6 +65,14 @@
     <p class="nb-sub t-meta">Places you saved on this phone</p>
     <ul class="nb-rows" id="sv-list"></ul>
     <p class="sv-empty t-body" id="sv-empty" hidden>Nothing saved yet. Open a place and tap Save to keep it here.</p>
+  </section>
+
+  <section class="sheet intro" id="intro" hidden aria-labelledby="in-t">
+    <div class="grab"></div>
+    <h2 id="in-t" class="t-title" tabindex="-1">See NOAA's work on your horizon</h2>
+    <p class="in-text t-body">Hold your phone up to the sky or the sea. Labels show the forecast, weather stations, radar, tides, marine sanctuaries and the sun, each in its real direction.</p>
+    <p class="in-note t-meta">Horizon asks for your camera and location only when you turn the camera on.</p>
+    <button class="btn" type="button" id="intro-go">Start looking</button>
   </section>
 
   <nav class="tabs" aria-label="Horizon">

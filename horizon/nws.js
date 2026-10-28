@@ -195,5 +195,32 @@ window.HorizonNWS = (() => {
     return out;
   }
 
-  return { points, forecast, nearby, latest, station, radar, alerts, spot };
+  // Tides come from NOAA's tide stations (CO-OPS) through the app's own /api/tides, which finds the nearest station.
+  const TIDES = new URL('../api/tides', document.baseURI).href;
+  function tidePlace(j) {
+    const st = j.station;
+    const town = st.name.split(',')[0].trim();
+    return {
+      id: `tide-${st.id}`, kind: 'tide', code: st.id, lat: st.lat, lon: st.lon,
+      name: `Tides at ${st.name}`, short: `${town} tides`,
+      what: 'Tide predictions', office: 'National Ocean Service',
+      predictions: j.predictions || [],
+      link: `https://tidesandcurrents.noaa.gov/noaatidepredictions.html?id=${encodeURIComponent(st.id)}`, linkText: 'See the tide chart',
+    };
+  }
+  async function tidesFrom(url, key) {
+    const hit = cacheGet(key, 30 * 60 * 1000);
+    if (hit) return hit;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(String(r.status));
+    const out = tidePlace(await r.json());
+    // the station's own time zone, so its tide times read right from anywhere
+    try { out.tz = (await points(out)).tz || null; } catch (_) { out.tz = null; }
+    cacheSet(key, out);
+    return out;
+  }
+  const tides = (v) => tidesFrom(`${TIDES}?lat=${v.lat.toFixed(2)}&lon=${v.lon.toFixed(2)}`, `horizon:tides:${v.lat.toFixed(2)},${v.lon.toFixed(2)}`);
+  const tideStation = (id) => tidesFrom(`${TIDES}?station=${encodeURIComponent(id)}`, `horizon:tide:${id}`);
+
+  return { points, forecast, nearby, latest, station, radar, alerts, tides, tideStation, spot };
 })();
