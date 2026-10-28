@@ -30,6 +30,7 @@
   <div class="top">
     <div class="where"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11.2a6.5 6.5 0 0 1 13 0C18.5 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.3"/></svg><div><b class="t-row" id="place-name">Key Largo, Florida</b><span class="t-meta" id="facing">Facing east</span><span class="note t-meta b"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6.3"/><path d="M8 7.2v4M8 4.8v.2" stroke-linecap="round"/></svg><span id="note">Demo location, sample view</span></span></div></div>
     <button class="round" type="button" id="stop" hidden aria-label="Turn off the camera" title="Turn off the camera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.8l1.6-2.2h6.2L16.7 7h2.8A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="12.8" r="3.4"/><path d="M4 4l16 16"/></svg></button>
+    <div class="alert-row" id="alert-row" hidden><button class="alert" type="button" id="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4.2l8.6 15.3H3.4z"/><path d="M12 10v4.4M12 16.9v.2"/></svg><span id="alert-label"></span><span class="more" id="alert-more" hidden></span></button></div>
   </div>
 
   <button class="mk" type="button" data-place="weather" aria-label="Weather for this sky"><span class="pill t-meta">Weather for this sky</span><span class="lead" data-lead="48" style="height: 48px"></span><span class="dot"></span></button>
@@ -55,13 +56,20 @@
     <ul class="nb-rows" id="nb-list"></ul>
     <p class="nb-state t-meta" id="nb-state" role="status" hidden></p>
     <button class="btn secondary nb-retry" type="button" id="nb-retry" hidden>Try again</button>
-    <p class="nb-source t-meta">Weather stations, radar and forecasts come live from the National Weather Service.</p>
+    <p class="nb-source t-meta">Weather stations, radar, forecasts and alerts come live from the National Weather Service.</p>
+  </section>
+
+  <section class="panel" id="saved" hidden aria-labelledby="sv-t">
+    <h1 id="sv-t" class="t-title" tabindex="-1">Saved</h1>
+    <p class="nb-sub t-meta">Places you saved on this phone</p>
+    <ul class="nb-rows" id="sv-list"></ul>
+    <p class="sv-empty t-body" id="sv-empty" hidden>Nothing saved yet. Open a place and tap Save to keep it here.</p>
   </section>
 
   <nav class="tabs" aria-label="Horizon">
     <a href="index.html" id="tab-view" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7h2.8l1.6-2.2h6.2L16.7 7h2.8A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z"/><circle cx="12" cy="12.8" r="3.4"/></svg>View</a>
     <a href="#nearby" id="tab-nearby"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="18" r="1" fill="currentColor"/></svg>Nearby</a>
-    <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 4h11v16l-5.5-4-5.5 4z"/></svg>Saved</a>
+    <a href="#saved" id="tab-saved"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" aria-hidden="true"><path d="M6.5 4h11v16l-5.5-4-5.5 4z"/></svg>Saved</a>
   </nav>
 </div>
 
@@ -96,10 +104,24 @@
       <h2 id="pv-t" class="t-title" tabindex="-1">Weather for this sky</h2>
       <p class="what t-body b" data-forecast>Loading the forecast…</p>
       <p class="dist t-meta" data-period>Key Largo, Florida</p>
+      <p class="dist t-meta" data-alerts hidden></p>
     </div>
   </div>
   <p class="office t-meta"><b>NOAA</b><i></i><span>National Weather Service</span></p>
   <a class="btn" data-forecast-link href="https://forecast.weather.gov/MapClick.php?lat=25.2156&amp;lon=-80.3467" target="_blank" rel="noopener">See the full forecast</a>
+</template>
+
+<template id="tpl-alert">
+  <div class="pv no-img">
+    <div>
+      <h2 id="pv-t" class="t-title" tabindex="-1" data-name></h2>
+      <p class="what t-body b" data-when></p>
+      <p class="dist area t-meta" data-area></p>
+    </div>
+  </div>
+  <p class="alert-text t-body" data-text></p>
+  <p class="office t-meta"><b>NOAA</b><i></i><span>National Weather Service</span></p>
+  <a class="btn" data-link target="_blank" rel="noopener"></a>
 </template>
 
 <template id="tpl-place">

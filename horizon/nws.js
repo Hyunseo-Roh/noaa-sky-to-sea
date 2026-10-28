@@ -34,7 +34,7 @@ window.HorizonNWS = (() => {
   const sentence = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
   async function points(v) {
-    const key = `horizon:points2:${spot(v)}`;
+    const key = `horizon:points3:${spot(v)}`;
     const hit = cacheGet(key, 24 * 60 * 60 * 1000);
     if (hit) return hit;
     const p = (await getJSON(`${API}/points/${v.lat.toFixed(4)},${v.lon.toFixed(4)}`)).properties;
@@ -44,6 +44,7 @@ window.HorizonNWS = (() => {
       stations: p.observationStations || null,
       radar: p.radarStation || null,
       city: rl && rl.city ? `${rl.city}, ${STATES[rl.state] || rl.state}` : null,
+      tz: p.timeZone || null,
     };
     cacheSet(key, out);
     return out;
@@ -80,6 +81,52 @@ window.HorizonNWS = (() => {
     return { text: parts.join(', '), age };
   }
 
+  // A station's latest reading, cached for ten minutes.
+  async function latest(code) {
+    const key = `horizon:obs:${code}`;
+    const hit = cacheGet(key, 10 * 60 * 1000);
+    if (hit) return hit.r;
+    let r = null;
+    try { r = reading((await getJSON(`${API}/stations/${code}/observations/latest`)).properties); } catch (_) { r = null; }
+    cacheSet(key, { r });
+    return r;
+  }
+
+  // a break chance after each slash, so "Burbank/Glendale/Pasadena Airport" can wrap
+  const stationName = (name, code) => nameCase(name || code).replace(/\//g, '/\u200B');
+  function stationPlace(s) {
+    return {
+      id: `station-${s.code}`, kind: 'station', code: s.code, lat: s.lat, lon: s.lon,
+      name: s.name, short: `${s.name.split(/\s+-\s+|[/,]/)[0].trim()} station`,
+      what: 'Weather station', office: 'National Weather Service',
+      reading: s.reading, link: `https://www.weather.gov/wrh/timeseries?site=${s.code}`, linkText: "See this station's readings",
+    };
+  }
+  function radarPlace(rd, fallback) {
+    const [lon, lat] = rd.geometry.coordinates;
+    const code = rd.properties.id || fallback;
+    const town = rd.properties.name ? titleCase(rd.properties.name) : code;
+    return {
+      id: `radar-${code}`, kind: 'radar', code, lat, lon,
+      name: `${town} weather radar`, short: `Radar ${code}`,
+      what: rd.properties.stationType === 'TDWR' ? `Airport weather radar ${code}` : `Doppler weather radar ${code}`,
+      office: 'National Weather Service',
+      link: `https://radar.weather.gov/station/${code.toLowerCase()}/standard`, linkText: 'See the radar',
+    };
+  }
+
+  // One station or radar by its code, for a saved place or a shared link.
+  async function station(code) {
+    const f = await getJSON(`${API}/stations/${encodeURIComponent(code)}`);
+    const [lon, lat] = f.geometry.coordinates;
+    const id = (f.properties && f.properties.stationIdentifier) || code;
+    return stationPlace({ code: id, name: stationName(f.properties && f.properties.name, id), lat, lon, reading: await latest(id) });
+  }
+  async function radar(code) {
+    const rd = await getJSON(`${API}/radar/stations/${encodeURIComponent(code)}`);
+    return radarPlace(rd, code);
+  }
+
   // The three closest weather stations that reported in the last three hours, and the radar that covers you.
   async function nearby(v) {
     const key = `horizon:nearby2:${spot(v)}`;
@@ -96,41 +143,57 @@ window.HorizonNWS = (() => {
       .map((f) => {
         const [lon, lat] = (f.geometry && f.geometry.coordinates) || [];
         const code = f.properties && f.properties.stationIdentifier;
-        // a break chance after each slash, so "Burbank/Glendale/Pasadena Airport" can wrap
-        return typeof lat === 'number' && code ? { code, name: nameCase(f.properties.name || code).replace(/\//g, '/\u200B'), lat, lon } : null;
+        return typeof lat === 'number' && code ? { code, name: stationName(f.properties.name, code), lat, lon } : null;
       })
       .filter((s) => s && !seen.has(s.code) && seen.add(s.code))
       .sort((a, b) => G.miles(v, a) - G.miles(v, b))
       .slice(0, 6);
     await Promise.all(stations.map(async (s) => {
-      try { s.reading = reading((await getJSON(`${API}/stations/${s.code}/observations/latest`)).properties); } catch (_) { s.reading = null; }
+      s.reading = await latest(s.code);
     }));
     // Stations that are not reporting are left out; if none is, the closest one shows with "No recent reading".
     let shown = stations.filter((s) => s.reading).slice(0, 3);
     if (!shown.length && stations.length) shown = stations.slice(0, 1);
-    for (const s of shown) {
-      out.push({
-        id: `station-${s.code}`, kind: 'station', code: s.code, lat: s.lat, lon: s.lon,
-        name: s.name, short: `${s.name.split(/\s+-\s+|[/,]/)[0].trim()} station`,
-        what: 'Weather station', office: 'National Weather Service',
-        reading: s.reading, link: `https://www.weather.gov/wrh/timeseries?site=${s.code}`, linkText: "See this station's readings",
-      });
-    }
-    if (rd && rd.geometry && rd.properties) {
-      const [lon, lat] = rd.geometry.coordinates;
-      const code = rd.properties.id || pt.radar;
-      const town = rd.properties.name ? titleCase(rd.properties.name) : code;
-      out.push({
-        id: `radar-${code}`, kind: 'radar', code, lat, lon,
-        name: `${town} weather radar`, short: `Radar ${code}`,
-        what: rd.properties.stationType === 'TDWR' ? `Airport weather radar ${code}` : `Doppler weather radar ${code}`,
-        office: 'National Weather Service',
-        link: `https://radar.weather.gov/station/${code.toLowerCase()}/standard`, linkText: 'See the radar',
-      });
-    }
+    for (const s of shown) out.push(stationPlace(s));
+    if (rd && rd.geometry && rd.properties) out.push(radarPlace(rd, pt.radar));
     cacheSet(key, out);
     return out;
   }
 
-  return { points, forecast, nearby, spot };
+  // Weather alerts in effect where you are (warnings, watches, advisories), most severe first.
+  const SEVERITY = { Extreme: 0, Severe: 1, Moderate: 2, Minor: 3 };
+  const shortId = (s) => { let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h.toString(36); };
+  function alertWhat(p) {
+    const d = (p.description || '').replace(/\r/g, '');
+    const m = d.match(/\*\s*WHAT\.\.\.([\s\S]*?)(?:\n\s*\n|\n\*|$)/);
+    let t = m ? m[1] : (d.split(/\n\s*\n/)[0] || p.headline || '');
+    t = t.replace(/\s+/g, ' ').trim();
+    if (t && t === t.toUpperCase()) t = sentence(t);
+    return t;
+  }
+  async function alerts(v) {
+    const key = `horizon:alerts:${spot(v)}`;
+    const hit = cacheGet(key, 5 * 60 * 1000);
+    if (hit) return hit;
+    const fc = await getJSON(`${API}/alerts/active?point=${v.lat.toFixed(4)},${v.lon.toFixed(4)}`);
+    let tz = null;
+    try { tz = (await points(v)).tz; } catch (_) { /* no time zone: the phone's own is used */ }
+    const now = Date.now();
+    const out = ((fc && fc.features) || [])
+      .map((f) => f.properties || {})
+      .filter((p) => p.event && p.status === 'Actual' && p.messageType !== 'Cancel')
+      .filter((p) => { const end = Date.parse(p.ends || p.expires); return Number.isNaN(end) || end > now; })
+      .sort((a, b) => (SEVERITY[a.severity] ?? 4) - (SEVERITY[b.severity] ?? 4))
+      .map((p) => ({
+        id: `alert-${shortId(p.id || p['@id'] || p.event)}`, kind: 'alert',
+        name: p.event, short: p.event, severity: p.severity || 'Unknown',
+        what: alertWhat(p), area: p.areaDesc || '', ends: p.ends || p.expires || null, tz,
+        office: 'National Weather Service',
+        link: `https://forecast.weather.gov/MapClick.php?lat=${v.lat.toFixed(4)}&lon=${v.lon.toFixed(4)}`, linkText: 'See the full alert',
+      }));
+    cacheSet(key, out);
+    return out;
+  }
+
+  return { points, forecast, nearby, latest, station, radar, alerts, spot };
 })();

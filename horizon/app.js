@@ -45,13 +45,21 @@
   const edgeLabel = $('#edge-label');
   const sheet = $('#sheet');
   const sheetBody = $('#sheet-body');
-  const panel = $('#nearby');
+  const nbPanel = $('#nearby');
+  const svPanel = $('#saved');
+  const svList = $('#sv-list');
+  const svEmpty = $('#sv-empty');
   const nbSub = $('#nb-sub');
   const nbState = $('#nb-state');
   const nbList = $('#nb-list');
   const nbRetry = $('#nb-retry');
   const tabView = $('#tab-view');
   const tabNearby = $('#tab-nearby');
+  const tabSaved = $('#tab-saved');
+  const alertRow = $('#alert-row');
+  const alertBtn = $('#alert');
+  const alertLabel = $('#alert-label');
+  const alertMore = $('#alert-more');
   const topBlock = $('.top');
   const hintBlock = $('.hint');
   let markers = [...document.querySelectorAll('.mk')];
@@ -80,9 +88,12 @@
     compass: false,
     drag: null,
     stream: null,
-    pushed: false,
+    at: null,              // the hash last routed, so one navigation is handled once
+    next: null,            // a tab to open once Back has returned to the view
     hintOverride: '',
+    alerts: [], alertsKey: null, alertsFailed: false,
   };
+  const anyPanel = () => !nbPanel.hidden || !svPanel.hidden;
 
   const canCamera = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) && window.isSecureContext;
   const isTouch = matchMedia('(pointer: coarse)').matches;
@@ -101,7 +112,8 @@
     G.saveViewer(v);
     updateText();
     if (!sheet.hidden) openSheet(sheet.dataset.place, false);
-    if (moved && (S.mode === 'live' || !panel.hidden)) loadNearby();
+    if (moved && (S.mode === 'live' || !nbPanel.hidden)) loadNearby();
+    if (moved) loadAlerts();
   }
 
   function geometry() {
@@ -184,7 +196,8 @@
         m.hidden = false;
         const dot = m.querySelector('.dot');
         const pill = m.querySelector('.pill');
-        const anchor = dot.offsetTop + dot.offsetHeight / 2;
+        const lead = m.querySelector('.lead');
+        let anchor = dot.offsetTop + dot.offsetHeight / 2;
         const half = m.offsetWidth / 2;
         let shift = 0;
         if (pl.follow != null) {
@@ -192,6 +205,12 @@
           y = clamp(y, ceiling + anchor, floor);
         } else {
           shift = clamp(x, half + 8, g.W - half - 8) - x;
+          // When the label would reach into the header, its line gets shorter instead of the place disappearing.
+          const base = Math.round(Number(lead.dataset.lead) * k);
+          const full = anchor - lead.offsetHeight + base;
+          const lh = y - full < ceiling ? Math.max(24, base - Math.ceil(ceiling - (y - full))) : base;
+          if (lh !== lead.offsetHeight) lead.style.height = `${lh}px`;
+          anchor = full - base + lh;
         }
         visible = y - anchor >= ceiling && y <= floor;
         if (visible) {
@@ -206,8 +225,12 @@
     // The weather label can sit anywhere in the sky, so when it lands on another label it moves down below it.
     for (const w of pills.filter((p) => p.follow)) {
       let t = w.t;
+      const ph = w.b - w.t;
       for (let i = 0; i < 4; i++) {
-        const hit = pills.filter((p) => !p.follow && p.l < w.r + 8 && w.l < p.r + 8 && p.t < t + (w.b - w.t) + 8 && t < p.b + 8);
+        // another label touching this label, or crossing its line and dot
+        const hit = pills.filter((p) => !p.follow && (
+          (p.l < w.r + 8 && w.l < p.r + 8 && p.t < t + ph + 8 && t < p.b + 8) ||
+          (p.l < w.x + 10 && w.x - 10 < p.r && p.t < t + w.anchor + 10 && t + ph < p.b)));
         if (!hit.length) break;
         t = Math.max(...hit.map((p) => p.b)) + 8;
       }
@@ -221,7 +244,7 @@
     else if (!open && REEF.miles <= NEAR_MILES) target = 'carysfort-reef';
     const t = target && at[target];
     const off = t && (t.x < EDGE_IN || t.x > g.W - EDGE_IN);
-    edge.hidden = !off || !panel.hidden;
+    edge.hidden = !off || anyPanel();
     if (off) {
       const side = t.x < g.cx ? 'left' : 'right';
       edge.classList.toggle('left', side === 'left');
@@ -309,9 +332,10 @@
     S.h = S.th = REEF_FROM_DEMO - LIGHTHOUSE_OFFSET;
     S.hintOverride = '';
     try { sessionStorage.removeItem('horizon:live'); } catch (_) { /* no storage */ }
-    if (location.hash) { history.replaceState(null, '', location.pathname + location.search); S.pushed = false; }
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    S.at = location.hash;
     closeSheet();
-    showPanel(false);
+    showPanel(null);
     setViewer(DEMO);
     updateText();
     startBtn.focus({ preventScroll: true });
@@ -390,12 +414,25 @@
       const mi = G.miles(v, s);
       if (!best || mi < best.mi) best = { s, mi };
     }
-    if (!best) return null;
-    const s = best.s;
+    return best ? sanctuaryPlace(best.s) : null;
+  }
+  function sanctuaryPlace(s) {
     return {
       id: `sanctuary-${s.id}`, kind: 'sanctuary', lat: s.lat, lon: s.lon,
       name: s.name, short: s.short, what: 'National marine sanctuary', office: 'National Ocean Service',
       link: s.link || null, linkText: 'Visit the sanctuary',
+    };
+  }
+  // The weather follows you, so a saved or shared weather is the forecast for one spot.
+  const forecastId = (v) => `forecast-${NWS.spot(v)}`;
+  // A forecast for the spot you stand on is "where you are", not "about 1 mi north".
+  const isHere = (p) => p.kind === 'forecast' && G.miles(S.viewer, p) < 2;
+  function forecastPlace(v, name) {
+    const n = name || (v.name ? `Weather ${/^-?\d/.test(v.name) ? 'at' : 'in'} ${v.name}` : `Weather at ${G.coordsName(v)}`);
+    return {
+      id: forecastId(v), kind: 'forecast', lat: v.lat, lon: v.lon, name: n, short: n,
+      what: 'Forecast', office: 'National Weather Service',
+      link: `https://forecast.weather.gov/MapClick.php?lat=${v.lat.toFixed(4)}&lon=${v.lon.toFixed(4)}`, linkText: 'See the full forecast',
     };
   }
 
@@ -417,7 +454,7 @@
       syncMarkers();
       renderNearby();
       const id = decodeURIComponent(location.hash.slice(1));
-      if (id && PLACES[id] && sheet.hidden && panel.hidden) route();
+      if (id && PLACES[id] && sheet.hidden && !anyPanel()) route();
     })();
     return NB.promise;
   }
@@ -448,33 +485,43 @@
     weather: '<path d="M7 18h10.5a4 4 0 0 0 .4-8 6 6 0 0 0-11.6 1.6A3.2 3.2 0 0 0 7 18z"/>',
     station: '<path d="M10 13.6V5a2 2 0 0 1 4 0v8.6a4 4 0 1 1-4 0z"/><path d="M12 9v6"/>',
     radar: '<path d="M12 12l6.4-6.4"/><path d="M19.1 7.6A8.5 8.5 0 1 1 16.4 4.9"/><path d="M15.4 10.2A3.8 3.8 0 1 1 13.8 8.6"/>',
+    alert: '<path d="M12 4.2l8.6 15.3H3.4z"/><path d="M12 10v4.4M12 16.9v.2"/>',
     sanctuary: '<path d="M3 9.5c1.8 0 1.8-1.5 3.6-1.5s1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/><path d="M3 15c1.8 0 1.8-1.5 3.6-1.5S8.4 15 10.2 15s1.8-1.5 3.6-1.5 1.8 1.5 3.6 1.5 1.8-1.5 3.6-1.5"/>',
   };
-  const PHOTOS = { 'carysfort-reef': '../images/coral-replanting-carysfort.jpg', 'florida-keys-sanctuary': '../images/mangroves-aerial.jpg' };
+  const PHOTOS = { 'carysfort-reef': '../images/coral-replanting-carysfort.jpg', 'florida-keys-sanctuary': '../images/mangroves-aerial.jpg', 'sanctuary-florida-keys': '../images/mangroves-aerial.jpg' };
   const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+  const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const readingText = (r) => `${r.text}${r.age ? `, ${r.age}` : ''}`;
+  const forecastText = (f) => `${f.short}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit}`;
 
-  function row(id, title, line, live) {
+  function row(id, title, line, live, kind, face = true) {
     const li = document.createElement('li');
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'row';
-    const kind = PLACES[id].found ? PLACES[id].kind : (id === 'weather' ? 'weather' : null);
-    const lead = PHOTOS[id] ? `<img src="${PHOTOS[id]}" alt="">` : `<span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[kind] || ICONS.sanctuary}</svg></span>`;
+    if (kind === undefined) kind = PLACES[id] && PLACES[id].found ? PLACES[id].kind : (id === 'weather' ? 'weather' : null);
+    if (kind === 'forecast') kind = 'weather';
+    const lead = PHOTOS[id] ? `<img src="${PHOTOS[id]}" alt="">` : `<span class="tile${kind === 'alert' ? ' is-alert' : ''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[kind] || ICONS.sanctuary}</svg></span>`;
     b.innerHTML = `${lead}<span><b class="t-row"></b><span class="t t-meta"></span>${live ? '<span class="t t-meta now"></span>' : ''}</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>`;
     b.querySelector('b').textContent = title;
     b.querySelector('.t').textContent = line;
     if (live) b.querySelector('.now').textContent = live;
-    b.addEventListener('click', () => { faceToward(id); select(id); });
+    b.addEventListener('click', () => { if (face) faceToward(id); select(id); });
     li.append(b);
     return li;
   }
+  function setLive(li, text) {
+    const n = li.querySelector('.now');
+    if (n) n.textContent = text;
+  }
 
   function renderNearby() {
-    if (panel.hidden) return;
+    if (nbPanel.hidden) return;
     nbRetry.hidden = true;
     if (NB.status === 'loading') { nbState.hidden = false; nbState.textContent = "Finding NOAA's work near you…"; }
     else nbState.hidden = true;
 
     const items = [];
+    for (const a of S.alerts) items.push(row(a.id, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, 'alert', false));
     items.push(row('weather', 'Weather for this sky', `Forecast for ${S.viewer.name}`, NB.forecast || null));
     const places = Object.entries(PLACES)
       .filter(([id, p]) => id !== 'weather' && !p.away && (p.found || id === 'carysfort-reef' || id === 'florida-keys-sanctuary'))
@@ -496,7 +543,7 @@
   async function loadNearbyForecast() {
     try {
       const f = await NWS.forecast(S.viewer);
-      NB.forecast = `${f.short}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit}`;
+      NB.forecast = forecastText(f);
     } catch (_) { NB.forecast = null; }
     renderNearby();
   }
@@ -506,22 +553,37 @@
 
   function openSheet(id, focus = true) {
     const pl = PLACES[id];
-    const tpl = document.getElementById(pl && pl.found ? 'tpl-place' : `tpl-${id}`);
+    const generic = pl && (pl.found || pl.kept);
+    const tpl = document.getElementById(pl && pl.alert ? 'tpl-alert' : generic ? 'tpl-place' : `tpl-${id}`);
     if (!tpl || !pl || pl.away) { closeSheet(); return; }
     sheetBody.replaceChildren(tpl.content.cloneNode(true));
     sheet.dataset.place = id;
-    if (pl.found) {
+    sheet.dataset.kind = pl.alert ? 'alert' : (pl.kind || id);
+    if (pl.alert) fillAlert(pl);
+    else if (generic) {
       sheetBody.querySelector('[data-name]').textContent = pl.name;
       sheetBody.querySelector('[data-kind]').textContent = pl.what;
       const r = sheetBody.querySelector('[data-reading]');
-      if (pl.kind === 'station') r.textContent = pl.reading ? `${pl.reading.text.charAt(0).toUpperCase()}${pl.reading.text.slice(1)}${pl.reading.age ? `, ${pl.reading.age}` : ''}` : 'No recent reading';
-      else r.remove();
-      sheetBody.querySelector('[data-office]').textContent = pl.office;
+      if (pl.kind === 'station') {
+        if (pl.reading || !pl.kept) r.textContent = pl.reading ? capital(readingText(pl.reading)) : 'No recent reading';
+        else {
+          r.textContent = 'Loading the latest reading…';
+          NWS.latest(pl.code).then((x) => { if (sheetIs(id)) r.textContent = x ? capital(readingText(x)) : 'No recent reading'; });
+        }
+      } else if (pl.kind === 'forecast') {
+        r.textContent = 'Loading the forecast…';
+        NWS.forecast(pl).then(
+          (f) => { if (sheetIs(id)) r.textContent = `${f.name}: ${lower(forecastText(f))}`; },
+          () => { if (sheetIs(id)) r.textContent = "The forecast didn't load. Try again in a moment."; },
+        );
+      } else r.remove();
+      sheetBody.querySelector('[data-office]').textContent = pl.office || 'NOAA';
       const a = sheetBody.querySelector('[data-link]');
       if (pl.link) { a.href = pl.link; a.textContent = pl.linkText; } else a.remove();
     }
+    if (!pl.alert) { sheetBody.append(actions()); syncActs(); }
     const d = sheetBody.querySelector('[data-distance]');
-    if (d && pl.lat != null) d.textContent = G.distanceText(S.viewer, pl);
+    if (d && pl.lat != null) d.textContent = isHere(pl) ? 'Where you are' : G.distanceText(S.viewer, pl);
     const when = sheetBody.querySelector('[data-period]');
     if (when) when.textContent = S.viewer.name;
     const link = sheetBody.querySelector('[data-forecast-link]');
@@ -534,7 +596,7 @@
       m.setAttribute('aria-expanded', String(on));
     }
     if (focus) sheetBody.querySelector('h2')?.focus({ preventScroll: true });
-    if (id === 'weather') loadForecast();
+    if (id === 'weather') { loadForecast(); alertsLine(); }
   }
   function closeSheet() {
     const was = sheet.dataset.place;
@@ -543,42 +605,80 @@
     }
     sheet.hidden = true;
     delete sheet.dataset.place;
+    delete sheet.dataset.kind;
     screen.classList.remove('has-sheet');
     for (const m of markers) { m.classList.remove('on'); m.setAttribute('aria-expanded', 'false'); }
   }
-  function showPanel(on) {
-    if (on === !panel.hidden) return;
-    panel.hidden = !on;
-    tabView.toggleAttribute('aria-current', !on);
-    tabNearby.toggleAttribute('aria-current', on);
-    if (on) {
-      tabNearby.setAttribute('aria-current', 'page');
+  // Nearby and Saved are lists over the view; the View tab closes them.
+  function showPanel(name) {
+    const cur = !nbPanel.hidden ? 'nearby' : !svPanel.hidden ? 'saved' : null;
+    if (cur === (name || null)) return;
+    nbPanel.hidden = name !== 'nearby';
+    svPanel.hidden = name !== 'saved';
+    for (const [n, t] of [['view', tabView], ['nearby', tabNearby], ['saved', tabSaved]]) {
+      if (n === (name || 'view')) t.setAttribute('aria-current', 'page'); else t.removeAttribute('aria-current');
+    }
+    if (name === 'nearby') {
       renderNearby();
       loadNearby();
       loadNearbyForecast();
-      panel.scrollTop = 0;
+      nbPanel.scrollTop = 0;
       $('#nb-t').focus({ preventScroll: true });
-    } else {
-      tabView.setAttribute('aria-current', 'page');
+    }
+    if (name === 'saved') {
+      renderSaved();
+      svPanel.scrollTop = 0;
+      $('#sv-t').focus({ preventScroll: true });
     }
   }
   function route() {
+    S.at = location.hash;
     const id = decodeURIComponent(location.hash.slice(1));
-    if (id === 'nearby') { closeSheet(); showPanel(true); return; }
-    showPanel(false);
+    if (id === 'nearby' || id === 'saved') { closeSheet(); showPanel(id); return; }
+    showPanel(null);
     if (PLACES[id]) { openSheet(id); return; }
     closeSheet();
-    if (/^(station|radar|sanctuary)-/.test(id)) loadNearby();
+    // a saved place or a shared link: look the place up, then open it if you are still on it
+    if (id) {
+      resolvePlace(id).then((p) => {
+        if (p && decodeURIComponent(location.hash.slice(1)) === id && sheet.hidden && !anyPanel()) openSheet(id);
+      });
+    }
   }
-  function dismiss() {
-    if (S.pushed) { history.back(); return; }
-    history.replaceState(null, '', location.pathname + location.search);
+
+  // Each step into a list or a preview adds one history entry, so Back closes them in turn.
+  const depth = () => (history.state && history.state.d) || 0;
+  function push(id) {
+    history.pushState({ d: depth() + 1 }, '', `#${id}`);
     route();
   }
   function select(id) {
     if (location.hash === `#${id}`) return;
-    S.pushed = true;
-    location.hash = id;
+    push(id);
+  }
+  function dismiss() {
+    if (depth() > 0) { history.back(); return; }
+    history.replaceState(null, '', location.pathname + location.search);
+    route();
+  }
+  // A tab starts from the view: go back to it first, then open the tab's list.
+  function goTab(name) {
+    const target = name === 'view' ? '' : name;
+    if (location.hash.slice(1) === target && sheet.hidden) return;
+    const d = depth();
+    if (d > 0) { S.next = target; history.go(-d); return; }
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    if (target) push(target); else route();
+  }
+  function nav() {
+    if (S.next !== null) {
+      const t = S.next;
+      S.next = null;
+      if (t) push(t); else route();
+      return;
+    }
+    if (location.hash === S.at) return;
+    route();
   }
 
   for (const m of markers) m.addEventListener('click', () => select(m.dataset.place));
@@ -588,10 +688,196 @@
     if (!sheetIs(id)) select(id);
   });
   $('#close').addEventListener('click', dismiss);
-  tabView.addEventListener('click', (e) => { e.preventDefault(); if (!sheet.hidden || !panel.hidden) dismiss(); });
-  tabNearby.addEventListener('click', (e) => { e.preventDefault(); if (panel.hidden) select('nearby'); });
-  addEventListener('hashchange', () => { if (!location.hash) S.pushed = false; route(); });
-  addEventListener('keydown', (e) => { if (e.key === 'Escape' && (!sheet.hidden || !panel.hidden)) dismiss(); });
+  tabView.addEventListener('click', (e) => { e.preventDefault(); goTab('view'); });
+  tabNearby.addEventListener('click', (e) => { e.preventDefault(); goTab('nearby'); });
+  tabSaved.addEventListener('click', (e) => { e.preventDefault(); goTab('saved'); });
+  addEventListener('popstate', nav);
+  addEventListener('hashchange', nav);
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && (!sheet.hidden || anyPanel())) dismiss(); });
+
+  // A place you open from Saved or from a shared link, when it is not one of the places around you.
+  const LINKED = /^(station|radar|sanctuary|forecast)-(.+)$/;
+  async function resolvePlace(id) {
+    if (PLACES[id]) return PLACES[id];
+    const m = id.match(LINKED);
+    if (!m) return null;
+    const snap = saved.find((x) => x.id === id);
+    let p = null;
+    try {
+      if (m[1] === 'sanctuary') {
+        const s = SANCTUARIES.find((x) => x.id === m[2]);
+        p = s ? sanctuaryPlace(s) : null;
+      } else if (m[1] === 'forecast') {
+        const [lat, lon] = m[2].split(',').map(Number);
+        if (Math.abs(lat) <= 90 && Math.abs(lon) <= 180) {
+          let name = snap && snap.name;
+          if (!name) {
+            try { const pt = await NWS.points({ lat, lon }); if (pt.city) name = forecastPlace({ lat, lon, name: pt.city }).name; } catch (_) { /* keep the coordinates */ }
+          }
+          p = forecastPlace({ lat, lon }, name);
+        }
+      } else if (snap) p = { ...snap };
+      else if (m[1] === 'station') p = await NWS.station(m[2]);
+      else if (m[1] === 'radar') p = await NWS.radar(m[2]);
+    } catch (_) { p = null; }
+    if (PLACES[id]) return PLACES[id];
+    if (!p) return null;
+    PLACES[id] = { ...p, id, elev: 0, kept: true };
+    refreshPlaces();
+    return PLACES[id];
+  }
+
+  // Saved places stay on this phone.
+  const SAVED_KEY = 'horizon:saved';
+  let saved = [];
+  try {
+    const a = JSON.parse(localStorage.getItem(SAVED_KEY) || '[]');
+    if (Array.isArray(a)) saved = a.filter((x) => x && typeof x.id === 'string' && typeof x.name === 'string');
+  } catch (_) { /* no storage */ }
+  function storeSaved() {
+    try { localStorage.setItem(SAVED_KEY, JSON.stringify(saved)); } catch (_) { /* no storage */ }
+  }
+  // The lasting name of the place in the open preview.
+  function keepId(id) {
+    if (id === 'weather') return forecastId(S.viewer);
+    if (id === 'florida-keys-sanctuary') return 'sanctuary-florida-keys';
+    return id;
+  }
+  function keptPlace(id) {
+    if (id === 'weather') return forecastPlace(S.viewer);
+    if (id === 'florida-keys-sanctuary') {
+      const s = SANCTUARIES.find((x) => x.id === 'florida-keys');
+      return s ? sanctuaryPlace(s) : null;
+    }
+    const p = PLACES[id];
+    if (!p) return null;
+    if (id === 'carysfort-reef') return { id, kind: 'reef', lat: p.lat, lon: p.lon, name: p.name, short: p.short, what: p.what };
+    const { id: _id, kind, code, lat, lon, name, short, what, office, link, linkText } = p;
+    return { id, kind, code, lat, lon, name, short, what, office, link, linkText };
+  }
+  function toggleSave(id) {
+    const k = keepId(id);
+    const i = saved.findIndex((x) => x.id === k);
+    if (i >= 0) saved.splice(i, 1);
+    else {
+      const p = keptPlace(id);
+      if (!p) return;
+      saved.unshift({ ...p, savedAt: Date.now() });
+    }
+    storeSaved();
+    syncActs();
+  }
+
+  const ACT_ICONS = {
+    save: '<path d="M6.5 4h11v16l-5.5-4-5.5 4z"/>',
+    share: '<path d="M12 14.5V3.5"/><path d="M7.8 7.7L12 3.5l4.2 4.2"/><path d="M8 10.5H6.5A1.5 1.5 0 0 0 5 12v7.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V12a1.5 1.5 0 0 0-1.5-1.5H16"/>',
+  };
+  const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+  function actions() {
+    const d = document.createElement('div');
+    d.className = 'acts';
+    d.innerHTML = `<button class="btn secondary" type="button" data-save aria-pressed="false">${svg(ACT_ICONS.save)}<span>Save</span></button><button class="btn secondary" type="button" data-share>${svg(ACT_ICONS.share)}<span>Share</span></button>`;
+    d.querySelector('[data-save]').addEventListener('click', () => toggleSave(sheet.dataset.place));
+    d.querySelector('[data-share]').addEventListener('click', (e) => share(sheet.dataset.place, e.currentTarget));
+    return d;
+  }
+  function syncActs() {
+    const b = sheetBody.querySelector('[data-save]');
+    if (!b || !sheet.dataset.place) return;
+    const on = saved.some((x) => x.id === keepId(sheet.dataset.place));
+    b.setAttribute('aria-pressed', String(on));
+    b.querySelector('span').textContent = on ? 'Saved' : 'Save';
+  }
+
+  // Share a place with the phone's share sheet. The link opens the same preview in Horizon.
+  async function share(id, btn) {
+    const p = keptPlace(id);
+    if (!p) return;
+    const url = new URL(`${location.pathname}#${keepId(id)}`, location.origin).href;
+    const name = p.name.replace(/\u200B/g, '');
+    const data = { title: name, text: `${name}, seen on Horizon.`, url };
+    if (navigator.share) {
+      try { await navigator.share(data); } catch (_) { /* closed without sharing */ }
+      return;
+    }
+    let ok = false;
+    try { await navigator.clipboard.writeText(url); ok = true; } catch (_) { /* no clipboard */ }
+    const label = btn.querySelector('span');
+    label.textContent = ok ? 'Link copied' : "Couldn't copy the link";
+    setTimeout(() => { if (label.isConnected) label.textContent = 'Share'; }, 2000);
+  }
+
+  function renderSaved() {
+    if (svPanel.hidden) return;
+    svEmpty.hidden = saved.length > 0;
+    svList.hidden = saved.length === 0;
+    svList.replaceChildren(...saved.map((x) => {
+      const where = x.lat == null ? '' : isHere(x) ? 'where you are' : lower(G.distanceText(S.viewer, x));
+      const live = x.kind === 'station' ? 'Loading the latest reading…' : x.kind === 'forecast' ? 'Loading the forecast…' : null;
+      const li = row(x.id, x.name, where ? `${x.what}, ${where}` : x.what, live, x.kind, false);
+      if (x.kind === 'station') NWS.latest(x.code).then((r) => setLive(li, r ? readingText(r) : 'No recent reading'));
+      if (x.kind === 'forecast') NWS.forecast(x).then((f) => setLive(li, forecastText(f)), () => setLive(li, "The forecast didn't load"));
+      return li;
+    }));
+  }
+
+  // Weather alerts in effect where you are, from the National Weather Service.
+  // "until 6 PM PDT", "until tomorrow 6 PM PDT", "until Thursday 6 PM PDT"; short for the banner: "until Thu 6 PM".
+  function untilText(iso, tz, short) {
+    const d = new Date(iso);
+    if (Number.isNaN(+d)) return '';
+    let zone = tz || undefined;
+    const fmt = (o) => { try { return new Intl.DateTimeFormat('en-US', { ...o, timeZone: zone }).format(d); } catch (_) { zone = undefined; return new Intl.DateTimeFormat('en-US', o).format(d); } };
+    const time = fmt(short ? { hour: 'numeric', minute: '2-digit' } : { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).replace(':00', '');
+    const day = (x) => new Intl.DateTimeFormat('en-US', { timeZone: zone, year: 'numeric', month: 'numeric', day: 'numeric' }).format(x);
+    if (day(d) === day(new Date())) return `until ${time}`;
+    if (day(d) === day(new Date(Date.now() + 864e5))) return `until tomorrow ${time}`;
+    return `until ${fmt({ weekday: short ? 'short' : 'long' })} ${time}`;
+  }
+  async function loadAlerts() {
+    const v = S.viewer, key = NWS.spot(v);
+    let list = [], failed = false;
+    try { list = await NWS.alerts(v); } catch (_) { failed = true; }
+    if (NWS.spot(S.viewer) !== key) return;
+    for (const id of Object.keys(PLACES)) if (PLACES[id].alert) delete PLACES[id];
+    for (const a of list) PLACES[a.id] = { ...a, alert: true };
+    S.alerts = list; S.alertsKey = key; S.alertsFailed = failed;
+    renderAlerts();
+    alertsLine();
+    renderNearby();
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (id.startsWith('alert-') && PLACES[id] && sheet.hidden && !anyPanel()) route();
+  }
+  function renderAlerts() {
+    const a = S.alerts[0];
+    alertRow.hidden = !a;
+    if (!a) return;
+    alertLabel.textContent = a.ends ? `${a.name} ${untilText(a.ends, a.tz, true)}` : a.name;
+    const more = S.alerts.length - 1;
+    alertMore.hidden = more < 1;
+    alertMore.textContent = `+${more}`;
+    const full = a.ends ? `${a.name} ${untilText(a.ends, a.tz)}` : a.name;
+    alertBtn.setAttribute('aria-label', more ? `${full}, and ${more} more weather alert${more > 1 ? 's' : ''}` : full);
+  }
+  alertBtn.addEventListener('click', () => { if (S.alerts.length) select(S.alerts.length > 1 ? 'nearby' : S.alerts[0].id); });
+  function alertsLine() {
+    const el = sheetIs('weather') && sheetBody.querySelector('[data-alerts]');
+    if (!el || S.alertsKey !== NWS.spot(S.viewer) || S.alertsFailed) return;
+    el.hidden = false;
+    const n = S.alerts.length;
+    el.textContent = n ? `${n} weather alert${n > 1 ? 's' : ''} in effect` : 'No weather alerts here right now';
+  }
+  function fillAlert(a) {
+    sheetBody.querySelector('[data-name]').textContent = a.name;
+    sheetBody.querySelector('[data-when]').textContent = a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now';
+    const area = sheetBody.querySelector('[data-area]');
+    if (a.area) area.textContent = a.area; else area.remove();
+    const t = sheetBody.querySelector('[data-text]');
+    if (a.what) t.textContent = a.what; else t.remove();
+    const l = sheetBody.querySelector('[data-link]');
+    l.href = a.link; l.textContent = a.linkText;
+  }
+  setInterval(() => { if (!document.hidden) loadAlerts(); }, 5 * 60 * 1000);
 
   async function loadForecast() {
     const what = sheetBody.querySelector('[data-forecast]');
@@ -623,10 +909,10 @@
   let fromStory = false;
   try { fromStory = new URL(document.referrer).pathname.endsWith('/horizon/back-to-the-reef.html'); } catch (_) { /* no referrer */ }
   const returning = navType === 'back_forward' || (navType === 'navigate' && fromStory);
-  const saved = G.savedViewer();
+  const lastWhere = G.savedViewer();
   if (wasLive && canCamera && returning) {
     startCamera(true).then((on) => {
-      if (on && saved) useLocation(saved);
+      if (on && lastWhere) useLocation(lastWhere);
       else if (on) loadNearby();
       setTimeout(updateText, 1500);
     });
@@ -638,5 +924,6 @@
   refreshPlaces();
   updateText();
   route();
+  loadAlerts();
   requestAnimationFrame(tick);
 })();
