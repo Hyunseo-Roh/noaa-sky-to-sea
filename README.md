@@ -8,6 +8,8 @@ A redesigned NOAA website and the Horizon app, built as static HTML, CSS and Jav
 
 Photo credits are in `credits.txt`.
 
+The logo files in `images/logo/` are the final NOAA logo (Oct 30). Each is placed by the height of NOAA's letters, with that height kept clear on every side. The full name shows only where it stays at 10 px or more. The favicon and the app icons use the small mark, a provisional choice.
+
 ## Horizon
 
 Hold the phone up to the sky or the sea. Labels for NOAA's work sit on the places you are looking at. Tap one to preview it.
