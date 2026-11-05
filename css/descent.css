@@ -14,7 +14,24 @@
 .dsc-3 { --g: #DCEBF5; }      /* haze above the horizon; the plate is Deep ocean below it */
 .dsc-4 { --g: var(--c-brand); }   /* Deep ocean */
 .dsc-4 .stage { aspect-ratio: 1600 / 800; }
-.dsc-4 { padding-top: var(--s-8); }
+.dsc-5 { --g: var(--c-brand); }   /* Deep ocean */
+.dsc-6 { --g: var(--c-brand); }
+.dsc-6 .stage { aspect-ratio: 1600 / 800; }
+.dsc-7 { --g: var(--c-ink); }     /* Night horizon */
+.dsc-7 .inset .ph { aspect-ratio: 4 / 5; }
+.dsc-7 .inset img { object-position: 50% 60%; }
+.dsc-5 .inset .ph { aspect-ratio: 4 / 3; }
+.dsc-5 .stage { aspect-ratio: 1600 / 860; }
+.dsc-7 .stage { aspect-ratio: 1600 / 700; }
+.dsc-4, .dsc-5, .dsc-6, .dsc-7 { padding-top: var(--s-8); }
+
+/* The close, on Night horizon like the last chapter, then the footer under a rule */
+.closing.dark { background: var(--c-ink); color: var(--c-ground); border-bottom: 1px solid var(--c-rule-dark); }
+.closing.dark .t-head, .closing.dark .t-lead { color: var(--c-ground); }
+.closing.dark .cap { color: var(--c-on-dark-2); }
+.closing.dark .btn { background: var(--c-ground); color: var(--c-brand); border-color: var(--c-ground); }
+.closing.dark .link { color: var(--c-ground); }
+.closing.dark .shot .ph { border-color: var(--c-rule-dark); }
 /* a callout drawn in the water of a light chapter takes the dark tone */
 .co.dark { --ln: var(--c-ground); --pill: var(--c-ground); --pill-fg: var(--c-brand); --pill-bd: var(--c-ground); --pill-on: var(--c-data); --pill-on-fg: var(--c-brand); --dot: var(--c-brand); }
 .dsc .bridge { color: var(--fg); margin-bottom: var(--s-6); }
@@ -104,8 +121,13 @@
 @media (min-width: 761px) and (max-width: 1199px) {
   .dsc-head h2 { grid-column: 1 / -1; font: var(--f-l2); }
   .dsc-intro { grid-column: 1 / 10; margin-top: var(--s-5); }
-  .inset .cap { font-size: 12px; line-height: 16px; }
+  /* the photo sits above the drawing, half the width, so its caption never runs into the drawing */
+  .dsc-plate { display: flex; flex-direction: column; }
+  .inset { position: static; order: -1; width: 50%; margin: 0 var(--margin) var(--s-6); }
+  .dsc-7 .inset { width: 32%; }
   .ax span { font-size: 12px; }
+  .closing .btn { white-space: nowrap; }
+  .closing .acts { flex-wrap: wrap; gap: var(--s-4) var(--s-6); }
 }
 
 @media (max-width: 760px) {
@@ -139,6 +161,9 @@
   .dsc-3 .co-key { margin: -1px 0 0; padding: var(--s-5) var(--margin) var(--s-8); background: var(--c-brand); }
   .dsc-3 .stage { aspect-ratio: 1000 / 1000; }
   .dsc-4 .stage { aspect-ratio: 900 / 800; }
+  .dsc-5 .stage { aspect-ratio: 900 / 860; }
+  .dsc-6 .stage { aspect-ratio: 1040 / 800; }
+  .dsc-7 .stage { aspect-ratio: 1060 / 700; }
   .co-k { display: flex; align-items: center; gap: var(--s-3); width: 100%; min-height: 52px; padding: 0 var(--s-4) 0 var(--s-2); border: 1px solid var(--c-brand); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); text-align: left; }
   .dsc:not(.light) .co-k, .dsc-3 .co-k { border-color: var(--c-ground); }
   .co-k .co-n { display: flex; align-items: center; justify-content: center; flex: none; width: 34px; height: 34px; border-radius: var(--r-round); background: var(--c-brand); color: var(--c-ground); }
