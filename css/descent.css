@@ -5,12 +5,20 @@
    and callouts on the drawing that open a card in place. */
 
 .dsc { --g: var(--c-brand); --fg: var(--c-ground); --fg2: rgba(255, 255, 255, .8); --ln: var(--c-ground);
-  --pill: rgba(20, 38, 61, .78); --pill-fg: var(--c-ground); --pill-bd: rgba(255, 255, 255, .6); --pill-on: var(--c-ground); --pill-on-fg: var(--c-brand); --dot: var(--c-ink);
+  --pill: var(--c-ground); --pill-fg: var(--c-brand); --pill-bd: var(--c-ground); --pill-on: var(--c-data); --pill-on-fg: var(--c-brand); --dot: var(--c-brand);
   position: relative; padding-top: var(--s-10); background: var(--g); color: var(--fg); overflow-x: clip; }
 .dsc.light { --fg: var(--c-ink); --fg2: var(--c-ink-2); --ln: var(--c-brand);
   --pill: var(--c-ground); --pill-fg: var(--c-brand); --pill-bd: rgba(0, 48, 135, .45); --pill-on: var(--c-brand); --pill-on-fg: var(--c-ground); --dot: var(--c-ground); }
 .dsc-1 { --g: #FFFFFF; }      /* Cloud light */
 .dsc-2 { --g: #DCEBF5; }      /* Atmospheric haze */
+.dsc-3 { --g: #DCEBF5; }      /* haze above the horizon; the plate is Deep ocean below it */
+.dsc-4 { --g: var(--c-brand); }   /* Deep ocean */
+.dsc-4 .stage { aspect-ratio: 1600 / 800; }
+.dsc-4 { padding-top: var(--s-8); }
+/* a callout drawn in the water of a light chapter takes the dark tone */
+.co.dark { --ln: var(--c-ground); --pill: var(--c-ground); --pill-fg: var(--c-brand); --pill-bd: var(--c-ground); --pill-on: var(--c-data); --pill-on-fg: var(--c-brand); --dot: var(--c-brand); }
+.dsc .bridge { color: var(--fg); margin-bottom: var(--s-6); }
+.dsc .ch-top.ruled { padding-top: var(--s-5); border-top: 1px solid var(--fg2); }
 .art-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 /* Header: the title wide on the left, the lead and offices on the right */
@@ -22,6 +30,8 @@
 .dsc-head h2 { grid-column: 1 / 8; font: var(--f-display); }
 .dsc-intro { grid-column: 9 / 13; }
 .dsc-intro .offices { margin-top: var(--s-5); }
+.dsc-more { display: inline-block; margin-top: var(--s-5); color: var(--ln); }
+.dsc:not(.light) .dsc-more { color: var(--c-ground); }
 
 /* The plate */
 .dsc-plate { position: relative; max-width: 1600px; margin: var(--s-6) auto 0; }
@@ -39,7 +49,7 @@
 .inset { position: absolute; z-index: 2; left: var(--l); top: var(--t); width: var(--w); }
 .inset .ph { aspect-ratio: 4 / 3; }
 .dsc-1 .inset img { object-position: 60% 50%; }
-.dsc-2 .inset .ph { aspect-ratio: 3 / 2; }
+.dsc-2 .inset .ph, .dsc-3 .inset .ph { aspect-ratio: 3 / 2; }
 .dsc-2 .inset img { object-position: 30% 40%; }
 .inset .cap { color: var(--fg2); }
 
@@ -99,11 +109,16 @@
 }
 
 @media (max-width: 760px) {
-  .dsc { padding-top: var(--s-9); }
+  .dsc { padding-top: var(--s-8); }
+  /* more air between the chapter number, the title, the lead and the offices */
   .dsc .ch-top { margin-bottom: var(--s-4); }
+  .dsc .kicker.chno, .dsc .ch-top .kicker.chno { font: var(--f-item); }
   .dsc-head h2 { grid-column: 1 / -1; font: var(--f-l2); }
-  .dsc-intro { grid-column: 1 / -1; margin-top: var(--s-4); }
-  .dsc-intro .offices { margin-top: var(--s-4); }
+  .dsc-intro { grid-column: 1 / -1; margin-top: var(--s-5); }
+  .dsc-intro .offices { margin-top: var(--s-5); }
+  .dsc-more { margin-top: var(--s-5); }
+  .dsc .bridge { margin-bottom: var(--s-7); }
+  .dsc .ch-top.ruled { padding-top: var(--s-6); }
   .dsc-plate { margin-top: var(--s-5); display: flex; flex-direction: column; }
   .stage { aspect-ratio: 820 / 1000; }
   .dsc-2 .stage { aspect-ratio: 880 / 1000; }
@@ -111,19 +126,25 @@
   .art-m { display: block; }
   .ax span { left: 4.5%; font-size: 12px; }
   .co { left: var(--mx); top: var(--my); }
-  /* on a phone the drawing carries numbered markers; the key under it names them */
+  /* On a phone the drawing carries numbered markers and the key under it names them.
+     Markers and key rows are the same object everywhere: a white circle or row with Deep ocean type,
+     so they stand out on every ground and read as the things to tap. */
   .co-b, .co[data-mside] .co-b { flex-direction: row; transform: translate(-50%, -50%); padding: 6px; }
   .co-line, .co-t { display: none; }
-  .co-dot { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: var(--pill); border-color: var(--ln); }
-  .co-n { display: block; font: 700 14px/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--pill-fg); }
-  .co-b[aria-expanded="true"] .co-dot { background: var(--pill-on); border-color: var(--pill-on); }
-  .co-b[aria-expanded="true"] .co-n { color: var(--pill-on-fg); }
-  .co-key { display: grid; gap: var(--s-2); margin: var(--s-4) var(--margin) 0; padding-bottom: var(--s-6); }
-  .co-k { display: flex; align-items: center; gap: var(--s-3); width: 100%; min-height: 48px; padding: 0 var(--s-3) 0 var(--s-2); border: 1px solid var(--pill-bd); border-radius: var(--r-round); background: var(--pill); color: var(--pill-fg); text-align: left; }
-  .co-k .co-n { display: flex; align-items: center; justify-content: center; flex: none; width: 30px; height: 30px; border-radius: var(--r-round); border: 2px solid currentColor; color: inherit; }
-  .co-kt { display: inline-flex; align-items: center; gap: var(--s-2); flex: 1; font: var(--f-meta-b); font-size: 15px; }
+  .co-dot { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: var(--c-ground); border: 2px solid var(--c-brand); box-shadow: 0 1px 4px rgba(20, 38, 61, .3); }
+  .co-n { display: block; font: 700 14px/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--c-brand); }
+  .co-b[aria-expanded="true"] .co-dot { background: var(--c-brand); border-color: var(--c-ground); }
+  .co-b[aria-expanded="true"] .co-n { color: var(--c-ground); }
+  .co-key { display: grid; gap: var(--s-2); margin: var(--s-5) var(--margin) 0; padding-bottom: var(--s-8); }
+  .dsc-3 .co-key { margin: -1px 0 0; padding: var(--s-5) var(--margin) var(--s-8); background: var(--c-brand); }
+  .dsc-3 .stage { aspect-ratio: 1000 / 1000; }
+  .dsc-4 .stage { aspect-ratio: 900 / 800; }
+  .co-k { display: flex; align-items: center; gap: var(--s-3); width: 100%; min-height: 52px; padding: 0 var(--s-4) 0 var(--s-2); border: 1px solid var(--c-brand); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); text-align: left; }
+  .dsc:not(.light) .co-k, .dsc-3 .co-k { border-color: var(--c-ground); }
+  .co-k .co-n { display: flex; align-items: center; justify-content: center; flex: none; width: 34px; height: 34px; border-radius: var(--r-round); background: var(--c-brand); color: var(--c-ground); }
+  .co-kt { display: inline-flex; align-items: center; gap: var(--s-2); flex: 1; font: var(--f-meta-b); font-size: 16px; }
   .co-kt svg { width: 16px; height: 16px; flex: none; }
-  .co-k[aria-expanded="true"] { background: var(--pill-on); color: var(--pill-on-fg); border-color: var(--pill-on); }
+  .co-k[aria-expanded="true"] { background: var(--c-data); }
   /* the photo leaves the drawing and sits under it */
   .inset { position: static; order: -1; width: auto; margin: 0 var(--margin) var(--s-6); }
   /* on a phone the card is a sheet from the bottom of the screen, like the app's place preview */
