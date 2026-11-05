@@ -139,7 +139,7 @@ ul { margin: 0; padding: 0; list-style: none; }
    then the Sea on Deep ocean, each place on its own card */
 .nb-photo { margin: var(--s-5) 0 0; }
 .nb-photo[hidden] { display: none; }
-.nb-photo img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-thumb); }
+.nb-photo img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 45%; border-radius: var(--r-thumb); }
 .nb-photo figcaption { margin-top: var(--s-2); color: var(--c-ink-2); }
 .nb-groups { margin: var(--s-6) -20px 0; }
 .nb-sec { padding: var(--s-6) 20px var(--s-7); }

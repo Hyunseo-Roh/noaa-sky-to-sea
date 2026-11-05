@@ -639,7 +639,7 @@
   // A photo of the horizon where you are, when there is one: the demo spot, and Los Angeles.
   const LOCAL = [
     { lat: DEMO.lat, lon: DEMO.lon, radius: 40, src: '../images/carysfort-lighthouse.jpg', alt: 'A calm sea with Carysfort Lighthouse on the horizon', cap: 'Your horizon from Key Largo, facing east. Photo: Nancy Diersing/NOAA' },
-    { lat: 34.05, lon: -118.25, radius: 60, src: '../images/local/los-angeles-horizon.jpg', alt: 'The sea off Los Angeles', cap: 'Your horizon: the sea off Los Angeles.' },
+    { lat: 34.05, lon: -118.25, radius: 60, src: '../images/local/los-angeles-horizon.jpg', alt: 'Two humpback whales surface in calm water off the rocky shore of San Miguel Island', cap: 'Near you: humpback whales off San Miguel Island, Channel Islands National Marine Sanctuary. Photo: Robert Schwemmer/NOAA' },
   ];
   const nbPhoto = $('#nb-photo');
   function showLocalPhoto(v) {
