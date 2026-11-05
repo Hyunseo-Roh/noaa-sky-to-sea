@@ -1,0 +1,136 @@
+/* Sky to sea, as one descent.
+   Each chapter sits on one flat colour from the palette, a step darker than the one above it:
+   Cloud light, Atmospheric haze, then the sea in Deep ocean and Night horizon. No gradients.
+   A chapter is a wide header, then a plate: a line drawing the width of the page, its photo set into it,
+   and callouts on the drawing that open a card in place. */
+
+.dsc { --g: var(--c-brand); --fg: var(--c-ground); --fg2: rgba(255, 255, 255, .8); --ln: var(--c-ground);
+  --pill: rgba(20, 38, 61, .78); --pill-fg: var(--c-ground); --pill-bd: rgba(255, 255, 255, .6); --pill-on: var(--c-ground); --pill-on-fg: var(--c-brand); --dot: var(--c-ink);
+  position: relative; padding-top: var(--s-10); background: var(--g); color: var(--fg); overflow-x: clip; }
+.dsc.light { --fg: var(--c-ink); --fg2: var(--c-ink-2); --ln: var(--c-brand);
+  --pill: var(--c-ground); --pill-fg: var(--c-brand); --pill-bd: rgba(0, 48, 135, .45); --pill-on: var(--c-brand); --pill-on-fg: var(--c-ground); --dot: var(--c-ground); }
+.dsc-1 { --g: #FFFFFF; }      /* Cloud light */
+.dsc-2 { --g: #DCEBF5; }      /* Atmospheric haze */
+.art-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* Header: the title wide on the left, the lead and offices on the right */
+.dsc .t-head, .dsc .t-lead, .dsc .chno .n, .dsc .office b { color: var(--fg); }
+.dsc .kicker.chno, .dsc .office { color: var(--fg2); }
+.dsc:not(.light) .chlink { background: var(--c-ground); color: var(--c-brand); border-color: var(--c-ground); }
+.dsc .ch-top { margin-bottom: var(--s-6); }
+.dsc-head { align-items: end; }
+.dsc-head h2 { grid-column: 1 / 8; font: var(--f-display); }
+.dsc-intro { grid-column: 9 / 13; }
+.dsc-intro .offices { margin-top: var(--s-5); }
+
+/* The plate */
+.dsc-plate { position: relative; max-width: 1600px; margin: var(--s-6) auto 0; }
+.stage { position: relative; aspect-ratio: 1600 / 1000; }
+.art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.art-m { display: none; }
+
+/* The altitude ruler's numbers */
+.ax span { position: absolute; left: 2.6%; top: var(--y); transform: translateY(-50%); padding: 0 4px; font: var(--f-meta); color: var(--fg2); font-variant-numeric: tabular-nums; white-space: nowrap;
+  text-shadow: 0 0 3px var(--g), 0 0 6px var(--g), 0 0 6px var(--g); }
+.ax span.key { font: var(--f-meta-b); color: var(--ln); }
+.ax span.base { transform: translateY(-125%); }
+
+/* The photo, set into the drawing */
+.inset { position: absolute; z-index: 2; left: var(--l); top: var(--t); width: var(--w); }
+.inset .ph { aspect-ratio: 4 / 3; }
+.dsc-1 .inset img { object-position: 60% 50%; }
+.dsc-2 .inset .ph { aspect-ratio: 3 / 2; }
+.dsc-2 .inset img { object-position: 30% 40%; }
+.inset .cap { color: var(--fg2); }
+
+/* Callouts: a ring on the drawing, a leader, and a label that opens its card */
+.co { position: absolute; z-index: 3; left: var(--x); top: var(--y); width: 0; height: 0; }
+.co:has([aria-expanded="true"]) { z-index: 8; }
+.co-b { position: absolute; left: 0; top: 0; display: flex; align-items: center; transform: translate(-7px, -50%); color: var(--pill-fg); }
+.co[data-side="l"] .co-b { flex-direction: row-reverse; transform: translate(calc(-100% + 7px), -50%); }
+.co-dot { flex: none; width: 14px; height: 14px; border-radius: var(--r-round); border: 2px solid var(--ln); background: var(--dot); }
+.co-line { flex: none; width: 28px; height: 1px; background: var(--ln); }
+.co-t { display: inline-flex; align-items: center; gap: var(--s-2); min-height: 36px; padding: 0 var(--s-2) 0 var(--s-3); border: 1px solid var(--pill-bd); border-radius: var(--r-round); background: var(--pill); font: var(--f-meta-b); white-space: nowrap; }
+.co-t > svg:not(.co-plus) { width: 16px; height: 16px; flex: none; }
+.co-plus { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
+.co-b:hover .co-t { border-color: var(--ln); }
+.co-b:focus-visible { outline: none; }
+.co-b:focus-visible .co-t { outline: 3px solid var(--c-state); outline-offset: 3px; }
+.co-b[aria-expanded="true"] .co-t { background: var(--pill-on); color: var(--pill-on-fg); border-color: var(--pill-on); }
+.co-b[aria-expanded="true"] .co-plus { transform: rotate(45deg); }
+.co-b[aria-expanded="true"] .co-dot { background: var(--c-state); }
+.co-n { display: none; }
+.co-key { display: none; }
+
+/* Cards open under their label (above it near the ground), on the label's side */
+.card { position: absolute; z-index: 6; top: 30px; left: -7px; width: 320px;
+  padding: var(--s-5); border-radius: var(--r-thumb); background: var(--c-ground); color: var(--c-ink); box-shadow: 0 16px 40px rgba(10, 20, 40, .4); }
+.co[data-card="l"] .card { left: auto; right: -7px; }
+.co.up .card { top: auto; bottom: 30px; }
+.card[hidden] { display: none; }
+.card-x { position: absolute; z-index: 2; top: var(--s-2); right: var(--s-2); display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: var(--r-round); color: var(--c-ink-2); }
+.card-x:hover { background: var(--c-data); color: var(--c-ink); }
+.card-x:has(+ figure) { background: var(--c-ground); box-shadow: 0 1px 6px rgba(20, 38, 61, .35); }
+.card-x svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; }
+.card h3 { padding-right: var(--s-7); }
+.card figure { margin: calc(-1 * var(--s-5)) calc(-1 * var(--s-5)) 0; }
+.card figure .ph { aspect-ratio: 3 / 2; border-radius: var(--r-thumb) var(--r-thumb) 0 0; }
+.card figure img { object-position: 45% 52%; }
+.card figure .cap { padding: 0 var(--s-5); }
+.card figure + h3 { margin-top: var(--s-4); }
+.card h3 + .t-body, .card h3 + .measures { margin-top: var(--s-3); }
+.card .t-body { font: 400 16px/24px var(--font-read); color: var(--c-ink); }
+.card .measures { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2) var(--s-4); }
+.card .measures li { font: var(--f-body-b); font-size: 17px; color: var(--c-brand); }
+.card .measures + .t-body { margin-top: var(--s-4); }
+.card .office { margin-top: var(--s-4); color: var(--c-ink-2); }
+.card .office b { color: var(--c-ink); }
+.ww3 { display: grid; gap: var(--s-1); margin: var(--s-4) 0 0; padding-top: var(--s-3); border-top: 1px solid var(--c-rule); }
+.ww3 > div { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: var(--s-3); }
+.ww3 dt { font: var(--f-meta-b); color: var(--c-ink-2); }
+.ww3 dd { margin: 0; font: var(--f-meta); color: var(--c-ink); }
+.card .link { display: inline-block; margin-top: var(--s-5); font: var(--f-meta-b); }
+
+@media (min-width: 761px) and (max-width: 1199px) {
+  .dsc-head h2 { grid-column: 1 / -1; font: var(--f-l2); }
+  .dsc-intro { grid-column: 1 / 10; margin-top: var(--s-5); }
+  .inset .cap { font-size: 12px; line-height: 16px; }
+  .ax span { font-size: 12px; }
+}
+
+@media (max-width: 760px) {
+  .dsc { padding-top: var(--s-9); }
+  .dsc .ch-top { margin-bottom: var(--s-4); }
+  .dsc-head h2 { grid-column: 1 / -1; font: var(--f-l2); }
+  .dsc-intro { grid-column: 1 / -1; margin-top: var(--s-4); }
+  .dsc-intro .offices { margin-top: var(--s-4); }
+  .dsc-plate { margin-top: var(--s-5); display: flex; flex-direction: column; }
+  .stage { aspect-ratio: 820 / 1000; }
+  .dsc-2 .stage { aspect-ratio: 880 / 1000; }
+  .art-d { display: none; }
+  .art-m { display: block; }
+  .ax span { left: 4.5%; font-size: 12px; }
+  .co { left: var(--mx); top: var(--my); }
+  /* on a phone the drawing carries numbered markers; the key under it names them */
+  .co-b, .co[data-mside] .co-b { flex-direction: row; transform: translate(-50%, -50%); padding: 6px; }
+  .co-line, .co-t { display: none; }
+  .co-dot { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: var(--pill); border-color: var(--ln); }
+  .co-n { display: block; font: 700 14px/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--pill-fg); }
+  .co-b[aria-expanded="true"] .co-dot { background: var(--pill-on); border-color: var(--pill-on); }
+  .co-b[aria-expanded="true"] .co-n { color: var(--pill-on-fg); }
+  .co-key { display: grid; gap: var(--s-2); margin: var(--s-4) var(--margin) 0; padding-bottom: var(--s-6); }
+  .co-k { display: flex; align-items: center; gap: var(--s-3); width: 100%; min-height: 48px; padding: 0 var(--s-3) 0 var(--s-2); border: 1px solid var(--pill-bd); border-radius: var(--r-round); background: var(--pill); color: var(--pill-fg); text-align: left; }
+  .co-k .co-n { display: flex; align-items: center; justify-content: center; flex: none; width: 30px; height: 30px; border-radius: var(--r-round); border: 2px solid currentColor; color: inherit; }
+  .co-kt { display: inline-flex; align-items: center; gap: var(--s-2); flex: 1; font: var(--f-meta-b); font-size: 15px; }
+  .co-kt svg { width: 16px; height: 16px; flex: none; }
+  .co-k[aria-expanded="true"] { background: var(--pill-on); color: var(--pill-on-fg); border-color: var(--pill-on); }
+  /* the photo leaves the drawing and sits under it */
+  .inset { position: static; order: -1; width: auto; margin: 0 var(--margin) var(--s-6); }
+  /* on a phone the card is a sheet from the bottom of the screen, like the app's place preview */
+  .card, .co[data-card="l"] .card, .co.up .card { position: fixed; z-index: 40; left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 78vh; overflow-y: auto;
+    padding: var(--s-5) var(--margin) calc(var(--s-5) + env(safe-area-inset-bottom)); border-radius: 16px 16px 0 0; box-shadow: 0 -8px 32px rgba(10, 20, 40, .4); }
+  .card figure { margin: calc(-1 * var(--s-5)) calc(-1 * var(--margin)) 0; }
+  .card figure .ph { border-radius: 16px 16px 0 0; aspect-ratio: 16 / 9; }
+  .card figure .cap { padding: 0 var(--margin); }
+  .card-x { top: var(--s-3); right: var(--s-3); }
+}
