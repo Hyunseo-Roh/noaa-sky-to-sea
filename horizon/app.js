@@ -379,7 +379,7 @@
     } catch (_) { /* outside the NWS area: keep the coordinates */ }
   }
 
-  startBtn.addEventListener('click', async () => {
+  async function turnOn() {
     const DOE = window.DeviceOrientationEvent;
     const motion = DOE && typeof DOE.requestPermission === 'function'
       ? DOE.requestPermission().catch(() => 'denied')
@@ -393,7 +393,8 @@
     }
     await motion;
     setTimeout(updateText, 1500);
-  });
+  }
+  startBtn.addEventListener('click', turnOn);
 
   // Look around by dragging (sample view, or a camera without a compass).
   screen.addEventListener('pointerdown', (e) => {
@@ -596,71 +597,122 @@
     li.append(b);
     return li;
   }
+  // One Nearby card: the same parts as a row, on its own white card.
+  function card(id, p, title, line, live, { face = true, big = false } = {}) {
+    const li = row(id, p, title, line, live, face);
+    const b = li.querySelector('button');
+    b.className = `nc${big ? ' big' : ''}${iconName(id, p) === 'alert' ? ' is-alert' : ''}`;
+    return li;
+  }
+  // Sunrise and sunset share one card: two halves, each opening its own preview.
+  function sunPair(ids) {
+    const li = document.createElement('li');
+    const pair = document.createElement('div');
+    pair.className = 'nc-pair';
+    for (const id of ids) {
+      const p = PLACES[id];
+      const half = row(id, p, p.name, `${capital(dayWord(p.at, S.tz))}, toward the ${G.dir8(p.bearing)}`, clock(p.at, S.tz)).querySelector('button');
+      half.className = 'nc';
+      pair.append(half);
+    }
+    li.append(pair);
+    return li;
+  }
   function setLive(li, text) {
     const n = li.querySelector('.now');
     if (n) n.textContent = text;
   }
 
-  // A titled group of rows: Weather alerts, Sky, Sea, Instruments.
-  function group(key, title, note, rows, extra) {
-    if (!rows.length && !extra) return null;
+  // A section of Nearby: Weather alerts, then the Sky on Atmospheric haze, then the Sea on Deep ocean.
+  function group(key, title, note, cards, extra) {
+    if (!cards.length && !extra) return null;
     const sec = document.createElement('section');
-    sec.className = 'nb-group';
+    sec.className = 'nb-sec';
     sec.dataset.group = key;
-    sec.innerHTML = `<h2 class="nb-h t-row"></h2>${note ? '<p class="nb-note t-meta"></p>' : ''}${rows.length ? '<ul class="nb-rows"></ul>' : ''}`;
+    sec.innerHTML = `<h2 class="nb-h t-title"></h2>${note ? '<p class="nb-note t-meta"></p>' : ''}${cards.length ? '<ul class="nb-cards"></ul>' : ''}`;
     sec.querySelector('h2').textContent = title;
     if (note) sec.querySelector('.nb-note').textContent = note;
-    if (rows.length) sec.querySelector('ul').append(...rows);
-    if (extra) sec.append(extra);
+    if (cards.length) sec.querySelector('ul').append(...cards);
+    if (extra) sec.append(...[].concat(extra));
     return sec;
+  }
+  // A photo of the horizon where you are, when there is one: the demo spot, and Los Angeles.
+  const LOCAL = [
+    { lat: DEMO.lat, lon: DEMO.lon, radius: 40, src: '../images/carysfort-lighthouse.jpg', alt: 'A calm sea with Carysfort Lighthouse on the horizon', cap: 'Your horizon from Key Largo, facing east. Photo: Nancy Diersing/NOAA' },
+    { lat: 34.05, lon: -118.25, radius: 60, src: '../images/local/los-angeles-horizon.jpg', alt: 'The sea off Los Angeles', cap: 'Your horizon: the sea off Los Angeles.' },
+  ];
+  const nbPhoto = $('#nb-photo');
+  function showLocalPhoto(v) {
+    const L = LOCAL.find((x) => G.miles(v, x) <= x.radius);
+    const img = nbPhoto.querySelector('img');
+    if (!L) { nbPhoto.hidden = true; img.removeAttribute('src'); return; }
+    if (img.getAttribute('src') === L.src) return;
+    nbPhoto.hidden = true;
+    img.onload = () => { nbPhoto.hidden = false; };
+    img.onerror = () => { nbPhoto.hidden = true; };
+    img.alt = L.alt;
+    nbPhoto.querySelector('figcaption').textContent = L.cap;
+    img.src = L.src;
   }
   function renderNearby() {
     if (nbPanel.hidden) return;
     nbState.hidden = NB.status !== 'loading';
     nbState.textContent = "Finding NOAA's work near you…";
     const v = S.viewer;
+    showLocalPhoto(v);
     const where = (p) => lower(G.distanceText(v, p));
     const byMiles = (a, b) => (a[1].miles ?? 0) - (b[1].miles ?? 0);
     const entries = Object.entries(PLACES);
 
-    const alerts = S.alerts.map((a) => row(a.id, PLACES[a.id] || a, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, false));
+    const alerts = S.alerts.map((a) => card(a.id, PLACES[a.id] || a, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, { face: false }));
 
-    const sky = [row('weather', PLACES.weather, 'Weather for this sky', NB.forecast || `Forecast for ${v.name}`, null)];
-    for (const id of ['sunrise', 'sunset'].filter((k) => PLACES[k]).sort((a, b) => PLACES[a].at - PLACES[b].at)) {
-      const p = PLACES[id];
-      sky.push(row(id, p, p.name, `${capital(dayWord(p.at, S.tz))} at ${clock(p.at, S.tz)}, toward the ${G.dir8(p.bearing)}`, null));
-    }
-
-    const sea = entries
-      .filter(([id, p]) => !p.away && !p.far && ((p.found && SEA.has(p.kind)) || id === 'carysfort-reef' || id === 'florida-keys-sanctuary'))
-      .sort(byMiles)
-      .map(([id, p]) => {
-        if (id === 'florida-keys-sanctuary') return row(id, p, p.name, 'Marine sanctuary, the water in front of you', null);
-        if (p.kind === 'tide') return row(id, p, p.name, `Tide station, ${where(p)}`, tideText(p) || 'No tide predictions right now');
-        if (p.kind === 'sanctuary') return row(id, p, p.name, `Marine sanctuary, ${where(p)}`, null);
-        return row(id, p, p.name, `${p.what}, ${where(p)}`, null);
-      });
+    const sky = [card('weather', PLACES.weather, 'Weather for this sky', `Forecast for ${v.name}`, NB.forecast || 'Loading the forecast…', { big: true })];
+    const sun = ['sunrise', 'sunset'].filter((k) => PLACES[k]).sort((a, b) => PLACES[a].at - PLACES[b].at);
+    if (sun.length === 2) sky.push(sunPair(sun));
+    else for (const id of sun) sky.push(card(id, PLACES[id], PLACES[id].name, `${capital(dayWord(PLACES[id].at, S.tz))}, toward the ${G.dir8(PLACES[id].bearing)}`, clock(PLACES[id].at, S.tz)));
 
     const instruments = entries
       .filter(([, p]) => p.found && (p.kind === 'station' || p.kind === 'radar'))
       .sort(byMiles)
       .map(([id, p]) => (p.kind === 'station'
-        ? row(id, p, p.name, `Weather station, ${where(p)}`, p.reading ? readingText(p.reading) : 'No recent reading')
-        : row(id, p, p.name, `${p.what}, ${where(p)}`, null)));
-    let failed = null;
+        ? card(id, p, p.name, `Weather station, ${where(p)}`, p.reading ? readingText(p.reading) : 'No recent reading')
+        : card(id, p, p.name, `${p.what}, ${where(p)}`, null)));
+    const extra = [];
+    if (instruments.length || (NB.status === 'ready' && NB.error)) {
+      const h = document.createElement('h3');
+      h.className = 'nb-sub2 t-body b';
+      h.textContent = 'Measuring the weather near you';
+      extra.push(h);
+    }
+    if (instruments.length) {
+      const ul = document.createElement('ul');
+      ul.className = 'nb-cards';
+      ul.append(...instruments);
+      extra.push(ul);
+    }
     if (NB.status === 'ready' && NB.error) {
-      failed = document.createElement('div');
+      const failed = document.createElement('div');
       failed.className = 'nb-failed';
       failed.innerHTML = '<p class="t-meta">Weather stations and radar didn\'t load.</p>';
       nbRetry.hidden = false;
       failed.append(nbRetry);
+      extra.push(failed);
     } else nbRetry.hidden = true;
+
+    const sea = entries
+      .filter(([id, p]) => !p.away && !p.far && ((p.found && SEA.has(p.kind)) || id === 'carysfort-reef' || id === 'florida-keys-sanctuary'))
+      .sort(byMiles)
+      .map(([id, p]) => {
+        if (id === 'florida-keys-sanctuary') return card(id, p, p.name, 'Marine sanctuary, the water in front of you', null);
+        if (p.kind === 'tide') return card(id, p, p.name, `Tide station, ${where(p)}`, tideText(p) || 'No tide predictions right now');
+        if (p.kind === 'sanctuary') return card(id, p, p.name, `Marine sanctuary, ${where(p)}`, null);
+        return card(id, p, p.name, `${p.what}, ${where(p)}`, null);
+      });
 
     nbList.replaceChildren(...[
       group('alerts', 'Weather alerts', null, alerts),
-      group('sky', 'Sky', 'The forecast and the sun, for where you are', sky),
+      group('sky', 'Sky', 'The forecast, the sun and the instruments, for where you are', sky, extra),
       group('sea', 'Sea', "NOAA's work on the water closest to you", sea),
-      group('instruments', 'Instruments', 'Stations and radar measuring the weather near you', instruments, failed),
     ].filter(Boolean));
   }
   nbRetry.addEventListener('click', () => loadNearby(true));
@@ -1032,23 +1084,31 @@
   }
   setInterval(() => { if (!document.hidden) loadAlerts(); }, 5 * 60 * 1000);
 
-  // The first time you open Horizon, a short note says what it does. It is remembered on the phone.
-  const INTRO_KEY = 'horizon:intro';
+  // The start screen: Horizon opens on it, says what it does and why it asks for the camera,
+  // and nothing turns on until you choose. It is skipped for a shared link or a return to the camera.
   function openIntro() {
     intro.hidden = false;
     screen.classList.add('has-intro');
+    const cam = canCamera && isTouch;
+    $('#intro-go').hidden = !cam;
+    $('#intro-sample').textContent = cam ? 'Try the sample view first' : 'See the sample view';
+    $('#intro-sample').className = cam ? 'btn secondary' : 'btn';
     $('#in-t').focus({ preventScroll: true });
   }
   function closeIntro() {
     if (intro.hidden) return;
     intro.hidden = true;
     screen.classList.remove('has-intro');
-    try { localStorage.setItem(INTRO_KEY, '1'); } catch (_) { /* no storage */ }
   }
   $('#intro-go').addEventListener('click', () => {
     closeIntro();
+    turnOn();
+  });
+  $('#intro-sample').addEventListener('click', () => {
+    closeIntro();
     (startBtn.hidden ? screen : startBtn).focus({ preventScroll: true });
   });
+  for (const pill of intro.querySelectorAll('[data-icon]')) pill.insertAdjacentHTML('afterbegin', svgOf(pill.dataset.icon));
 
   async function loadForecast() {
     const what = sheetBody.querySelector('[data-forecast]');
@@ -1104,8 +1164,6 @@
   updateSun(true);
   route();
   loadAlerts();
-  let introSeen = false;
-  try { introSeen = localStorage.getItem(INTRO_KEY) === '1'; } catch (_) { /* no storage */ }
-  if (!introSeen && !location.hash && !(wasLive && canCamera && returning)) openIntro();
+  if (!location.hash && !(wasLive && canCamera && returning)) openIntro();
   requestAnimationFrame(tick);
 })();

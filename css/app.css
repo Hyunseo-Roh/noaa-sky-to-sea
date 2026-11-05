@@ -107,12 +107,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 .pv img { width: 72px; height: 72px; object-fit: cover; border-radius: var(--r-thumb); }
 .sheet .office { margin-top: var(--s-3); }
 .sheet .btn { margin-top: var(--s-4); width: 100%; }
-/* the first-run note: a sheet over the sample view */
-.intro { z-index: 22; }
-.intro h2, .intro h2:focus-visible { margin-top: 2px; outline: none; }
-.intro .in-text { margin-top: var(--s-2); }
-.intro .in-note { margin-top: var(--s-3); color: var(--c-ink-2); }
-
 /* Save and Share under the main button */
 .acts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); margin-top: var(--s-2); }
 .sheet .acts .btn { margin-top: 0; width: auto; padding: 0 var(--s-3); }
@@ -132,14 +126,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-sub { margin-top: var(--s-1); color: var(--c-ink-2); }
 .nb-rows { margin-top: var(--s-4); border-top: 1px solid var(--c-rule); }
 .nb-rows li { border-bottom: 1px solid var(--c-rule); }
-/* Nearby comes in titled groups: Weather alerts, Sky, Sea, Instruments */
-.nb-group { margin-top: var(--s-6); }
-.nb-groups > .nb-group:first-child { margin-top: var(--s-5); }
-.nb-h { color: var(--c-ink); }
-.nb-note { margin-top: 2px; color: var(--c-ink-2); }
-.nb-group .nb-rows { margin-top: var(--s-3); }
-.nb-failed { margin-top: var(--s-3); color: var(--c-ink-2); }
-/* a row: the icon (outline for instruments, solid for public information), what it is, one line, a live reading */
+/* a row (Saved): the icon, what it is, one line, a live reading */
 .row { width: 100%; display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; gap: var(--s-4); align-items: start; padding: 14px 0; text-align: left; }
 .row .ic { width: 24px; height: 24px; color: var(--c-brand); }
 .row .ic svg { display: block; width: 24px; height: 24px; }
@@ -148,13 +135,76 @@ ul { margin: 0; padding: 0; list-style: none; }
 .row .t { display: block; color: var(--c-ink-2); }
 .row .now { color: var(--c-ink); }
 .row .chev { width: 20px; height: 20px; color: var(--c-ink-2); align-self: center; }
+/* Nearby, as the website's descent: a photo of your horizon, then the Sky on Atmospheric haze,
+   then the Sea on Deep ocean, each place on its own card */
+.nb-photo { margin: var(--s-5) 0 0; }
+.nb-photo[hidden] { display: none; }
+.nb-photo img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-thumb); }
+.nb-photo figcaption { margin-top: var(--s-2); color: var(--c-ink-2); }
+.nb-groups { margin: var(--s-6) -20px 0; }
+.nb-sec { padding: var(--s-6) 20px var(--s-7); }
+.nb-sec[data-group="alerts"] { padding-top: 0; padding-bottom: var(--s-6); }
+.nb-sec[data-group="sky"] { background: var(--c-data); }
+.nb-sec[data-group="sea"] { background: var(--c-brand); color: var(--c-ground); }
+.nb-h { display: flex; align-items: baseline; gap: var(--s-2); font: 700 24px/30px var(--font-ui); color: var(--c-ink); }
+.nb-sec[data-group="sea"] .nb-h { color: var(--c-ground); }
+.nb-note { margin-top: 2px; color: var(--c-ink-2); }
+.nb-sec[data-group="sea"] .nb-note { color: var(--c-on-dark-2); }
+.nb-sub2 { margin-top: var(--s-6); color: var(--c-ink); }
+.nb-cards { display: grid; gap: var(--s-2); margin-top: var(--s-4); }
+.nb-failed { margin-top: var(--s-3); color: var(--c-ink-2); }
+/* a card: the icon (outline for instruments, solid for public information), what it is, one line, a live reading */
+.nc { width: 100%; display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; gap: var(--s-3); align-items: start; padding: var(--s-4); text-align: left;
+  background: var(--c-ground); color: var(--c-ink); border-radius: var(--r-thumb); box-shadow: 0 1px 3px color-mix(in srgb, var(--c-ink) 18%, transparent); }
+.nc .ic { width: 24px; height: 24px; color: var(--c-brand); }
+.nc .ic svg { display: block; width: 24px; height: 24px; }
+.nc .ic.is-alert { color: var(--c-alert); }
+.nc b { display: block; color: var(--c-ink); }
+.nc .t { display: block; margin-top: 2px; color: var(--c-ink-2); }
+.nc .now { display: block; margin-top: var(--s-2); font: var(--f-app-body-b); color: var(--c-brand); }
+.nc .chev { width: 20px; height: 20px; color: var(--c-ink-2); align-self: center; }
+.nc.is-alert { box-shadow: inset 4px 0 0 var(--c-alert), 0 1px 3px color-mix(in srgb, var(--c-ink) 18%, transparent); }
+/* the forecast: the first card, with the forecast in large type */
+.nc.big .now { font: var(--f-app-row); color: var(--c-ink); }
+/* sunrise and sunset share one card, side by side */
+.nc-pair { display: grid; grid-template-columns: 1fr 1fr; background: var(--c-ground); border-radius: var(--r-thumb); box-shadow: 0 1px 3px color-mix(in srgb, var(--c-ink) 18%, transparent); }
+.nc-pair .nc { box-shadow: none; grid-template-columns: 24px minmax(0, 1fr); border-radius: 0; background: none; }
+.nc-pair .nc + .nc { border-left: 1px solid var(--c-rule); }
+.nc-pair .nc .chev { display: none; }
+.nc-pair .now { font: var(--f-app-row); color: var(--c-ink); }
+.nb-sec[data-group="sea"] + .nb-source, .nb-groups + .nb-state + .nb-retry + .nb-source { margin-top: 0; }
 .nb-state { margin-top: var(--s-4); color: var(--c-ink-2); }
 .nb-retry { margin-top: var(--s-3); }
 .nb-retry[hidden] { display: none; }
-.nb-source { margin-top: var(--s-6); color: var(--c-ink-2); }
+.nb-source { margin: 0 -20px calc(-1 * var(--s-6)); padding: 0 20px var(--s-6); background: var(--c-brand); color: var(--c-on-dark-2); }
+#nearby { padding-bottom: var(--s-6); }
 .sv-empty { margin-top: var(--s-5); color: var(--c-ink-2); }
 
 /* on a wide screen, the app sits in a phone-width column */
 @media (min-width: 600px) {
   .screen { box-shadow: 0 0 0 1px var(--c-rule-dark); }
 }
+
+/* The start screen: what Horizon does, and why it asks for the camera, before anything turns on */
+.start { position: absolute; z-index: 40; inset: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; user-select: text; -webkit-user-select: text; background: var(--c-ground); color: var(--c-ink); display: flex; flex-direction: column; }
+.start[hidden] { display: none; }
+.st-scene { position: relative; flex: none; height: calc(250px + env(safe-area-inset-top)); overflow: hidden; background: var(--c-data); }
+.st-art { position: absolute; left: 0; bottom: 0; width: 100%; height: 250px; }
+.st-mk { position: absolute; left: var(--x); bottom: calc(250px - var(--y)); transform: translate(-50%, 100%); display: flex; flex-direction: column; align-items: center; }
+.st-mk .pill { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--s-3) 0 10px; border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); white-space: nowrap; box-shadow: 0 1px 6px color-mix(in srgb, var(--c-ink) 25%, transparent); }
+.st-mk .pill svg { width: 16px; height: 16px; flex: none; }
+.st-mk .lead { width: 2px; background: var(--c-brand); }
+.st-mk .dot { width: 10px; height: 10px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-ground); border: 2px solid var(--c-brand); }
+.st-body { flex: 1 0 auto; padding: var(--s-6) 20px calc(var(--s-6) + env(safe-area-inset-bottom)); }
+.st-body h1, .st-body h1:focus-visible { outline: none; }
+.st-steps { display: grid; gap: var(--s-3); margin: var(--s-5) 0 0; padding: 0; list-style: none; }
+.st-steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--s-3); align-items: start; }
+.st-steps .n { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--r-round); background: var(--c-brand); color: var(--c-ground); font: 700 14px/1 var(--font-ui); font-variant-numeric: tabular-nums; }
+.st-steps .t-body { padding-top: 2px; }
+.st-why { margin-top: var(--s-5); padding: var(--s-4); border-radius: var(--r-thumb); background: var(--c-data); }
+.st-why p { margin-top: var(--s-1); color: var(--c-ink); }
+.st-acts { display: grid; gap: var(--s-2); margin-top: var(--s-5); }
+.st-acts .btn svg { width: 22px; height: 22px; }
+.st-acts .btn[hidden] { display: none; }
+.st-small { margin-top: var(--s-4); color: var(--c-ink-2); text-align: center; }
+.screen.has-intro .tabs { visibility: hidden; }
