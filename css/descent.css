@@ -17,6 +17,7 @@
 .dsc-5 { --g: var(--c-brand); }   /* Deep ocean */
 .dsc-6 { --g: var(--c-brand); }
 .dsc-6 .stage { aspect-ratio: 1600 / 800; }
+.dsc-3 .stage { aspect-ratio: 1600 / 880; }
 .dsc-7 { --g: var(--c-ink); }     /* Night horizon */
 .dsc-7 .inset .ph { aspect-ratio: 1 / 1; }
 .dsc-7 .inset img { object-position: 50% 60%; }
@@ -34,8 +35,8 @@
 .closing.dark .shot .ph { border-color: var(--c-rule-dark); }
 /* a callout drawn in the water of a light chapter takes the dark tone */
 .co.dark { --ln: var(--c-ground); --pill: var(--c-ground); --pill-fg: var(--c-brand); --pill-bd: var(--c-ground); --pill-on: var(--c-data); --pill-on-fg: var(--c-brand); --dot: var(--c-brand); }
-.dsc .bridge { color: var(--fg); margin-bottom: var(--s-6); }
-.dsc .ch-top.ruled { padding-top: var(--s-5); border-top: 1px solid var(--fg2); }
+.dsc .bridge { color: var(--fg); margin-bottom: var(--s-8); }
+.dsc .ch-top.ruled { padding-top: 0; border-top: 0; }   /* space, not a rule, between the bridge and the chapter */
 .art-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 /* Header: the title wide on the left, the lead and offices on the right */
@@ -141,10 +142,9 @@
   .dsc-intro .offices { margin-top: var(--s-5); }
   .dsc-more { margin-top: var(--s-5); }
   .dsc .bridge { margin-bottom: var(--s-7); }
-  .dsc .ch-top.ruled { padding-top: var(--s-6); }
   .dsc-plate { margin-top: var(--s-5); display: flex; flex-direction: column; }
   .stage { aspect-ratio: 820 / 1000; }
-  .dsc-2 .stage { aspect-ratio: 880 / 1000; }
+  .dsc-2 .stage { aspect-ratio: 1040 / 1000; }
   .art-d { display: none; }
   .art-m { display: block; }
   .ax span { left: 4.5%; font-size: 12px; }
@@ -160,7 +160,7 @@
   .co-b[aria-expanded="true"] .co-n { color: var(--c-ground); }
   .co-key { display: grid; gap: var(--s-2); margin: var(--s-5) var(--margin) 0; padding-bottom: var(--s-8); }
   .dsc-3 .co-key { margin: -1px 0 0; padding: var(--s-5) var(--margin) var(--s-8); background: var(--c-brand); }
-  .dsc-3 .stage { aspect-ratio: 1000 / 1000; }
+  .dsc-3 .stage { aspect-ratio: 1080 / 880; }
   .dsc-4 .stage { aspect-ratio: 900 / 800; }
   .dsc-5 .stage { aspect-ratio: 900 / 860; }
   .dsc-6 .stage { aspect-ratio: 1200 / 800; }

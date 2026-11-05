@@ -40,6 +40,23 @@
       if (c.dataset.side0 === 'r' && b.right > right) c.dataset.side = 'l';
       else if (c.dataset.side0 === 'l' && b.left < Math.max(s.left, 0) + 8) c.dataset.side = 'r';
     });
+    if (phone.matches) return;
+    // two labels that meet on a narrow drawing: turn one of them to the other side of its dot, if it still fits
+    const rect = (c) => c.querySelector('.co-b').getBoundingClientRect();
+    const hit = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+    const fits = (c) => { const r = rect(c), s = c.closest('.stage').getBoundingClientRect(); return r.left >= s.left + 8 && r.right <= Math.min(s.right, document.documentElement.clientWidth) - 8; };
+    document.querySelectorAll('.dsc .stage').forEach((st) => {
+      const cs = [...st.querySelectorAll('.co')].filter((c) => rect(c).width);
+      for (let i = 0; i < cs.length; i++) for (let j = i + 1; j < cs.length; j++) {
+        if (!hit(rect(cs[i]), rect(cs[j]))) continue;
+        for (const c of [cs[i], cs[j]]) {
+          const was = c.dataset.side;
+          c.dataset.side = was === 'r' ? 'l' : 'r';
+          if (fits(c) && !cs.some((o) => o !== c && hit(rect(c), rect(o)))) break;
+          c.dataset.side = was;
+        }
+      }
+    });
   };
   fit();
   addEventListener('resize', fit);
