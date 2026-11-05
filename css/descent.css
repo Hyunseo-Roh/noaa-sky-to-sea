@@ -18,7 +18,7 @@
 .dsc-6 { --g: var(--c-brand); }
 .dsc-6 .stage { aspect-ratio: 1600 / 800; }
 .dsc-7 { --g: var(--c-ink); }     /* Night horizon */
-.dsc-7 .inset .ph { aspect-ratio: 4 / 5; }
+.dsc-7 .inset .ph { aspect-ratio: 1 / 1; }
 .dsc-7 .inset img { object-position: 50% 60%; }
 .dsc-5 .inset .ph { aspect-ratio: 4 / 3; }
 .dsc-5 .stage { aspect-ratio: 1600 / 860; }
@@ -69,6 +69,7 @@
 .dsc-2 .inset .ph, .dsc-3 .inset .ph { aspect-ratio: 3 / 2; }
 .dsc-2 .inset img { object-position: 30% 40%; }
 .inset .cap { color: var(--fg2); }
+.dsc .cap .credit { white-space: normal; }   /* captions keep to their photo's (or card's) width */
 
 /* Callouts: a ring on the drawing, a leader, and a label that opens its card */
 .co { position: absolute; z-index: 3; left: var(--x); top: var(--y); width: 0; height: 0; }
@@ -162,7 +163,7 @@
   .dsc-3 .stage { aspect-ratio: 1000 / 1000; }
   .dsc-4 .stage { aspect-ratio: 900 / 800; }
   .dsc-5 .stage { aspect-ratio: 900 / 860; }
-  .dsc-6 .stage { aspect-ratio: 1040 / 800; }
+  .dsc-6 .stage { aspect-ratio: 1200 / 800; }
   .dsc-7 .stage { aspect-ratio: 1060 / 700; }
   .co-k { display: flex; align-items: center; gap: var(--s-3); width: 100%; min-height: 52px; padding: 0 var(--s-4) 0 var(--s-2); border: 1px solid var(--c-brand); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); text-align: left; }
   .dsc:not(.light) .co-k, .dsc-3 .co-k { border-color: var(--c-ground); }
