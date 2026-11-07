@@ -59,7 +59,7 @@
 
 /* The altitude ruler's numbers */
 .ax span { position: absolute; left: 2.6%; top: var(--y); transform: translateY(-50%); padding: 0 4px; font: var(--f-meta); color: var(--fg2); font-variant-numeric: tabular-nums; white-space: nowrap;
-  text-shadow: 0 0 3px var(--g), 0 0 6px var(--g), 0 0 6px var(--g); }
+  background: var(--g); }
 .ax span.key { font: var(--f-meta-b); color: var(--ln); }
 .ax span.base { transform: translateY(-125%); }
 
@@ -153,6 +153,7 @@
      Markers and key rows are the same object everywhere: a white circle or row with Deep ocean type,
      so they stand out on every ground and read as the things to tap. */
   .co-b, .co[data-mside] .co-b { flex-direction: row; transform: translate(-50%, -50%); padding: 6px; }
+  .co[data-side="l"] .co-b { transform: translate(-50%, -50%); }   /* every marker centred on its point, whichever side its label takes on a desktop */
   .co-line, .co-t { display: none; }
   .co-dot { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: var(--c-ground); border: 2px solid var(--c-brand); box-shadow: 0 1px 4px rgba(20, 38, 61, .3); }
   .co-n { display: block; font: 700 14px/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--c-brand); }
