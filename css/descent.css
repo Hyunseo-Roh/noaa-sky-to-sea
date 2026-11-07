@@ -153,7 +153,7 @@
      Markers and key rows are the same object everywhere: a white circle or row with Deep ocean type,
      so they stand out on every ground and read as the things to tap. */
   .co-b, .co[data-mside] .co-b { flex-direction: row; transform: translate(-50%, -50%); padding: 6px; }
-  .dsc-1 .co[data-side="l"] .co-b { transform: translate(-50%, -50%); }   /* every marker centred on its point, whichever side its label takes on a desktop */
+  .dsc-1 .co[data-side="l"] .co-b, .dsc-4 .co[data-side="l"] .co-b { transform: translate(-50%, -50%); }   /* every marker centred on its point, whichever side its label takes on a desktop */
   .co-line, .co-t { display: none; }
   .co-dot { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: var(--c-ground); border: 2px solid var(--c-brand); box-shadow: 0 1px 4px rgba(20, 38, 61, .3); }
   .co-n { display: block; font: 700 14px/1 var(--font-ui); font-variant-numeric: tabular-nums; color: var(--c-brand); }
