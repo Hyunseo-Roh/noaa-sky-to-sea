@@ -35,8 +35,15 @@
 .closing.dark .shot .ph { border-color: var(--c-rule-dark); }
 /* a callout drawn in the water of a light chapter takes the dark tone */
 .co.dark { --ln: var(--c-ground); --pill: var(--c-ground); --pill-fg: var(--c-brand); --pill-bd: var(--c-ground); --pill-on: var(--c-data); --pill-on-fg: var(--c-brand); --dot: var(--c-brand); }
-.dsc .bridge { color: var(--fg); margin-bottom: var(--s-8); }
-.dsc .ch-top.ruled { padding-top: 0; border-top: 0; }   /* space, not a rule, between the bridge and the chapter */
+/* The bridge closes a chapter: it hangs under its drawing, and the larger space comes before the next chapter */
+.dsc-end { margin-top: calc(min(100%, 1600px) * var(--pull, 0) * -1); padding-bottom: var(--s-9); }
+.dsc .bridge { color: var(--fg); margin: 0; }
+/* --pull lifts the bridge into the empty water under each drawing, so it sits 48 px under the lowest line (at 1440) */
+.dsc-3 { --pull: .0361; } .dsc-4 { --pull: .0278; } .dsc-5 { --pull: .0292; } .dsc-6 { --pull: .0111; }
+.dsc-3 .dsc-end { position: relative; z-index: 0; background: var(--c-brand); }
+.dsc-3 .dsc-end .bridge { color: var(--c-ground); }
+/* chapter 3's water is also filled behind the drawing, so no light line shows where the drawing ends */
+.dsc-3 .stage::before { content: ""; position: absolute; left: 0; right: 0; top: 47.8%; bottom: -2px; background: var(--c-brand); }
 .art-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
 /* Header: the title wide on the left, the lead and offices on the right */
@@ -141,7 +148,7 @@
   .dsc-intro { grid-column: 1 / -1; margin-top: var(--s-5); }
   .dsc-intro .offices { margin-top: var(--s-5); }
   .dsc-more { margin-top: var(--s-5); }
-  .dsc .bridge { margin-bottom: var(--s-7); }
+  .dsc .dsc-end { margin-top: calc(var(--s-6) - var(--s-8)); padding-bottom: var(--s-8); }   /* 32 px under the key list */
   .dsc-plate { margin-top: var(--s-5); display: flex; flex-direction: column; }
   .stage { aspect-ratio: 820 / 1000; }
   .dsc-2 .stage { aspect-ratio: 1040 / 1000; }
