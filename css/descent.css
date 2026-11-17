@@ -27,7 +27,7 @@
 .dsc-4, .dsc-5, .dsc-6, .dsc-7 { padding-top: var(--s-8); }
 
 /* The close, on Night horizon like the last chapter, then the footer under a rule */
-.closing.dark { background: var(--c-ink) url(../images/lines/currents-night.svg) center / cover no-repeat; color: var(--c-ground); border-bottom: 1px solid var(--c-rule-dark); }
+.closing.dark { background: var(--c-ink); color: var(--c-ground); border-bottom: 1px solid var(--c-rule-dark); }
 /* each chapter overlaps the one above by 1 px, so no light seam shows between two grounds in a PDF viewer */
 .dsc + .dsc, .dsc + .closing { margin-top: -1px; }
 .closing.dark .t-head, .closing.dark .t-lead { color: var(--c-ground); }
