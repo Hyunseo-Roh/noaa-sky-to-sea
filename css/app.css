@@ -144,8 +144,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-groups { margin: var(--s-6) -20px 0; }
 .nb-sec { padding: var(--s-6) 20px var(--s-7); }
 .nb-sec[data-group="alerts"] { padding-top: 0; padding-bottom: var(--s-6); }
-.nb-sec[data-group="sky"] { background: var(--c-data); }
-.nb-sec[data-group="sea"] { background: var(--c-brand); color: var(--c-ground); }
+.nb-sec[data-group="sky"] { background: var(--c-data) url(../images/lines/jet-haze.svg) center / cover no-repeat; }
+.nb-sec[data-group="sea"] { background: var(--c-brand) url(../images/lines/currents-deep.svg) center / cover no-repeat; color: var(--c-ground); }
 .nb-h { display: flex; align-items: baseline; gap: var(--s-2); font: 700 24px/30px var(--font-ui); color: var(--c-ink); }
 .nb-sec[data-group="sea"] .nb-h { color: var(--c-ground); }
 .nb-note { margin-top: 2px; color: var(--c-ink-2); }
