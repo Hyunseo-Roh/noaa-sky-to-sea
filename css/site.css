@@ -195,7 +195,10 @@ figure .cap { margin-top: var(--s-4); }
 .nav-b .chev { width: 16px; height: 16px; flex: none; transition: transform .2s ease-out; }
 .nav-b[aria-expanded="true"] .chev { transform: rotate(180deg); }
 .nav-b:hover, .nav-b[aria-expanded="true"] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; }
-.search-btn { flex: none; }
+.sr, .search-btn { flex: none; }
+.search-btn .i-x { display: none; }
+.search-btn[aria-expanded="true"] .i-pin { display: none; }
+.search-btn[aria-expanded="true"] .i-x { display: block; }
 .wx { flex: none; }
 .wx-b { display: inline-flex; align-items: center; gap: var(--s-2); height: 48px; padding: 0 var(--s-5) 0 var(--s-4); border: 1px solid currentColor; border-radius: var(--r-pill); font: var(--f-meta-b); white-space: nowrap; }
 .wx-b svg { width: 20px; height: 20px; flex: none; }
@@ -238,6 +241,17 @@ figure .cap { margin-top: var(--s-4); }
 .wx-row .btn { flex: none; white-space: nowrap; }
 .wx-links { margin-top: var(--s-7); }
 
+/* Search this site: the field, then the results in the same groups as the menus */
+.search-body { grid-column: 4 / 13; }
+.search-form label { display: block; font: var(--f-meta-b); color: var(--c-ink); }
+.search-form input { display: block; width: 100%; max-width: 600px; height: 48px; margin-top: var(--s-2); padding: 0 var(--s-4); border: 1px solid var(--c-ink-2); border-radius: var(--r-pill); font: 400 17px/24px var(--font-ui); color: var(--c-ink); background: var(--c-ground); }
+.search-form input::placeholder { color: var(--c-ink-2); }
+.search-form input:focus-visible { outline: 2px solid var(--c-state); outline-offset: -1px; border-color: var(--c-state); }
+.search-note { margin-top: var(--s-4); font: var(--f-meta); color: var(--c-ink-2); }
+.search-note:empty { display: none; }
+.search-results { margin-top: var(--s-6); }
+.search-results:empty { display: none; }
+
 /* noaa.gov topics: a plain line of links next to the chapter number */
 .topics { font: 400 16px/24px var(--font-ui); color: var(--c-ink-2); }
 .topics a { color: var(--c-brand); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; white-space: nowrap; }
@@ -255,7 +269,7 @@ html.no-scroll { overflow: hidden; }
 /* Below 1200 px: the menu button opens the list as a sheet; each menu opens in place */
 @media (max-width: 1199px) {
   .site-head .row { gap: var(--s-2); }
-  .search-btn { margin-left: auto; }
+  .sr { margin-left: auto; }
   .menu-btn { display: inline-flex; }
   .primary { display: none; position: fixed; z-index: 40; left: 0; right: 0; top: var(--l-header-height); bottom: 0; margin: 0; overflow-y: auto; overscroll-behavior: contain;
     padding: var(--s-4) var(--margin) var(--s-8); background: var(--c-ground); color: var(--c-ink); }
@@ -268,13 +282,16 @@ html.no-scroll { overflow: hidden; }
   .nav-i .mega .wrap.mega-in { display: block; padding: var(--s-2) 0 var(--s-6); }
   .nav-i .mega-intro { display: none; }
   .nav-i .mega-list, .nav-i .mega-list.c4, .nav-i .mega-list.c5 { grid-template-columns: 1fr; gap: var(--s-5); }
-  .site-head.sheet-on { position: fixed; z-index: 41; background: var(--c-ground); color: var(--c-brand); }
+  .site-head.sheet-on { position: fixed; z-index: 41; top: 0; left: 0; right: 0; background: var(--c-ground); color: var(--c-brand); }
+  /* on a page whose header sits in the flow, its place is kept while it is fixed, so nothing under it jumps */
+  .site-head.sheet-on:not(.over-photo) + * { margin-top: var(--l-header-height); }
   .site-head.over-photo.sheet-on .brand .on-photo { display: none; }
   .site-head.over-photo.sheet-on .brand .on-white { display: block; }
   /* Local weather opens as a sheet over the page, like the menu, so it never stops halfway down the screen */
-  .wx-panel { position: fixed; top: var(--l-header-height); bottom: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--c-ground); }
-  .wx-panel .mega-in { display: block; padding-top: var(--s-6); padding-bottom: var(--s-8); }
-  .wx-panel .mega-intro { padding: 0; margin-bottom: var(--s-5); }
+  .wx-panel, .search-panel { position: fixed; top: var(--l-header-height); bottom: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--c-ground); }
+  .wx-panel .mega-in, .search-panel .mega-in { display: block; padding-top: var(--s-6); padding-bottom: var(--s-8); }
+  .wx-panel .mega-intro, .search-panel .mega-intro { padding: 0; margin-bottom: var(--s-5); }
+  .search-panel .search-results { grid-template-columns: 1fr; gap: var(--s-5); }
   .wx-panel .mega-list.c4 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5) var(--s-6); }
 }
 @media (max-width: 760px) {
