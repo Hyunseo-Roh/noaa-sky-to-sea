@@ -69,31 +69,34 @@
   .closing .shot { margin-top: var(--s-7); justify-self: start; }
   .closing .shot .ph { width: 240px; }
 }
-/* What this site is: NOAA in one sentence, how the site works, and the seven chapters with their noaa.gov topics.
-   Each chapter is one group (number, name, a line on it, its topics, 8 px apart); the groups sit 48 px apart. */
+/* What this site is: NOAA in one sentence, how the site works, and the seven chapters in their two halves,
+   the sky (1 to 3) and the sea (4 to 7). Hierarchy: chapter name, then a line on it, then its noaa.gov topics.
+   Inside a chapter 8 px; between chapters 32 px; between the two halves 48 px. */
 .about { padding: var(--s-9) 0; background: var(--c-ground); }
 .about .g { align-items: start; }
 .about-text { grid-column: 1 / 6; }
 .about-text .t-lead { margin-top: var(--s-5); }
 .about-text .t-body { margin-top: var(--s-4); color: var(--c-ink); }
 .about-text .about-find { color: var(--c-ink-2); }
-.about-list { grid-column: 7 / 13; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-7) var(--s-7); padding-top: var(--s-2); }
-.ov-a { display: grid; grid-template-columns: 40px minmax(0, 1fr); text-decoration: none; }
+.about-groups { grid-column: 7 / 13; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--s-7); padding-top: var(--s-2); }
+.ov-h { font: var(--f-meta-b); color: var(--c-ink-2); }
+.about-list { display: grid; gap: var(--s-6); margin-top: var(--s-5); }
+.ov-a { display: grid; grid-template-columns: 32px minmax(0, 1fr); text-decoration: none; }
 .ov-n { grid-row: 1 / 4; font: var(--f-item); color: var(--c-ink-2); font-variant-numeric: tabular-nums; }
 .ov-name { font: var(--f-item); color: var(--c-brand); }
 .ov-a:hover .ov-name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
-.ov-d { margin-top: var(--s-2); font: var(--f-meta); color: var(--c-ink); }
+.ov-d { margin-top: var(--s-2); font: 400 16px/24px var(--font-ui); color: var(--c-ink); }
 .ov-k { margin-top: var(--s-2); font: var(--f-meta); color: var(--c-ink-2); }
 
 @media (min-width: 761px) and (max-width: 1199px) {
   .about-text { grid-column: 1 / -1; }
   .about-text p { max-width: 40em; }
-  .about-list { grid-column: 1 / -1; margin-top: var(--s-7); }
+  .about-groups { grid-column: 1 / -1; margin-top: var(--s-7); }
 }
 @media (max-width: 760px) {
   .about { padding: var(--s-8) 0; }
-  .about-text, .about-list { grid-column: 1 / -1; }
-  .about-list { grid-template-columns: 1fr; gap: var(--s-6); margin-top: var(--s-7); }
+  .about-text, .about-groups { grid-column: 1 / -1; }
+  .about-groups { grid-template-columns: 1fr; row-gap: var(--s-7); margin-top: var(--s-7); }
 }
 
 </style>
@@ -131,11 +134,14 @@
   <div class="wrap g">
     <div class="about-text">
       <h2 id="about-t" class="t-sec">What NOAA does, from the sky to the sea</h2>
-      <p class="t-lead">The National Oceanic and Atmospheric Administration forecasts the weather, charts the coasts, manages fisheries and protects marine&nbsp;sanctuaries.</p>
-      <p class="t-body">This redesign of noaa.gov follows that work down through seven chapters, from weather balloons in the upper air to whales in the open sea. Each chapter names the NOAA office behind the work and the noaa.gov topic it belongs&nbsp;to.</p>
-      <p class="t-body about-find">Your local weather, news, data and tools are in the menu at the top of every page.</p>
+      <p class="t-lead">The National Oceanic and Atmospheric Administration forecasts the weather, charts the coasts, manages fisheries and protects&nbsp;marine sanctuaries.</p>
+      <p class="t-body">This redesign of noaa.gov follows that work down through seven chapters, from weather balloons in the upper air to whales in the open sea. Each chapter names the NOAA office behind the work and the noaa.gov topic it&nbsp;belongs to.</p>
+      <p class="t-body about-find">Your local weather, news, data and tools are in the menu at the top of every page.</p>
     </div>
-    <ol class="about-list" aria-label="The seven chapters"><li><a class="ov-a" href="#ch1"><span class="ov-n">1</span><span class="ov-name">Upper air</span><span class="ov-d">Weather balloons read the sky twice a day</span><span class="ov-k">Weather, Research</span></a></li><li><a class="ov-a" href="#ch2"><span class="ov-n">2</span><span class="ov-name">Storms</span><span class="ov-d">Watches and warnings, from the ground, the air and the sea</span><span class="ov-k">Weather, Marine and aviation</span></a></li><li><a class="ov-a" href="ocean-and-sky.html"><span class="ov-n">3</span><span class="ov-name">Ocean and sky</span><span class="ov-d">Buoys, tide stations and charts made with sound</span><span class="ov-k">Ocean and coasts, Charting</span></a></li><li><a class="ov-a" href="#ch4"><span class="ov-n">4</span><span class="ov-name">Curiosity</span><span class="ov-d">A science camp that studies plankton on the shore</span><span class="ov-k">Education, Fisheries</span></a></li><li><a class="ov-a" href="#ch5"><span class="ov-n">5</span><span class="ov-name">Sanctuaries</span><span class="ov-d">Listening to a reef 100 miles offshore</span><span class="ov-k">Sanctuaries</span></a></li><li><a class="ov-a" href="#ch6"><span class="ov-n">6</span><span class="ov-name">Sea turtles</span><span class="ov-d">Rescuing turtles stunned by cold water</span><span class="ov-k">Fisheries</span></a></li><li><a class="ov-a" href="#ch7"><span class="ov-n">7</span><span class="ov-name">Whales</span><span class="ov-d">Watching humpbacks from a respectful distance</span><span class="ov-k">Sanctuaries, Fisheries</span></a></li></ol>
+    <div class="about-groups">
+      <div class="ov-group"><h3 class="ov-h">In the sky, chapters 1 to 3</h3><ol class="about-list"><li><a class="ov-a" href="#ch1"><span class="ov-n">1</span><span class="ov-name">Upper air</span><span class="ov-d">Weather balloons read the sky twice a day</span><span class="ov-k">Weather, Research</span></a></li><li><a class="ov-a" href="#ch2"><span class="ov-n">2</span><span class="ov-name">Storms</span><span class="ov-d">Watches and warnings, from the ground, the air and the sea</span><span class="ov-k">Weather, Marine and aviation</span></a></li><li><a class="ov-a" href="ocean-and-sky.html"><span class="ov-n">3</span><span class="ov-name">Ocean and sky</span><span class="ov-d">Buoys, tide stations and charts made with sound</span><span class="ov-k">Ocean and coasts, Charting</span></a></li></ol></div>
+      <div class="ov-group"><h3 class="ov-h">In the sea, chapters 4 to 7</h3><ol class="about-list" start="4"><li><a class="ov-a" href="#ch4"><span class="ov-n">4</span><span class="ov-name">Curiosity</span><span class="ov-d">A science camp that studies plankton on the shore</span><span class="ov-k">Education, Fisheries</span></a></li><li><a class="ov-a" href="#ch5"><span class="ov-n">5</span><span class="ov-name">Sanctuaries</span><span class="ov-d">Listening to a reef 100 miles offshore</span><span class="ov-k">Sanctuaries</span></a></li><li><a class="ov-a" href="#ch6"><span class="ov-n">6</span><span class="ov-name">Sea turtles</span><span class="ov-d">Rescuing turtles stunned by cold water</span><span class="ov-k">Fisheries</span></a></li><li><a class="ov-a" href="#ch7"><span class="ov-n">7</span><span class="ov-name">Whales</span><span class="ov-d">Watching humpbacks from a respectful distance</span><span class="ov-k">Sanctuaries, Fisheries</span></a></li></ol></div>
+    </div>
   </div>
 </section>
 

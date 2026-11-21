@@ -269,7 +269,10 @@ html.no-scroll { overflow: hidden; }
   .site-head.sheet-on { position: fixed; z-index: 41; background: var(--c-ground); color: var(--c-brand); }
   .site-head.over-photo.sheet-on .brand .on-photo { display: none; }
   .site-head.over-photo.sheet-on .brand .on-white { display: block; }
-  .wx-panel .mega-in { display: block; padding-top: var(--s-6); padding-bottom: var(--s-7); }
+  .site-head.sheet-on .wx-b[aria-expanded="true"] { background: var(--c-brand); border-color: var(--c-brand); color: var(--c-ground); }
+  /* Local weather opens as a sheet over the page, like the menu, so it never stops halfway down the screen */
+  .wx-panel { position: fixed; top: var(--l-header-height); bottom: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--c-ground); }
+  .wx-panel .mega-in { display: block; padding-top: var(--s-6); padding-bottom: var(--s-8); }
   .wx-panel .mega-intro { padding: 0; margin-bottom: var(--s-5); }
   .wx-panel .mega-list.c4 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-5) var(--s-6); }
 }

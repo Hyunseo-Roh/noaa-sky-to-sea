@@ -14,17 +14,28 @@
     b.setAttribute('aria-expanded', on ? 'true' : 'false');
     panelOf(b).hidden = !on;
   };
+  const narrow = () => innerWidth < 1200;
+  // below 1200 px Local weather is a sheet over the page, like the menu: the header stays solid and the page stays put
+  const wxSheet = (on) => {
+    if (on && !narrow()) return;
+    if (!on && sheet.classList.contains('open')) return;
+    head.classList.toggle('sheet-on', on);
+    document.documentElement.classList.toggle('no-scroll', on);
+  };
   const close = (focus) => {
     if (!open) return;
     const b = open; open = null;
     setOpen(b, false);
     head.classList.remove('menu-on');
+    if (b.classList.contains('wx-b')) wxSheet(false);
     if (focus) b.focus();
   };
   const show = (b) => {
-    if (open && open !== b) setOpen(open, false);
+    if (open && open !== b) close(false);
+    if (b.classList.contains('wx-b') && sheet.classList.contains('open')) setSheet(false);
     setOpen(b, true); open = b;
     head.classList.add('menu-on');
+    if (b.classList.contains('wx-b')) wxSheet(true);
     if (b.classList.contains('wx-b')) {
       const q = document.getElementById('wx-q');
       if (q && matchMedia('(hover: hover)').matches) q.focus({ preventScroll: true });
@@ -32,13 +43,13 @@
   };
   toggles.forEach((b) => b.addEventListener('click', () => (open === b ? close(false) : show(b))));
 
-  const setSheet = (on) => {
+  function setSheet(on) {
     menuBtn.setAttribute('aria-expanded', on ? 'true' : 'false');
     sheet.classList.toggle('open', on);
     head.classList.toggle('sheet-on', on);
     document.documentElement.classList.toggle('no-scroll', on);
     if (!on && open && open.classList.contains('nav-b')) close(false);
-  };
+  }
   menuBtn.addEventListener('click', () => {
     const on = menuBtn.getAttribute('aria-expanded') !== 'true';
     if (on && open && open.classList.contains('wx-b')) close(false);
