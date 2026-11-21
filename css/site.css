@@ -199,8 +199,10 @@ figure .cap { margin-top: var(--s-4); }
 .wx { flex: none; }
 .wx-b { display: inline-flex; align-items: center; gap: var(--s-2); height: 48px; padding: 0 var(--s-5) 0 var(--s-4); border: 1px solid currentColor; border-radius: var(--r-pill); font: var(--f-meta-b); white-space: nowrap; }
 .wx-b svg { width: 20px; height: 20px; flex: none; }
-.wx-b[aria-expanded="true"] { background: var(--c-brand); border-color: var(--c-brand); color: var(--c-ground); }
-.over-photo .wx-b[aria-expanded="true"] { background: var(--c-ground); border-color: var(--c-ground); color: var(--c-brand); }
+/* open: the pin becomes a close mark, nothing else changes */
+.wx-b .i-x { display: none; }
+.wx-b[aria-expanded="true"] .i-pin { display: none; }
+.wx-b[aria-expanded="true"] .i-x { display: block; }
 .menu-btn .i-close { display: none; }
 .menu-btn[aria-expanded="true"] .i-open { display: none; }
 .menu-btn[aria-expanded="true"] .i-close { display: block; }
@@ -217,7 +219,7 @@ figure .cap { margin-top: var(--s-4); }
 /* each link is one group: its name, a line on it, and the chapters it appears in, close together;
    the groups sit 48 px apart, both ways */
 .mega-list { grid-column: 4 / 13; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-7); align-content: start; }
-.mega-list.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.mega-list.c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--s-6); }
 .mega-list.c5 { grid-template-columns: repeat(5, minmax(0, 1fr)); column-gap: var(--s-6); }
 .mega-list a { display: grid; text-decoration: none; }
 .mi-t { font: 600 16px/24px var(--font-ui); color: var(--c-brand); }
@@ -269,7 +271,6 @@ html.no-scroll { overflow: hidden; }
   .site-head.sheet-on { position: fixed; z-index: 41; background: var(--c-ground); color: var(--c-brand); }
   .site-head.over-photo.sheet-on .brand .on-photo { display: none; }
   .site-head.over-photo.sheet-on .brand .on-white { display: block; }
-  .site-head.sheet-on .wx-b[aria-expanded="true"] { background: var(--c-brand); border-color: var(--c-brand); color: var(--c-ground); }
   /* Local weather opens as a sheet over the page, like the menu, so it never stops halfway down the screen */
   .wx-panel { position: fixed; top: var(--l-header-height); bottom: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--c-ground); }
   .wx-panel .mega-in { display: block; padding-top: var(--s-6); padding-bottom: var(--s-8); }
@@ -280,7 +281,8 @@ html.no-scroll { overflow: hidden; }
   .wx-b { width: 48px; height: 48px; padding: 0; justify-content: center; border: 0; }
   .wx-b span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .wx-b svg { width: 24px; height: 24px; }
-  .wx-row { flex-direction: column; }
+  /* the field and its button are one pair, 8 px apart */
+  .wx-row { flex-direction: column; gap: var(--s-2); }
   .wx-row input { flex: none; width: 100%; }
   .wx-row .btn { width: 100%; }
   .wx-panel .mega-list.c4 { grid-template-columns: 1fr; gap: var(--s-5); }
