@@ -44,7 +44,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .screen[data-mode="live"] .feed { display: none; }
 .shade { position: absolute; z-index: 1; inset: 0 0 auto 0; height: calc(220px + env(safe-area-inset-top)); background: linear-gradient(180deg, var(--c-scrim) 0%, transparent 100%); opacity: .7; pointer-events: none; }
 .shade-b { position: absolute; z-index: 1; inset: auto 0 var(--tab-h) 0; height: 200px; background: linear-gradient(0deg, var(--c-scrim) 0%, transparent 100%); opacity: .6; pointer-events: none; }
-.hline { position: absolute; z-index: 2; left: 0; right: 0; height: 1px; background: var(--c-sun); pointer-events: none; }
+.hline { position: absolute; z-index: 2; left: 0; right: 0; height: 1px; background: var(--c-ground); opacity: .75; pointer-events: none; }
 .screen[data-mode="live"] .hline { display: none; }
 .top { position: relative; z-index: 10; display: flex; align-items: center; gap: var(--s-3); padding: calc(max(env(safe-area-inset-top), 20px) + var(--s-2)) var(--s-4) 0 20px; pointer-events: none; }
 .where { display: flex; align-items: flex-start; gap: var(--s-2); flex: 1 1 0; min-width: 0; }
@@ -76,7 +76,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .mk .lead { width: 2px; background: var(--c-ground); box-shadow: 0 0 2px color-mix(in srgb, var(--c-ink) 35%, transparent); }
 .mk .dot { width: 12px; height: 12px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-sun); border: 2px solid var(--c-brand); }
 .mk.on .pill { font: var(--f-meta-b); box-shadow: 0 0 0 3px var(--c-state), 0 1px 6px color-mix(in srgb, var(--c-ink) 35%, transparent); }
-.mk.on .dot { width: 16px; height: 16px; margin-top: -2px; background: var(--c-state); border: 3px solid var(--c-ground); }
+.mk.on .dot { width: 16px; height: 16px; margin-top: -2px; background: var(--c-sun); border: 3px solid var(--c-brand); }
 
 /* a place that is out of view: a pill at the edge pointing the way */
 .edge { position: absolute; z-index: 8; display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 var(--s-3); border-radius: var(--r-round); background: var(--c-scrim); color: var(--c-ground); font: var(--f-meta-b); white-space: nowrap; }
@@ -104,6 +104,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .pv h2 { margin-top: 2px; outline: none; }
 .pv .what { margin-top: var(--s-1); color: var(--c-ink); }
 .pv .dist { margin-top: 2px; color: var(--c-ink-2); }
+.pv .sunline { display: flex; align-items: center; gap: var(--s-2); margin-top: var(--s-2); color: var(--c-ink); }
+.pv .sunline[hidden] { display: none; }
+.pv .sunline svg { width: 20px; height: 20px; flex: none; color: var(--c-brand); }
 .pv img { width: 72px; height: 72px; object-fit: cover; border-radius: var(--r-thumb); }
 .sheet .office { margin-top: var(--s-3); }
 .sheet .btn { margin-top: var(--s-4); width: 100%; }
@@ -217,13 +220,18 @@ ul { margin: 0; padding: 0; list-style: none; }
 .st-small { margin-top: var(--s-2); font: var(--f-meta); color: var(--c-ink-2); }
 .screen.has-intro .tabs { visibility: hidden; }
 
-/* The launch screen: sky over sea, the sun on the horizon, for a moment before the start screen */
-.splash { position: absolute; z-index: 60; inset: 0; display: flex; flex-direction: column; transition: opacity .4s ease; }
+/* The launch screen: the website's drawings from sky to sea (balloon, Hurricane Hunter, lighthouse, buoy,
+   turtle, octopus) under the logo, for a moment before the start screen. The sky and the sea, with their lines,
+   fill the screen; the drawing sits on the horizon and shrinks on short screens instead of being cut off */
+.splash { --art-h: min(calc(100cqw * 564 / 390), calc(100cqh - env(safe-area-inset-top) - 232px)); position: absolute; z-index: 60; inset: 0; container-type: size; transition: opacity .4s ease;
+  background: var(--c-data) url(../images/lines/nearby-sky.svg) no-repeat center bottom calc(var(--art-h) * 374 / 564) / 100% auto; }
 .splash.out { opacity: 0; pointer-events: none; }
 .splash[hidden], .no-splash .splash { display: none; }
-.sp-sky { flex: 0 0 62%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-top: env(safe-area-inset-top); background: var(--c-data); }
+.sp-sea { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--art-h) * 374 / 564); background: var(--c-brand) url(../images/lines/nearby-sea.svg) no-repeat center top / 100% auto; }
+.sp-art { position: absolute; left: 0; bottom: 0; width: 100%; height: var(--art-h); overflow: visible; }
+.sp-words { position: absolute; top: calc(env(safe-area-inset-top) + 56px); left: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .sp-logo { display: block; width: auto; height: 40px; }
-.sp-name { margin-top: var(--s-4); font: 700 40px/44px var(--font-ui); color: var(--c-ink); }
-.sp-sun { display: block; width: 96px; height: 49px; margin-top: var(--s-7); }
-.sp-sea { flex: 1; display: flex; align-items: flex-end; justify-content: center; padding: 0 20px calc(var(--s-6) + env(safe-area-inset-bottom)); background: var(--c-brand); font: var(--f-meta); color: var(--c-on-dark-2); text-align: center; }
+.sp-name { margin-top: var(--s-3); font: 700 48px/52px var(--font-ui); color: var(--c-ink); }
+.sp-tag { margin-top: var(--s-1); font: var(--f-body); color: var(--c-ink); }
+.sp-note { position: absolute; left: 20px; right: 20px; bottom: calc(var(--s-5) + env(safe-area-inset-bottom)); font: var(--f-meta); color: var(--c-on-dark-2); text-align: center; }
 @media (prefers-reduced-motion: reduce) { .splash { transition: none; } }

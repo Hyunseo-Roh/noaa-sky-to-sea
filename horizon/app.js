@@ -789,6 +789,14 @@
     if (d && pl.lat != null) d.textContent = isHere(pl) ? 'Where you are' : G.distanceText(S.viewer, pl);
     const when = sheetBody.querySelector('[data-period]');
     if (when) when.textContent = S.viewer.name;
+    // the weather for this sky also gives the day's sunrise and sunset, with the sun in Sunlight
+    const sunline = sheetBody.querySelector('[data-sunline]');
+    if (sunline && PLACES.sunrise && PLACES.sunset) {
+      const [a, b] = [PLACES.sunrise, PLACES.sunset].sort((x, y) => x.at - y.at);
+      sunline.innerHTML = `${svgOf(a === PLACES.sunrise ? 'sunrise' : 'sunset')}<span></span>`;
+      sunline.querySelector('span').textContent = `${a.name} ${clock(a.at, S.tz)}, ${lower(b.name)} ${clock(b.at, S.tz)}`;
+      sunline.hidden = false;
+    }
     const link = sheetBody.querySelector('[data-forecast-link]');
     if (link) link.href = `https://forecast.weather.gov/MapClick.php?lat=${S.viewer.lat.toFixed(4)}&lon=${S.viewer.lon.toFixed(4)}`;
     sheet.hidden = false;
