@@ -4,6 +4,9 @@ A redesigned NOAA website and the Horizon app, built as static HTML, CSS and Jav
 
 - `index.html`: home, "Know your world, from sky to sea". One descent from the upper air to the whales: each chapter is a drawn plate (`css/descent.css`) on a ground that gets darker toward the sea. Tap a drawn object, or its line in the key on a phone, to open its card (`js/scene.js`).
 - `ocean-and-sky.html`: Chapter 3, Ocean and sky
+- The header (`js/nav.js`): Chapters, Topics (noaa.gov's ten topics), News, Data, Tools and About each open a panel of NOAA links; Local weather opens a forecast search that goes to weather.gov. Below 1200 px the menu button opens the same list as a sheet.
+- Under the opening, "What NOAA does, from the sky to the sea" says what the site is and lists the seven chapters with their noaa.gov topics. Each chapter shows its topics next to its number.
+- On a computer each chapter fits one screen under the chapter bar (1440 x 900 and up): the title across the top, the text in a column on the left, the drawing to the right edge.
 - `horizon/`: the Horizon app
 
 Photo credits are in `credits.txt`.
