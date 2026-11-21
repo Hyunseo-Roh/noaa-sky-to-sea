@@ -54,6 +54,11 @@
   const nbSub = $('#nb-sub');
   const nbState = $('#nb-state');
   const nbList = $('#nb-list');
+  // the Sea's lines run on under the sources line below it, so the sources line needs the Sea's height
+  new ResizeObserver(() => {
+    const sea = nbList.querySelector('.nb-sec[data-group="sea"]');
+    $('#nearby').style.setProperty('--sea-h', (sea ? sea.offsetHeight : 0) + 'px');
+  }).observe(nbList);
   const nbRetry = $('#nb-retry');
   const tabView = $('#tab-view');
   const tabNearby = $('#tab-nearby');
@@ -1164,6 +1169,20 @@
   updateSun(true);
   route();
   loadAlerts();
-  if (!location.hash && !(wasLive && canCamera && returning)) openIntro();
+  // The launch screen shows for a moment when Horizon opens on the start screen, then fades into it.
+  const splash = $('#splash');
+  const coldStart = !location.hash && !(wasLive && canCamera && returning);
+  if (coldStart) {
+    openIntro();
+    const fade = () => {
+      if (splash.hidden) return;
+      splash.classList.add('out');
+      setTimeout(() => { splash.hidden = true; }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 400);
+    };
+    splash.addEventListener('click', fade);
+    setTimeout(fade, 1500);
+  } else {
+    splash.hidden = true;
+  }
   requestAnimationFrame(tick);
 })();

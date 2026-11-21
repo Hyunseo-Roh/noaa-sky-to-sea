@@ -44,7 +44,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .screen[data-mode="live"] .feed { display: none; }
 .shade { position: absolute; z-index: 1; inset: 0 0 auto 0; height: calc(220px + env(safe-area-inset-top)); background: linear-gradient(180deg, var(--c-scrim) 0%, transparent 100%); opacity: .7; pointer-events: none; }
 .shade-b { position: absolute; z-index: 1; inset: auto 0 var(--tab-h) 0; height: 200px; background: linear-gradient(0deg, var(--c-scrim) 0%, transparent 100%); opacity: .6; pointer-events: none; }
-.hline { position: absolute; z-index: 2; left: 0; right: 0; height: 1px; background: var(--c-ground); opacity: .75; pointer-events: none; }
+.hline { position: absolute; z-index: 2; left: 0; right: 0; height: 1px; background: var(--c-sun); pointer-events: none; }
 .screen[data-mode="live"] .hline { display: none; }
 .top { position: relative; z-index: 10; display: flex; align-items: center; gap: var(--s-3); padding: calc(max(env(safe-area-inset-top), 20px) + var(--s-2)) var(--s-4) 0 20px; pointer-events: none; }
 .where { display: flex; align-items: flex-start; gap: var(--s-2); flex: 1 1 0; min-width: 0; }
@@ -74,7 +74,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .mk .pill { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--s-4) 0 var(--s-3); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); white-space: nowrap; box-shadow: 0 1px 6px color-mix(in srgb, var(--c-ink) 35%, transparent); }
 .mk .pill svg { width: 18px; height: 18px; flex: none; }
 .mk .lead { width: 2px; background: var(--c-ground); box-shadow: 0 0 2px color-mix(in srgb, var(--c-ink) 35%, transparent); }
-.mk .dot { width: 12px; height: 12px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-ground); border: 2px solid var(--c-brand); }
+.mk .dot { width: 12px; height: 12px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-sun); border: 2px solid var(--c-brand); }
 .mk.on .pill { font: var(--f-meta-b); box-shadow: 0 0 0 3px var(--c-state), 0 1px 6px color-mix(in srgb, var(--c-ink) 35%, transparent); }
 .mk.on .dot { width: 16px; height: 16px; margin-top: -2px; background: var(--c-state); border: 3px solid var(--c-ground); }
 
@@ -144,8 +144,10 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-groups { margin: var(--s-6) -20px 0; }
 .nb-sec { padding: var(--s-6) 20px var(--s-7); }
 .nb-sec[data-group="alerts"] { padding-top: 0; padding-bottom: var(--s-6); }
-.nb-sec[data-group="sky"] { background: var(--c-data) url(../images/lines/jet-haze.svg) center / cover no-repeat; }
-.nb-sec[data-group="sea"] { background: var(--c-brand) url(../images/lines/currents-deep.svg) center / cover no-repeat; color: var(--c-ground); }
+/* One set of lines runs through the Sky, the Sea and the sources line under it: the sky's lines hang from the
+   Sky's bottom edge, the sea's start at the Sea's top edge, and both are drawn at the screen's width, so they meet */
+.nb-sec[data-group="sky"] { background: var(--c-data) url(../images/lines/nearby-sky.svg) center bottom / 100% auto no-repeat; }
+.nb-sec[data-group="sea"] { background: var(--c-brand) url(../images/lines/nearby-sea.svg) center top / 100% auto no-repeat; color: var(--c-ground); }
 .nb-h { display: flex; align-items: baseline; gap: var(--s-2); font: 700 24px/30px var(--font-ui); color: var(--c-ink); }
 .nb-sec[data-group="sea"] .nb-h { color: var(--c-ground); }
 .nb-note { margin-top: 2px; color: var(--c-ink-2); }
@@ -176,7 +178,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-state { margin-top: var(--s-4); color: var(--c-ink-2); }
 .nb-retry { margin-top: var(--s-3); }
 .nb-retry[hidden] { display: none; }
-.nb-source { margin: 0 -20px calc(-1 * var(--s-6)); padding: 0 20px var(--s-6); background: var(--c-brand); color: var(--c-on-dark-2); }
+.nb-source { margin: 0 -20px calc(-1 * var(--s-6)); padding: 0 20px var(--s-6); background: var(--c-brand) url(../images/lines/nearby-sea.svg) center calc(-1 * var(--sea-h, 0px)) / 100% auto no-repeat; color: var(--c-on-dark-2); }
 #nearby { padding-bottom: var(--s-6); }
 .sv-empty { margin-top: var(--s-5); color: var(--c-ink-2); }
 
@@ -185,26 +187,43 @@ ul { margin: 0; padding: 0; list-style: none; }
   .screen { box-shadow: 0 0 0 1px var(--c-rule-dark); }
 }
 
-/* The start screen: what Horizon does, and why it asks for the camera, before anything turns on */
+/* The start screen: what Horizon is, then how it works, before anything turns on.
+   The drawing is the website's chapter 3 scene, so the app and the site share one illustration. */
 .start { position: absolute; z-index: 40; inset: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; user-select: text; -webkit-user-select: text; background: var(--c-ground); color: var(--c-ink); display: flex; flex-direction: column; }
 .start[hidden] { display: none; }
-.st-scene { position: relative; flex: none; height: calc(250px + env(safe-area-inset-top)); overflow: hidden; background: var(--c-data); }
-.st-art { position: absolute; left: 0; bottom: 0; width: 100%; height: 250px; }
-.st-mk { position: absolute; left: var(--x); bottom: calc(250px - var(--y)); transform: translate(-50%, 100%); display: flex; flex-direction: column; align-items: center; }
-.st-mk .pill { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--s-3) 0 10px; border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); white-space: nowrap; box-shadow: 0 1px 6px color-mix(in srgb, var(--c-ink) 25%, transparent); }
+.st-scene { flex: none; padding-top: env(safe-area-inset-top); background: var(--c-data); }
+.st-frame { position: relative; aspect-ratio: 870 / 759; container-type: inline-size; }
+.st-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.st-mk { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, calc(-100% + 6px)); display: flex; flex-direction: column; align-items: center; }
+.st-mk .pill { display: inline-flex; align-items: center; gap: var(--s-2); height: 32px; padding: 0 var(--s-3) 0 10px; border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); white-space: nowrap; }
 .st-mk .pill svg { width: 16px; height: 16px; flex: none; }
-.st-mk .lead { width: 2px; background: var(--c-brand); }
-.st-mk .dot { width: 10px; height: 10px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-ground); border: 2px solid var(--c-brand); }
-.st-body { flex: 1 0 auto; padding: var(--s-6) 20px calc(var(--s-6) + env(safe-area-inset-bottom)); }
+.st-mk .lead { width: 2px; height: calc(var(--l) * 100cqw / 870); background: var(--c-brand); }
+.st-mk.sea .lead { background: var(--c-ground); }
+.st-mk.sea .dot { border-color: var(--c-ground); }
+.st-mk .dot { width: 12px; height: 12px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-sun); border: 2px solid var(--c-brand); }
+.st-body { flex: 1 0 auto; padding: var(--s-5) 20px calc(var(--s-6) + env(safe-area-inset-bottom)); }
+.st-logo { display: block; width: auto; height: 32px; }
+.st-body h1 { margin-top: var(--s-4); }
 .st-body h1, .st-body h1:focus-visible { outline: none; }
-.st-steps { display: grid; gap: var(--s-3); margin: var(--s-5) 0 0; padding: 0; list-style: none; }
-.st-steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--s-3); align-items: start; }
-.st-steps .n { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--r-round); background: var(--c-brand); color: var(--c-ground); font: 700 14px/1 var(--font-ui); font-variant-numeric: tabular-nums; }
-.st-steps .t-body { padding-top: 2px; }
-.st-why { margin-top: var(--s-5); padding: var(--s-4); border-radius: var(--r-thumb); background: var(--c-data); }
-.st-why p { margin-top: var(--s-1); color: var(--c-ink); }
+.st-lead { margin-top: var(--s-2); font: var(--f-body); }
 .st-acts { display: grid; gap: var(--s-2); margin-top: var(--s-5); }
 .st-acts .btn svg { width: 22px; height: 22px; }
 .st-acts .btn[hidden] { display: none; }
-.st-small { margin-top: var(--s-4); color: var(--c-ink-2); text-align: center; }
+.st-h { margin-top: var(--s-7); font: var(--f-meta-b); }
+.st-steps { display: grid; gap: var(--s-2); margin: var(--s-2) 0 0; padding: 0; list-style: none; font: var(--f-meta); }
+.st-steps li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: var(--s-2); }
+.st-steps .n { font: var(--f-meta-b); color: var(--c-brand); font-variant-numeric: tabular-nums; }
+.st-note { margin-top: var(--s-5); font: var(--f-meta); color: var(--c-ink-2); }
+.st-small { margin-top: var(--s-2); font: var(--f-meta); color: var(--c-ink-2); }
 .screen.has-intro .tabs { visibility: hidden; }
+
+/* The launch screen: sky over sea, the sun on the horizon, for a moment before the start screen */
+.splash { position: absolute; z-index: 60; inset: 0; display: flex; flex-direction: column; transition: opacity .4s ease; }
+.splash.out { opacity: 0; pointer-events: none; }
+.splash[hidden], .no-splash .splash { display: none; }
+.sp-sky { flex: 0 0 62%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-top: env(safe-area-inset-top); background: var(--c-data); }
+.sp-logo { display: block; width: auto; height: 40px; }
+.sp-name { margin-top: var(--s-4); font: 700 40px/44px var(--font-ui); color: var(--c-ink); }
+.sp-sun { display: block; width: 96px; height: 49px; margin-top: var(--s-7); }
+.sp-sea { flex: 1; display: flex; align-items: flex-end; justify-content: center; padding: 0 20px calc(var(--s-6) + env(safe-area-inset-bottom)); background: var(--c-brand); font: var(--f-meta); color: var(--c-on-dark-2); text-align: center; }
+@media (prefers-reduced-motion: reduce) { .splash { transition: none; } }
