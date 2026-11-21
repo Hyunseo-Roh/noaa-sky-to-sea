@@ -54,6 +54,11 @@
   const nbSub = $('#nb-sub');
   const nbState = $('#nb-state');
   const nbList = $('#nb-list');
+  // the Sea's lines run on under the sources line below it, so the sources line needs the Sea's height
+  new ResizeObserver(() => {
+    const sea = nbList.querySelector('.nb-sec[data-group="sea"]');
+    $('#nearby').style.setProperty('--sea-h', (sea ? sea.offsetHeight : 0) + 'px');
+  }).observe(nbList);
   const nbRetry = $('#nb-retry');
   const tabView = $('#tab-view');
   const tabNearby = $('#tab-nearby');
@@ -784,6 +789,14 @@
     if (d && pl.lat != null) d.textContent = isHere(pl) ? 'Where you are' : G.distanceText(S.viewer, pl);
     const when = sheetBody.querySelector('[data-period]');
     if (when) when.textContent = S.viewer.name;
+    // the weather for this sky also gives the day's sunrise and sunset, with the sun in Sunlight
+    const sunline = sheetBody.querySelector('[data-sunline]');
+    if (sunline && PLACES.sunrise && PLACES.sunset) {
+      const [a, b] = [PLACES.sunrise, PLACES.sunset].sort((x, y) => x.at - y.at);
+      sunline.innerHTML = `${svgOf(a === PLACES.sunrise ? 'sunrise' : 'sunset')}<span></span>`;
+      sunline.querySelector('span').textContent = `${a.name} ${clock(a.at, S.tz)}, ${lower(b.name)} ${clock(b.at, S.tz)}`;
+      sunline.hidden = false;
+    }
     const link = sheetBody.querySelector('[data-forecast-link]');
     if (link) link.href = `https://forecast.weather.gov/MapClick.php?lat=${S.viewer.lat.toFixed(4)}&lon=${S.viewer.lon.toFixed(4)}`;
     sheet.hidden = false;
@@ -1164,6 +1177,20 @@
   updateSun(true);
   route();
   loadAlerts();
-  if (!location.hash && !(wasLive && canCamera && returning)) openIntro();
+  // The launch screen shows for a moment when Horizon opens on the start screen, then fades into it.
+  const splash = $('#splash');
+  const coldStart = !location.hash && !(wasLive && canCamera && returning);
+  if (coldStart) {
+    openIntro();
+    const fade = () => {
+      if (splash.hidden) return;
+      splash.classList.add('out');
+      setTimeout(() => { splash.hidden = true; }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 400);
+    };
+    splash.addEventListener('click', fade);
+    setTimeout(fade, 1500);
+  } else {
+    splash.hidden = true;
+  }
   requestAnimationFrame(tick);
 })();

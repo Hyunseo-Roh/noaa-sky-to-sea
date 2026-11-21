@@ -74,9 +74,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .mk .pill { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 var(--s-4) 0 var(--s-3); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); white-space: nowrap; box-shadow: 0 1px 6px color-mix(in srgb, var(--c-ink) 35%, transparent); }
 .mk .pill svg { width: 18px; height: 18px; flex: none; }
 .mk .lead { width: 2px; background: var(--c-ground); box-shadow: 0 0 2px color-mix(in srgb, var(--c-ink) 35%, transparent); }
-.mk .dot { width: 12px; height: 12px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-ground); border: 2px solid var(--c-brand); }
+.mk .dot { width: 12px; height: 12px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-sun); border: 2px solid var(--c-brand); }
 .mk.on .pill { font: var(--f-meta-b); box-shadow: 0 0 0 3px var(--c-state), 0 1px 6px color-mix(in srgb, var(--c-ink) 35%, transparent); }
-.mk.on .dot { width: 16px; height: 16px; margin-top: -2px; background: var(--c-state); border: 3px solid var(--c-ground); }
+.mk.on .dot { width: 16px; height: 16px; margin-top: -2px; background: var(--c-sun); border: 3px solid var(--c-brand); }
 
 /* a place that is out of view: a pill at the edge pointing the way */
 .edge { position: absolute; z-index: 8; display: inline-flex; align-items: center; gap: 4px; height: 36px; padding: 0 var(--s-3); border-radius: var(--r-round); background: var(--c-scrim); color: var(--c-ground); font: var(--f-meta-b); white-space: nowrap; }
@@ -104,6 +104,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .pv h2 { margin-top: 2px; outline: none; }
 .pv .what { margin-top: var(--s-1); color: var(--c-ink); }
 .pv .dist { margin-top: 2px; color: var(--c-ink-2); }
+.pv .sunline { display: flex; align-items: center; gap: var(--s-2); margin-top: var(--s-2); color: var(--c-ink); }
+.pv .sunline[hidden] { display: none; }
+.pv .sunline svg { width: 20px; height: 20px; flex: none; color: var(--c-brand); }
 .pv img { width: 72px; height: 72px; object-fit: cover; border-radius: var(--r-thumb); }
 .sheet .office { margin-top: var(--s-3); }
 .sheet .btn { margin-top: var(--s-4); width: 100%; }
@@ -144,8 +147,10 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-groups { margin: var(--s-6) -20px 0; }
 .nb-sec { padding: var(--s-6) 20px var(--s-7); }
 .nb-sec[data-group="alerts"] { padding-top: 0; padding-bottom: var(--s-6); }
-.nb-sec[data-group="sky"] { background: var(--c-data) url(../images/lines/jet-haze.svg) center / cover no-repeat; }
-.nb-sec[data-group="sea"] { background: var(--c-brand) url(../images/lines/currents-deep.svg) center / cover no-repeat; color: var(--c-ground); }
+/* One set of lines runs through the Sky, the Sea and the sources line under it: the sky's lines hang from the
+   Sky's bottom edge, the sea's start at the Sea's top edge, and both are drawn at the screen's width, so they meet */
+.nb-sec[data-group="sky"] { background: var(--c-data) url(../images/lines/nearby-sky.svg) center bottom / 100% auto no-repeat; }
+.nb-sec[data-group="sea"] { background: var(--c-brand) url(../images/lines/nearby-sea.svg) center top / 100% auto no-repeat; color: var(--c-ground); }
 .nb-h { display: flex; align-items: baseline; gap: var(--s-2); font: 700 24px/30px var(--font-ui); color: var(--c-ink); }
 .nb-sec[data-group="sea"] .nb-h { color: var(--c-ground); }
 .nb-note { margin-top: 2px; color: var(--c-ink-2); }
@@ -176,7 +181,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-state { margin-top: var(--s-4); color: var(--c-ink-2); }
 .nb-retry { margin-top: var(--s-3); }
 .nb-retry[hidden] { display: none; }
-.nb-source { margin: 0 -20px calc(-1 * var(--s-6)); padding: 0 20px var(--s-6); background: var(--c-brand); color: var(--c-on-dark-2); }
+.nb-source { margin: 0 -20px calc(-1 * var(--s-6)); padding: 0 20px var(--s-6); background: var(--c-brand) url(../images/lines/nearby-sea.svg) center calc(-1 * var(--sea-h, 0px)) / 100% auto no-repeat; color: var(--c-on-dark-2); }
 #nearby { padding-bottom: var(--s-6); }
 .sv-empty { margin-top: var(--s-5); color: var(--c-ink-2); }
 
@@ -185,26 +190,48 @@ ul { margin: 0; padding: 0; list-style: none; }
   .screen { box-shadow: 0 0 0 1px var(--c-rule-dark); }
 }
 
-/* The start screen: what Horizon does, and why it asks for the camera, before anything turns on */
+/* The start screen: what Horizon is, then how it works, before anything turns on.
+   The drawing is the website's chapter 3 scene, so the app and the site share one illustration. */
 .start { position: absolute; z-index: 40; inset: 0; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; user-select: text; -webkit-user-select: text; background: var(--c-ground); color: var(--c-ink); display: flex; flex-direction: column; }
 .start[hidden] { display: none; }
-.st-scene { position: relative; flex: none; height: calc(250px + env(safe-area-inset-top)); overflow: hidden; background: var(--c-data); }
-.st-art { position: absolute; left: 0; bottom: 0; width: 100%; height: 250px; }
-.st-mk { position: absolute; left: var(--x); bottom: calc(250px - var(--y)); transform: translate(-50%, 100%); display: flex; flex-direction: column; align-items: center; }
-.st-mk .pill { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 var(--s-3) 0 10px; border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); white-space: nowrap; box-shadow: 0 1px 6px color-mix(in srgb, var(--c-ink) 25%, transparent); }
+.st-scene { flex: none; padding-top: env(safe-area-inset-top); background: var(--c-data); }
+.st-frame { position: relative; aspect-ratio: 870 / 759; container-type: inline-size; }
+.st-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.st-mk { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, calc(-100% + 6px)); display: flex; flex-direction: column; align-items: center; }
+.st-mk .pill { display: inline-flex; align-items: center; gap: var(--s-2); height: 32px; padding: 0 var(--s-3) 0 10px; border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); white-space: nowrap; }
 .st-mk .pill svg { width: 16px; height: 16px; flex: none; }
-.st-mk .lead { width: 2px; background: var(--c-brand); }
-.st-mk .dot { width: 10px; height: 10px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-ground); border: 2px solid var(--c-brand); }
-.st-body { flex: 1 0 auto; padding: var(--s-6) 20px calc(var(--s-6) + env(safe-area-inset-bottom)); }
+.st-mk .lead { width: 2px; height: calc(var(--l) * 100cqw / 870); background: var(--c-brand); }
+.st-mk.sea .lead { background: var(--c-ground); }
+.st-mk.sea .dot { border-color: var(--c-ground); }
+.st-mk .dot { width: 12px; height: 12px; margin-top: -1px; border-radius: var(--r-round); background: var(--c-sun); border: 2px solid var(--c-brand); }
+.st-body { flex: 1 0 auto; padding: var(--s-5) 20px calc(var(--s-6) + env(safe-area-inset-bottom)); }
+.st-logo { display: block; width: auto; height: 32px; }
+.st-body h1 { margin-top: var(--s-4); }
 .st-body h1, .st-body h1:focus-visible { outline: none; }
-.st-steps { display: grid; gap: var(--s-3); margin: var(--s-5) 0 0; padding: 0; list-style: none; }
-.st-steps li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--s-3); align-items: start; }
-.st-steps .n { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: var(--r-round); background: var(--c-brand); color: var(--c-ground); font: 700 14px/1 var(--font-ui); font-variant-numeric: tabular-nums; }
-.st-steps .t-body { padding-top: 2px; }
-.st-why { margin-top: var(--s-5); padding: var(--s-4); border-radius: var(--r-thumb); background: var(--c-data); }
-.st-why p { margin-top: var(--s-1); color: var(--c-ink); }
+.st-lead { margin-top: var(--s-2); font: var(--f-body); }
 .st-acts { display: grid; gap: var(--s-2); margin-top: var(--s-5); }
 .st-acts .btn svg { width: 22px; height: 22px; }
 .st-acts .btn[hidden] { display: none; }
-.st-small { margin-top: var(--s-4); color: var(--c-ink-2); text-align: center; }
+.st-h { margin-top: var(--s-7); font: var(--f-meta-b); }
+.st-steps { display: grid; gap: var(--s-2); margin: var(--s-2) 0 0; padding: 0; list-style: none; font: var(--f-meta); }
+.st-steps li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: var(--s-2); }
+.st-steps .n { font: var(--f-meta-b); color: var(--c-brand); font-variant-numeric: tabular-nums; }
+.st-note { margin-top: var(--s-5); font: var(--f-meta); color: var(--c-ink-2); }
+.st-small { margin-top: var(--s-2); font: var(--f-meta); color: var(--c-ink-2); }
 .screen.has-intro .tabs { visibility: hidden; }
+
+/* The launch screen: the website's drawings from sky to sea (balloon, Hurricane Hunter, lighthouse, buoy,
+   turtle, octopus) under the logo, for a moment before the start screen. Flat sky and sea, as in the website's
+   chapters, so nothing competes with the drawings; the drawing sits on the horizon and shrinks on short screens */
+.splash { --art-h: min(calc(100cqw * 564 / 390), calc(100cqh - env(safe-area-inset-top) - 232px)); position: absolute; z-index: 60; inset: 0; container-type: size; transition: opacity .4s ease;
+  background: var(--c-data); }
+.splash.out { opacity: 0; pointer-events: none; }
+.splash[hidden], .no-splash .splash { display: none; }
+.sp-sea { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--art-h) * 374 / 564); background: var(--c-brand); }
+.sp-art { position: absolute; left: 0; bottom: 0; width: 100%; height: var(--art-h); overflow: visible; }
+.sp-words { position: absolute; top: calc(env(safe-area-inset-top) + 56px); left: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.sp-logo { display: block; width: auto; height: 40px; }
+.sp-name { margin-top: var(--s-3); font: 700 48px/52px var(--font-ui); color: var(--c-ink); }
+.sp-tag { margin-top: var(--s-1); font: var(--f-body); color: var(--c-ink); }
+.sp-note { position: absolute; left: 20px; right: 20px; bottom: calc(var(--s-5) + env(safe-area-inset-bottom)); font: var(--f-meta); color: var(--c-on-dark-2); text-align: center; }
+@media (prefers-reduced-motion: reduce) { .splash { transition: none; } }
