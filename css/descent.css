@@ -16,13 +16,15 @@
 .dsc-4 .stage { aspect-ratio: 1600 / 800; }
 .dsc-5 { --g: var(--c-brand); }   /* Deep ocean */
 .dsc-6 { --g: var(--c-brand); }
-.dsc-6 .stage { aspect-ratio: 1600 / 800; }
+.dsc-6 .stage { aspect-ratio: 1600 / 720; }
 .dsc-3 .stage { aspect-ratio: 1600 / 880; }
+.dsc-1 .stage { aspect-ratio: 1600 / 890; }
+.dsc-2 .stage { aspect-ratio: 1600 / 850; }
 .dsc-7 { --g: var(--c-ink); }     /* Night horizon */
 .dsc-7 .inset .ph { aspect-ratio: 1 / 1; }
 .dsc-7 .inset img { object-position: 50% 60%; }
 .dsc-5 .inset .ph { aspect-ratio: 4 / 3; }
-.dsc-5 .stage { aspect-ratio: 1600 / 860; }
+.dsc-5 .stage { aspect-ratio: 1600 / 700; }
 .dsc-7 .stage { aspect-ratio: 1600 / 700; }
 .dsc-4, .dsc-5, .dsc-6, .dsc-7 { padding-top: var(--s-8); }
 
@@ -41,7 +43,7 @@
 .dsc-end { margin-top: calc(min(100%, 1600px) * var(--pull, 0) * -1); padding-bottom: var(--s-9); }
 .dsc .bridge { color: var(--fg); margin: 0; }
 /* --pull lifts the bridge into the empty water under each drawing, so it sits 48 px under the lowest line (at 1440) */
-.dsc-3 { --pull: .0361; } .dsc-4 { --pull: .0278; } .dsc-5 { --pull: .0292; } .dsc-6 { --pull: .0111; }
+.dsc-3 { --pull: .0361; } .dsc-4 { --pull: .0278; } .dsc-5 { --pull: 0; } .dsc-6 { --pull: .0111; }
 .dsc-3 .dsc-end { position: relative; z-index: 0; background: var(--c-brand); }
 .dsc-3 .dsc-end .bridge { color: var(--c-ground); }
 /* chapter 3's water is also filled behind the drawing, so no light line shows where the drawing ends */
@@ -67,7 +69,7 @@
 .art-m { display: none; }
 
 /* The altitude ruler's numbers */
-.ax span { position: absolute; left: 2.6%; top: var(--y); transform: translateY(-50%); padding: 0 4px; font: var(--f-meta); color: var(--fg2); font-variant-numeric: tabular-nums; white-space: nowrap;
+.ax span { position: absolute; left: 2.6%; top: var(--y); transform: translateY(-50%); padding: 0 8px; font: var(--f-meta); color: var(--fg2); font-variant-numeric: tabular-nums; white-space: nowrap;
   background: var(--g); }
 .ax span.key { font: var(--f-meta-b); color: var(--ln); }
 .ax span.base { transform: translateY(-125%); }
@@ -87,8 +89,8 @@
 .co-b { position: absolute; left: 0; top: 0; display: flex; align-items: center; transform: translate(-7px, -50%); color: var(--pill-fg); }
 .co[data-side="l"] .co-b { flex-direction: row-reverse; transform: translate(calc(-100% + 7px), -50%); }
 .co-dot { flex: none; width: 14px; height: 14px; border-radius: var(--r-round); border: 2px solid var(--ln); background: var(--dot); }
-.co-line { flex: none; width: 28px; height: 1px; background: var(--ln); }
-.co-t { display: inline-flex; align-items: center; gap: var(--s-2); min-height: 36px; padding: 0 var(--s-2) 0 var(--s-3); border: 1px solid var(--pill-bd); border-radius: var(--r-round); background: var(--pill); font: var(--f-meta-b); white-space: nowrap; }
+.co-line { flex: none; width: 32px; height: 1px; background: var(--ln); }
+.co-t { display: inline-flex; align-items: center; gap: var(--s-2); min-height: 36px; padding: 0 var(--s-2) 0 var(--s-4); border: 1px solid var(--pill-bd); border-radius: var(--r-round); background: var(--pill); font: var(--f-meta-b); white-space: nowrap; }
 .co-t > svg:not(.co-plus) { width: 16px; height: 16px; flex: none; }
 .co-plus { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; }
 .co-b:hover .co-t { border-color: var(--ln); }
@@ -116,15 +118,15 @@
 .card figure img { object-position: 45% 52%; }
 .card figure .cap { padding: 0 var(--s-5); }
 .card figure + h3 { margin-top: var(--s-4); }
-.card h3 + .t-body, .card h3 + .measures { margin-top: var(--s-3); }
+.card h3 + .t-body, .card h3 + .measures { margin-top: var(--s-4); }
 .card .t-body { font: 400 16px/24px var(--font-read); color: var(--c-ink); }
 .card .measures { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2) var(--s-4); }
 .card .measures li { font: var(--f-body-b); font-size: 17px; color: var(--c-brand); }
 .card .measures + .t-body { margin-top: var(--s-4); }
 .card .office { margin-top: var(--s-4); color: var(--c-ink-2); }
 .card .office b { color: var(--c-ink); }
-.ww3 { display: grid; gap: var(--s-1); margin: var(--s-4) 0 0; padding-top: var(--s-3); border-top: 1px solid var(--c-rule); }
-.ww3 > div { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: var(--s-3); }
+.ww3 { display: grid; gap: var(--s-2); margin: var(--s-4) 0 0; padding-top: var(--s-4); border-top: 1px solid var(--c-rule); }
+.ww3 > div { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: var(--s-4); }
 .ww3 dt { font: var(--f-meta-b); color: var(--c-ink-2); }
 .ww3 dd { margin: 0; font: var(--f-meta); color: var(--c-ink); }
 .card .link { display: inline-block; margin-top: var(--s-5); font: var(--f-meta-b); }
@@ -152,7 +154,7 @@
   .dsc-more { margin-top: var(--s-5); }
   .dsc .dsc-end { margin-top: calc(var(--s-6) - var(--s-8)); padding-bottom: var(--s-8); }   /* 32 px under the key list */
   .dsc-plate { margin-top: var(--s-5); display: flex; flex-direction: column; }
-  .stage { aspect-ratio: 820 / 1000; }
+  .stage, .dsc-1 .stage { aspect-ratio: 820 / 1000; }
   .dsc-2 .stage { aspect-ratio: 1040 / 1000; }
   .art-d { display: none; }
   .art-m { display: block; }
@@ -161,7 +163,7 @@
   /* On a phone the drawing carries numbered markers and the key under it names them.
      Markers and key rows are the same object everywhere: a white circle or row with Deep ocean type,
      so they stand out on every ground and read as the things to tap. */
-  .co-b, .co[data-mside] .co-b { flex-direction: row; transform: translate(-50%, -50%); padding: 6px; }
+  .co-b, .co[data-mside] .co-b { flex-direction: row; transform: translate(-50%, -50%); padding: 8px; }
   .co[data-side="l"] .co-b { transform: translate(-50%, -50%); }   /* every marker centred on its point, whichever side its label takes on a desktop */
   .co-line, .co-t { display: none; }
   .co-dot { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; background: var(--c-ground); border: 2px solid var(--c-brand); box-shadow: 0 1px 4px rgba(20, 38, 61, .3); }
@@ -175,7 +177,7 @@
   .dsc-5 .stage { aspect-ratio: 900 / 860; }
   .dsc-6 .stage { aspect-ratio: 1200 / 800; }
   .dsc-7 .stage { aspect-ratio: 1060 / 700; }
-  .co-k { display: flex; align-items: center; gap: var(--s-3); width: 100%; min-height: 52px; padding: 0 var(--s-4) 0 var(--s-2); border: 1px solid var(--c-brand); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); text-align: left; }
+  .co-k { display: flex; align-items: center; gap: var(--s-4); width: 100%; min-height: 52px; padding: 0 var(--s-4) 0 var(--s-2); border: 1px solid var(--c-brand); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-brand); text-align: left; }
   .dsc:not(.light) .co-k, .dsc-3 .co-k { border-color: var(--c-ground); }
   .co-k .co-n { display: flex; align-items: center; justify-content: center; flex: none; width: 34px; height: 34px; border-radius: var(--r-round); background: var(--c-brand); color: var(--c-ground); }
   .co-kt { display: inline-flex; align-items: center; gap: var(--s-2); flex: 1; font: var(--f-meta-b); font-size: 16px; }
@@ -189,5 +191,29 @@
   .card figure { margin: calc(-1 * var(--s-5)) calc(-1 * var(--margin)) 0; }
   .card figure .ph { border-radius: 16px 16px 0 0; aspect-ratio: 16 / 9; }
   .card figure .cap { padding: 0 var(--margin); }
-  .card-x { top: var(--s-3); right: var(--s-3); }
+  .card-x { top: var(--s-4); right: var(--s-4); }
+}
+
+/* On a computer each chapter fits one screen under the chapter bar (1440 x 900 and up): the chapter number,
+   its noaa.gov topics and the title run across the top; under them the lead, the offices and the bridge sit
+   in a column on the left, and the drawing fills the rest, out to the right edge of the page. */
+.dsc .ch-top { justify-content: flex-start; align-items: baseline; flex-wrap: wrap; gap: var(--s-2) var(--s-5); }
+@media (min-width: 1200px) {
+  .dsc { display: grid; grid-template-columns: [m-start] max(var(--margin), calc((100% - 1440px) / 2 + var(--margin))) [text-start] 302px [text-end] var(--gutter) [art-start] minmax(0, 1fr) [art-end];
+    grid-template-rows: auto auto 1fr; padding-top: var(--s-7); scroll-margin-top: var(--l-chapter-bar-height); }
+  .dsc-4, .dsc-5, .dsc-6, .dsc-7 { padding-top: var(--s-7); }
+  .dsc > .wrap, .dsc-head, .dsc-end, .dsc-end > .wrap { display: contents; }
+  .dsc .ch-top { grid-column: text-start / art-end; grid-row: 1; margin: 0 0 var(--s-2); position: relative; z-index: 4; }
+  .dsc-head h2 { grid-column: text-start / art-end; grid-row: 2; max-width: 1040px; margin-bottom: var(--s-6); font: 700 48px/52px var(--font-ui); position: relative; z-index: 4; }
+  .dsc-intro { grid-column: text-start / text-end; grid-row: 3; align-self: start; position: relative; z-index: 4; }
+  .dsc-intro .t-lead { font: 400 20px/28px var(--font-read); }
+  .dsc-intro .offices { margin-top: var(--s-4); }
+  /* a link never breaks over two lines */
+  .dsc-more { margin-top: var(--s-4); font: 600 16px/24px var(--font-ui); white-space: nowrap; }
+  .dsc-plate { grid-column: art-start / art-end; grid-row: 3; max-width: none; margin: 0; }
+  .dsc .bridge { grid-column: text-start / text-end; grid-row: 3; align-self: end; position: relative; z-index: 4; margin: 0 0 var(--s-6); font: 400 20px/28px var(--font-read); }
+  .dsc-3 .bridge { color: var(--c-ground); }
+  .dsc-end { margin: 0; padding: 0; }
+  /* the seafloor of chapter 5 and the turtles' shore start at the drawing's edge, so they never run under the text */
+  .dsc-5 .art-d, .dsc-6 .art-d { clip-path: inset(-50% -50% -50% 0); }
 }
