@@ -221,13 +221,13 @@ ul { margin: 0; padding: 0; list-style: none; }
 .screen.has-intro .tabs { visibility: hidden; }
 
 /* The launch screen: the website's drawings from sky to sea (balloon, Hurricane Hunter, lighthouse, buoy,
-   turtle, octopus) under the logo, for a moment before the start screen. The sky and the sea, with their lines,
-   fill the screen; the drawing sits on the horizon and shrinks on short screens instead of being cut off */
+   turtle, octopus) under the logo, for a moment before the start screen. Flat sky and sea, as in the website's
+   chapters, so nothing competes with the drawings; the drawing sits on the horizon and shrinks on short screens */
 .splash { --art-h: min(calc(100cqw * 564 / 390), calc(100cqh - env(safe-area-inset-top) - 232px)); position: absolute; z-index: 60; inset: 0; container-type: size; transition: opacity .4s ease;
-  background: var(--c-data) url(../images/lines/nearby-sky.svg) no-repeat center bottom calc(var(--art-h) * 374 / 564) / 100% auto; }
+  background: var(--c-data); }
 .splash.out { opacity: 0; pointer-events: none; }
 .splash[hidden], .no-splash .splash { display: none; }
-.sp-sea { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--art-h) * 374 / 564); background: var(--c-brand) url(../images/lines/nearby-sea.svg) no-repeat center top / 100% auto; }
+.sp-sea { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--art-h) * 374 / 564); background: var(--c-brand); }
 .sp-art { position: absolute; left: 0; bottom: 0; width: 100%; height: var(--art-h); overflow: visible; }
 .sp-words { position: absolute; top: calc(env(safe-area-inset-top) + 56px); left: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .sp-logo { display: block; width: auto; height: 40px; }
