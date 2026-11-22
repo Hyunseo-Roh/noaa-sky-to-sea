@@ -220,32 +220,35 @@
 
 .dsc { scroll-margin-top: 0; }   /* the page keeps the room under the chapter bar now */
 
-/* Storms: each label is a point, a short line and its words, no pill. The words keep a patch of the colour
+/* Every chapter: each label is a point, a short line and its words, no pill. The words keep a patch of the colour
    behind them so the drawing's lines don't run through them, the + says the label opens, and the open label
-   is underlined with its point filled. The office that does the work sits under its label. */
+   is underlined. The office that does the work sits under its label.
+   The words take the colour the label sits on: white on Deep ocean and Night horizon, Deep ocean on Cloud light and haze. */
+:is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co { --lb-bg: var(--g); --lb-fg: var(--c-ground); --lb-fg2: var(--c-on-dark-2); }
+:is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7).light .co { --lb-bg: var(--g); --lb-fg: var(--c-brand); --lb-fg2: var(--c-ink-2); }
+:is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co.dark { --lb-bg: var(--c-brand); --lb-fg: var(--c-ground); --lb-fg2: var(--c-on-dark-2); }
 @media (min-width: 761px) {
-  #ch2 .co-t { display: grid; justify-items: start; row-gap: 0; min-height: 0; padding: 0 var(--s-2); border: 0; border-radius: 0; background: none; color: var(--c-brand); }
-  #ch2 .co.dark .co-t { background: var(--c-brand); color: var(--c-ground); }
-  #ch2 .co[data-side="l"] .co-t { justify-items: end; text-align: right; }
-  #ch2 .co-m { display: inline-flex; align-items: center; gap: var(--s-2); font: var(--f-meta-b); }
-  #ch2 .co-m > svg:not(.co-plus) { width: 16px; height: 16px; flex: none; }
-  #ch2 .co-o { font: var(--f-meta); color: var(--c-ink-2); white-space: nowrap; text-align: inherit; }
-  #ch2 .co.dark .co-o { color: var(--c-on-dark-2); }
-  #ch2 .co-b { min-height: 48px; }
-  #ch2 .co-b:hover .co-t { border-color: transparent; }
-  #ch2 .co-b:hover .co-m, #ch2 .co-b[aria-expanded="true"] .co-m { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
-  #ch2 .co-b[aria-expanded="true"] .co-t { background: none; color: var(--c-brand); }
-  #ch2 .co.dark .co-b[aria-expanded="true"] .co-t { background: var(--c-brand); color: var(--c-ground); }
-  #ch2 .co-t { text-align: left; }
-  #ch2 .co[data-side="l"] .co-t { text-align: right; }
+  :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-t, :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-b[aria-expanded="true"] .co-t { display: grid; justify-items: start; row-gap: 0; min-height: 0; padding: 0 var(--s-2); border: 0; border-radius: 0;
+    background: var(--lb-bg); color: var(--lb-fg); text-align: left; }
+  :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co[data-side="l"] .co-t { justify-items: end; text-align: right; }
+  :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-m { display: inline-flex; align-items: center; gap: var(--s-2); font: var(--f-meta-b); }
+  :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-m > svg:not(.co-plus) { width: 16px; height: 16px; flex: none; }
+  :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-o { font: var(--f-meta); color: var(--lb-fg2); white-space: nowrap; text-align: inherit; }
+  :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-b { min-height: 48px; }
+  :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-b:hover .co-t { border-color: transparent; }
+  :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-b:hover .co-m, :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-b[aria-expanded="true"] .co-m { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
   #ch2 .co-b[aria-controls="card-hunters"] .co-line { width: 16px; }   /* keeps the office clear of the cloud */
 }
-@media (min-width: 761px) and (max-width: 1023px) { #ch2 .co-t .co-o { display: none; } }   /* on a small drawing the offices stay in the cards */
-#ch2 .co-k { border-color: transparent; border-radius: 0; background: none; padding-left: 0; }
-#ch2 .co-k[aria-expanded="true"] { background: none; }
-#ch2 .co-k[aria-expanded="true"] .co-kt { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
-#ch2 .co-kt { display: grid; grid-template-columns: auto 1fr; column-gap: var(--s-2); align-items: center; }
-#ch2 .co-kt .co-o { grid-column: 1 / -1; font: var(--f-meta); }
+@media (min-width: 761px) and (max-width: 1023px) { :is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-t .co-o { display: none; } }   /* on a small drawing the offices stay in the cards */
+:is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-k { border-color: transparent; border-radius: 0; background: none; padding-left: 0; }
+:is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-k[aria-expanded="true"] { background: none; }
+:is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-k[aria-expanded="true"] .co-kt { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+:is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-kt { display: grid; grid-template-columns: auto 1fr; column-gap: var(--s-2); align-items: center; }
+:is(#ch1, #ch2, #ch3, #ch4, #ch5, #ch6, #ch7) .co-kt .co-o { grid-column: 1 / -1; font: var(--f-meta); }
+/* on the dark grounds (the sea chapters, and the Ocean and sky list under the horizon) the list is white, its numbers white discs */
+:is(#ch4, #ch5, #ch6, #ch7, #ch3) .co-k { color: var(--c-ground); }
+:is(#ch4, #ch5, #ch6, #ch7, #ch3) .co-k .co-n { background: var(--c-ground); color: var(--c-brand); }
+:is(#ch4, #ch5, #ch6, #ch7, #ch3) .co-kt .co-o { color: var(--c-on-dark-2); }
 .org { margin-top: var(--s-4); font: var(--f-meta-b); color: var(--c-ink); }
 /* the open panels keep their white face but lose the shadows */
 .card, .card-x:has(+ figure) { box-shadow: none; }
