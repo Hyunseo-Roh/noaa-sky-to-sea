@@ -304,3 +304,7 @@ html.no-scroll { overflow: hidden; }
   .wx-row .btn { width: 100%; }
   .wx-panel .mega-list.c4 { grid-template-columns: 1fr; gap: var(--s-5); }
 }
+
+
+.hero-note { margin-top: var(--s-5); font: var(--f-meta); opacity: .8; }
+html { scroll-padding-top: calc(var(--l-chapter-bar-height) + var(--s-4)); }

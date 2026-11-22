@@ -217,3 +217,5 @@
   /* the seafloor of chapter 5 and the turtles' shore start at the drawing's edge, so they never run under the text */
   .dsc-5 .art-d, .dsc-6 .art-d { clip-path: inset(-50% -50% -50% 0); }
 }
+
+.dsc { scroll-margin-top: 0; }   /* the page keeps the room under the chapter bar now */
