@@ -167,6 +167,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nc b { display: block; color: var(--c-ink); }
 .nc .t { display: block; margin-top: 2px; color: var(--c-ink-2); }
 .nc .now { display: block; margin-top: var(--s-2); font: var(--f-app-body-b); color: var(--c-brand); }
+.nc .now.wait, .nc.big .now.wait { font: var(--f-meta); color: var(--c-ink-2); }   /* waiting or failed: a note, not the reading */
 .nc .chev { width: 20px; height: 20px; color: var(--c-ink-2); align-self: center; }
 .nc.is-alert { box-shadow: inset 4px 0 0 var(--c-alert); }
 /* the forecast: the first card, with the forecast in large type */

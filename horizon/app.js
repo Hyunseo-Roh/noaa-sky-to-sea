@@ -604,20 +604,35 @@
     return li;
   }
   // One Nearby card: the same parts as a row, on its own white card.
-  function card(id, p, title, line, live, { face = true, big = false } = {}) {
+  function card(id, p, title, line, live, { face = true, big = false, wait = false } = {}) {
     const li = row(id, p, title, line, live, face);
     const b = li.querySelector('button');
     b.className = `nc${big ? ' big' : ''}${iconName(id, p) === 'alert' ? ' is-alert' : ''}`;
+    if (wait) { const now = b.querySelector('.now'); if (now) now.classList.add('wait'); }
     return li;
+  }
+  // Today's sunrise and sunset where you stand, even after they have passed
+  function sunToday() {
+    const v = S.viewer;
+    let y, m, d;
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', { timeZone: S.tz || undefined, year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(new Date());
+      y = +parts.find((x) => x.type === 'year').value; m = +parts.find((x) => x.type === 'month').value; d = +parts.find((x) => x.type === 'day').value;
+    } catch (_) { const now = new Date(); y = now.getFullYear(); m = now.getMonth() + 1; d = now.getDate(); }
+    const day = SUN.day(Date.UTC(y, m - 1, d), v.lat, v.lon);
+    return day ? { sunrise: { at: day.rise, az: day.riseAz }, sunset: { at: day.set, az: day.setAz } } : null;
   }
   // Sunrise and sunset share one card: two halves, each opening its own preview.
   function sunPair(ids) {
     const li = document.createElement('li');
     const pair = document.createElement('div');
     pair.className = 'nc-pair';
+    const today = sunToday();
     for (const id of ids) {
       const p = PLACES[id];
-      const half = row(id, p, p.name, `${capital(dayWord(p.at, S.tz))}, toward the ${G.dir8(p.bearing)}`, clock(p.at, S.tz)).querySelector('button');
+      const t = today && today[id];
+      const line = t ? `Today, toward the ${G.dir8(t.az)}` : `${capital(dayWord(p.at, S.tz))}, toward the ${G.dir8(p.bearing)}`;
+      const half = row(id, p, p.name, line, clock(t ? t.at : p.at, S.tz)).querySelector('button');
       half.className = 'nc';
       pair.append(half);
     }
@@ -672,7 +687,8 @@
 
     const alerts = S.alerts.map((a) => card(a.id, PLACES[a.id] || a, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, { face: false }));
 
-    const sky = [card('weather', PLACES.weather, 'Weather for this sky', `Forecast for ${v.name}`, NB.forecast || 'Loading the forecast…', { big: true })];
+    const wx = NB.forecast || (NB.forecastFailed ? "The forecast didn't load. Open it for the full forecast." : 'Loading the forecast…');
+    const sky = [card('weather', PLACES.weather, 'Weather for this sky', `Forecast for ${v.name}`, wx, { big: true, wait: !NB.forecast })];
     const sun = ['sunrise', 'sunset'].filter((k) => PLACES[k]).sort((a, b) => PLACES[a].at - PLACES[b].at);
     if (sun.length === 2) sky.push(sunPair(sun));
     else for (const id of sun) sky.push(card(id, PLACES[id], PLACES[id].name, `${capital(dayWord(PLACES[id].at, S.tz))}, toward the ${G.dir8(PLACES[id].bearing)}`, clock(PLACES[id].at, S.tz)));
@@ -725,9 +741,10 @@
 
   async function loadNearbyForecast() {
     try {
+      NB.forecastFailed = false;
       const f = await NWS.forecast(S.viewer);
       NB.forecast = forecastText(f);
-    } catch (_) { NB.forecast = null; }
+    } catch (_) { NB.forecast = null; NB.forecastFailed = true; }
     renderNearby();
   }
 
