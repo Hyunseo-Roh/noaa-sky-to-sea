@@ -1,12 +1,12 @@
 {
   "name": "Horizon",
   "short_name": "Horizon",
-  "description": "Hold your phone up to the sky or the sea and see NOAA's work there.",
+  "description": "See NOAA's work on your horizon. Explore the areas around you with your phone.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#14263D",
+  "background_color": "#DCEBF5",
   "theme_color": "#14263D",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },

@@ -18,8 +18,8 @@
 <style>
 html { background: var(--c-ground); }
 body { padding-bottom: var(--tab-h); }
-.nav { display: flex; align-items: center; justify-content: space-between; height: calc(52px + max(env(safe-area-inset-top), 20px)); padding: max(env(safe-area-inset-top), 20px) var(--s-2) 0 var(--s-1); }
-.back { display: inline-flex; align-items: center; gap: 2px; height: 48px; padding: 0 var(--s-3) 0 6px; font: var(--f-app-body-b); color: var(--c-brand); text-decoration: none; }
+.nav { display: flex; align-items: center; justify-content: space-between; height: calc(52px + max(env(safe-area-inset-top), 20px)); padding: max(env(safe-area-inset-top), 24px) var(--s-2) 0 var(--s-2); }
+.back { display: inline-flex; align-items: center; gap: 2px; height: 48px; padding: 0 var(--s-4) 0 var(--s-2); font: var(--f-app-body-b); color: var(--c-brand); text-decoration: none; }
 .back svg { width: 24px; height: 24px; }
 .acts { display: flex; }
 .ib { width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; color: var(--c-brand); }
@@ -32,20 +32,26 @@ body { padding-bottom: var(--tab-h); }
 .loc b { display: block; font: var(--f-meta-b); color: var(--c-ink); }
 .loc [data-icon] { flex: none; margin-top: 2px; color: var(--c-ink); }
 .loc svg { display: block; width: 16px; height: 16px; }
-.head h1 { margin-top: var(--s-3); color: var(--c-ink); }
+.head h1 { margin-top: var(--s-4); color: var(--c-ink); }
 .photo { margin: var(--s-4) 0 0; }
 .photo img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; object-position: 50% 45%; }
 .photo figcaption { padding: var(--s-2) var(--l-page-margin) 0; color: var(--c-ink-2); }
 .lede { padding: var(--s-4) var(--l-page-margin) 0; }
-.lede p + p { margin-top: var(--s-3); }
+.lede p + p { margin-top: var(--s-4); }
 .lede .office { margin-top: var(--s-4); }
+/* from nursery to reef: the coral tree, then the reef; staghorn coral is golden brown, drawn in Sunlight */
+.grow { margin-top: var(--s-7); }
+.grow h2 { padding: 0 var(--l-page-margin); color: var(--c-ink); }
+.grow figure { margin: var(--s-4) 0 0; }
+.grow svg { display: block; width: 100%; height: auto; }
+.grow figcaption { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); padding: var(--s-2) var(--l-page-margin) 0; color: var(--c-ink-2); }
+.grow + .next { padding-top: var(--s-6); }
 .next { padding: var(--s-5) var(--l-page-margin) 0; }
 .next .btn { width: 100%; }
-.also { margin-top: var(--s-7); padding: var(--s-5) 20px 0; border-top: 1px solid var(--c-rule); }
+.also { margin-top: var(--s-7); padding: 0 24px; }
 .also h2 { color: var(--c-ink); }
-.rows { margin-top: var(--s-3); }
-.rows { border-top: 1px solid var(--c-rule); }
-.rows a { display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; gap: var(--s-4); align-items: start; padding: 14px 0; border-bottom: 1px solid var(--c-rule); text-decoration: none; }
+.rows { display: grid; gap: var(--s-2); margin-top: var(--s-4); }
+.rows a { display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; gap: var(--s-4); align-items: start; padding: var(--s-2) 0; min-height: 48px; text-decoration: none; }
 .rows .ic { width: 24px; height: 24px; color: var(--c-brand); }
 .rows .ic svg { display: block; width: 24px; height: 24px; }
 .rows b { display: block; color: var(--c-ink); }
@@ -81,6 +87,14 @@ body { padding-bottom: var(--tab-h); }
       <p class="office t-meta"><b>NOAA</b><i></i><span>National Ocean Service, with partners</span></p>
     </div>
 
+    <section class="grow" aria-labelledby="grow-t">
+      <h2 id="grow-t" class="t-row">From nursery to reef</h2>
+      <figure>
+        <svg class="nursery" viewBox="0 0 390 232" aria-hidden="true" focusable="false"><rect width="390" height="232" fill="#003087"/><path d="M-4 206 C60 204 130 208 200 206 C260 203 330 205 394 207" stroke="#FFFFFF" stroke-width="1.0" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M92 206 L92 178" stroke="#FFFFFF" stroke-width="1.0" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M46 84 L138 84" stroke="#FFFFFF" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M54 84 L54 91" stroke="#FFFFFF" stroke-width="0.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M54.0 91.0 L54.0 102.2 M54.0 95.3 L49.7 100.9 M54.0 97.8 L57.7 104.0 M49.7 100.9 L48.4 105.9" stroke="#FFFFFF" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M54.0 91.0 L54.0 102.2 M54.0 95.3 L49.7 100.9 M54.0 97.8 L57.7 104.0 M49.7 100.9 L48.4 105.9" stroke="#F4B860" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M74 84 L74 91" stroke="#FFFFFF" stroke-width="0.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M74.0 91.0 L74.0 102.2 M74.0 95.3 L69.7 100.9 M74.0 97.8 L77.7 104.0 M69.7 100.9 L68.4 105.9" stroke="#FFFFFF" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M74.0 91.0 L74.0 102.2 M74.0 95.3 L69.7 100.9 M74.0 97.8 L77.7 104.0 M69.7 100.9 L68.4 105.9" stroke="#F4B860" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M110 84 L110 91" stroke="#FFFFFF" stroke-width="0.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M110.0 91.0 L110.0 102.2 M110.0 95.3 L105.7 100.9 M110.0 97.8 L113.7 104.0 M105.7 100.9 L104.4 105.9" stroke="#FFFFFF" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M110.0 91.0 L110.0 102.2 M110.0 95.3 L105.7 100.9 M110.0 97.8 L113.7 104.0 M105.7 100.9 L104.4 105.9" stroke="#F4B860" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M130 84 L130 91" stroke="#FFFFFF" stroke-width="0.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M130.0 91.0 L130.0 102.2 M130.0 95.3 L125.7 100.9 M130.0 97.8 L133.7 104.0 M125.7 100.9 L124.4 105.9" stroke="#FFFFFF" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M130.0 91.0 L130.0 102.2 M130.0 95.3 L125.7 100.9 M130.0 97.8 L133.7 104.0 M125.7 100.9 L124.4 105.9" stroke="#F4B860" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M46 132 L138 132" stroke="#FFFFFF" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M54 132 L54 139" stroke="#FFFFFF" stroke-width="0.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M54.0 139.0 L54.0 150.2 M54.0 143.3 L49.7 148.9 M54.0 145.8 L57.7 152.0 M49.7 148.9 L48.4 153.9" stroke="#FFFFFF" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M54.0 139.0 L54.0 150.2 M54.0 143.3 L49.7 148.9 M54.0 145.8 L57.7 152.0 M49.7 148.9 L48.4 153.9" stroke="#F4B860" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M74 132 L74 139" stroke="#FFFFFF" stroke-width="0.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M74.0 139.0 L74.0 150.2 M74.0 143.3 L69.7 148.9 M74.0 145.8 L77.7 152.0 M69.7 148.9 L68.4 153.9" stroke="#FFFFFF" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M74.0 139.0 L74.0 150.2 M74.0 143.3 L69.7 148.9 M74.0 145.8 L77.7 152.0 M69.7 148.9 L68.4 153.9" stroke="#F4B860" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M110 132 L110 139" stroke="#FFFFFF" stroke-width="0.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M110.0 139.0 L110.0 150.2 M110.0 143.3 L105.7 148.9 M110.0 145.8 L113.7 152.0 M105.7 148.9 L104.4 153.9" stroke="#FFFFFF" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M110.0 139.0 L110.0 150.2 M110.0 143.3 L105.7 148.9 M110.0 145.8 L113.7 152.0 M105.7 148.9 L104.4 153.9" stroke="#F4B860" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M130 132 L130 139" stroke="#FFFFFF" stroke-width="0.75" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M130.0 139.0 L130.0 150.2 M130.0 143.3 L125.7 148.9 M130.0 145.8 L133.7 152.0 M125.7 148.9 L124.4 153.9" stroke="#FFFFFF" stroke-width="5.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M130.0 139.0 L130.0 150.2 M130.0 143.3 L125.7 148.9 M130.0 145.8 L133.7 152.0 M125.7 148.9 L124.4 153.9" stroke="#F4B860" stroke-width="2.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M92.0 50.0 L92.0 178.0" stroke="#FFFFFF" stroke-width="7.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M92.0 50.0 L92.0 178.0" stroke="#003087" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M92 50 L92 36" stroke="#FFFFFF" stroke-width="1.0" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="92" cy="26" r="10" fill="#003087" stroke="#FFFFFF" stroke-width="1.5"/><path d="M150 110 C188 94 226 102 248 136" stroke="#FFFFFF" stroke-width="1.0" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 4"/><path d="M226 204.8 C228 184 244 168 272 166 C300 164 312 158 330 162 C352 167 366 186 368 203.8" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round"/><path d="M262.0 166.0 L262.0 145.3 M262.0 157.9 L253.9 147.6 M262.0 153.3 L268.9 141.8 M253.9 147.6 L251.7 138.4 M262.0 145.3 L260.9 134.9 M268.9 141.8 L272.4 133.8" stroke="#FFFFFF" stroke-width="6.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M262.0 166.0 L262.0 145.3 M262.0 157.9 L253.9 147.6 M262.0 153.3 L268.9 141.8 M253.9 147.6 L251.7 138.4 M262.0 145.3 L260.9 134.9 M268.9 141.8 L272.4 133.8" stroke="#F4B860" stroke-width="3.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M255.1 170.5 Q256.8 162.5 262.0 162.5 Q267.2 162.5 268.9 170.5" fill="#003087" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="round"/><path d="M300.0 163.0 L300.0 138.7 M300.0 153.6 L290.6 141.4 M300.0 148.2 L308.1 134.7 M290.6 141.4 L287.9 130.6 M300.0 138.7 L298.6 126.5 M308.1 134.7 L312.1 125.2" stroke="#FFFFFF" stroke-width="7.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M300.0 163.0 L300.0 138.7 M300.0 153.6 L290.6 141.4 M300.0 148.2 L308.1 134.7 M290.6 141.4 L287.9 130.6 M300.0 138.7 L298.6 126.5 M308.1 134.7 L312.1 125.2" stroke="#F4B860" stroke-width="4.3" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M291.9 167.5 Q293.9 159.5 300.0 159.5 Q306.1 159.5 308.1 167.5" fill="#003087" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="round"/><path d="M338.0 168.0 L338.0 149.1 M338.0 160.7 L330.6 151.2 M338.0 156.4 L344.3 145.9 M330.6 151.2 L328.6 142.8 M338.0 149.1 L336.9 139.7 M344.3 145.9 L347.4 138.6" stroke="#FFFFFF" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M338.0 168.0 L338.0 149.1 M338.0 160.7 L330.6 151.2 M338.0 156.4 L344.3 145.9 M330.6 151.2 L328.6 142.8 M338.0 149.1 L336.9 139.7 M344.3 145.9 L347.4 138.6" stroke="#F4B860" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M331.7 172.5 Q333.3 164.5 338.0 164.5 Q342.7 164.5 344.3 172.5" fill="#003087" stroke="#FFFFFF" stroke-width="1" stroke-linejoin="round"/></svg>
+        <figcaption class="t-meta"><span>Fragments grow on coral trees in an offshore&nbsp;nursery</span><span>Grown corals are fixed to the reef with&nbsp;epoxy</span></figcaption>
+      </figure>
+    </section>
+
     <div class="next">
       <a class="btn" href="../ocean-and-sky.html#reef">Read the Ocean and sky chapter</a>
     </div>
@@ -90,12 +104,12 @@ body { padding-bottom: var(--tab-h); }
       <ul class="rows">
         <li><a href="index.html#florida-keys-sanctuary">
           <span class="ic" data-icon="care"></span>
-          <span><b class="t-body b">Florida Keys sanctuary</b><span class="t t-meta">Marine sanctuary, the water around the reef</span></span>
+          <span><b class="t-body b">Florida Keys sanctuary</b><span class="t t-meta">Marine sanctuary, the water around the&nbsp;reef</span></span>
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
         </a></li>
         <li><a href="index.html#weather">
           <span class="ic" data-icon="weather"></span>
-          <span><b class="t-body b">Weather for this sky</b><span class="t t-meta">Forecast, National Weather Service</span></span>
+          <span><b class="t-body b">Weather for this sky</b><span class="t t-meta">Forecast, National Weather&nbsp;Service</span></span>
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
         </a></li>
       </ul>

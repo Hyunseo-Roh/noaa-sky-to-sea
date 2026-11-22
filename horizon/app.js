@@ -532,6 +532,7 @@
   const CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
   const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
   const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const keep2 = (s) => String(s).replace(/ (\S+)$/, '\u00a0$1');   // no one-word last line
   const readingText = (r) => `${r.text}${r.age ? `, ${r.age}` : ''}`;
   const forecastText = (f) => `${f.short}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit}`;
 
@@ -591,32 +592,46 @@
     const name = iconName(id, p);
     b.innerHTML = `<span class="ic${name === 'alert' ? ' is-alert' : ''}">${svgOf(name)}</span><span class="tx"><b class="t-body b"></b><span class="t t-meta"></span>${live ? '<span class="t t-meta now"></span>' : ''}</span>${CHEV}`;
     b.querySelector('b').textContent = title;
-    b.querySelector('.t').textContent = line;
+    b.querySelector('.t').textContent = keep2(line);
     if (live) b.querySelector('.now').textContent = live;
     b.addEventListener('click', () => { if (face) faceToward(id); select(id); });
     li.append(b);
     return li;
   }
   // One Nearby card: the same parts as a row, on its own white card.
-  function card(id, p, title, line, live, { face = true, big = false } = {}) {
+  function card(id, p, title, line, live, { face = true, big = false, wait = false, value = null } = {}) {
     const li = row(id, p, title, line, live, face);
     const b = li.querySelector('button');
     b.className = `nc${big ? ' big' : ''}${iconName(id, p) === 'alert' ? ' is-alert' : ''}`;
+    if (wait) { const now = b.querySelector('.now'); if (now) now.classList.add('wait'); }
+    if (value) {   // a short reading, on the same line as the name: Sunset ... 4:48 PM
+      const v = document.createElement('span');
+      v.className = 'val'; v.textContent = value;
+      b.querySelector('.chev').before(v);
+    }
     return li;
   }
-  // Sunrise and sunset share one card: two halves, each opening its own preview.
-  function sunPair(ids) {
-    const li = document.createElement('li');
-    const pair = document.createElement('div');
-    pair.className = 'nc-pair';
-    for (const id of ids) {
+  // Today's sunrise and sunset where you stand, even after they have passed
+  function sunToday() {
+    const v = S.viewer;
+    let y, m, d;
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', { timeZone: S.tz || undefined, year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(new Date());
+      y = +parts.find((x) => x.type === 'year').value; m = +parts.find((x) => x.type === 'month').value; d = +parts.find((x) => x.type === 'day').value;
+    } catch (_) { const now = new Date(); y = now.getFullYear(); m = now.getMonth() + 1; d = now.getDate(); }
+    const day = SUN.day(Date.UTC(y, m - 1, d), v.lat, v.lon);
+    return day ? { sunrise: { at: day.rise, az: day.riseAz }, sunset: { at: day.set, az: day.setAz } } : null;
+  }
+  // Sunrise and sunset: one row each, today's time on the right and the direction under the name.
+  // They come from the sun's position alone, so they read even when the forecast doesn't load.
+  function sunRows(ids) {
+    const today = sunToday();
+    return ids.map((id) => {
       const p = PLACES[id];
-      const half = row(id, p, p.name, `${capital(dayWord(p.at, S.tz))}, toward the ${G.dir8(p.bearing)}`, clock(p.at, S.tz)).querySelector('button');
-      half.className = 'nc';
-      pair.append(half);
-    }
-    li.append(pair);
-    return li;
+      const t = today && today[id];
+      const line = t ? `Today, toward the ${G.dir8(t.az)}` : `${capital(dayWord(p.at, S.tz))}, toward the ${G.dir8(p.bearing)}`;
+      return card(id, p, p.name, line, null, { value: clock(t ? t.at : p.at, S.tz) });
+    });
   }
   function setLive(li, text) {
     const n = li.querySelector('.now');
@@ -666,10 +681,21 @@
 
     const alerts = S.alerts.map((a) => card(a.id, PLACES[a.id] || a, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, { face: false }));
 
-    const sky = [card('weather', PLACES.weather, 'Weather for this sky', `Forecast for ${v.name}`, NB.forecast || 'Loading the forecast…', { big: true })];
-    const sun = ['sunrise', 'sunset'].filter((k) => PLACES[k]).sort((a, b) => PLACES[a].at - PLACES[b].at);
-    if (sun.length === 2) sky.push(sunPair(sun));
-    else for (const id of sun) sky.push(card(id, PLACES[id], PLACES[id].name, `${capital(dayWord(PLACES[id].at, S.tz))}, toward the ${G.dir8(PLACES[id].bearing)}`, clock(PLACES[id].at, S.tz)));
+    const wx = NB.forecast || (NB.forecastFailed ? "The forecast didn't load." : 'Loading the forecast…');
+    const wxRow = card('weather', PLACES.weather, 'Weather for this sky', `Forecast for ${v.name}`, wx, { big: true, wait: !NB.forecast });
+    if (NB.forecastFailed && !NB.forecast) {   // say where the link goes: the official forecast for this spot
+      const a = document.createElement('a');
+      a.className = 'nb-out';
+      a.href = `https://forecast.weather.gov/MapClick.php?lat=${v.lat.toFixed(4)}&lon=${v.lon.toFixed(4)}`;
+      a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = 'View forecast on weather.gov';
+      wxRow.append(a);
+    }
+    const sky = [wxRow];
+    const sun = ['sunrise', 'sunset'].filter((k) => PLACES[k]);
+    const today = sunToday();
+    sun.sort((a, b) => (today ? today[a].at - today[b].at : PLACES[a].at - PLACES[b].at));
+    sky.push(...sunRows(sun));
 
     const instruments = entries
       .filter(([, p]) => p.found && (p.kind === 'station' || p.kind === 'radar'))
@@ -719,9 +745,10 @@
 
   async function loadNearbyForecast() {
     try {
+      NB.forecastFailed = false;
       const f = await NWS.forecast(S.viewer);
       NB.forecast = forecastText(f);
-    } catch (_) { NB.forecast = null; }
+    } catch (_) { NB.forecast = null; NB.forecastFailed = true; }
     renderNearby();
   }
 
@@ -784,6 +811,14 @@
     if (d && pl.lat != null) d.textContent = isHere(pl) ? 'Where you are' : G.distanceText(S.viewer, pl);
     const when = sheetBody.querySelector('[data-period]');
     if (when) when.textContent = S.viewer.name;
+    // the weather for this sky also gives the day's sunrise and sunset, with the sun in Sunlight
+    const sunline = sheetBody.querySelector('[data-sunline]');
+    if (sunline && PLACES.sunrise && PLACES.sunset) {
+      const [a, b] = [PLACES.sunrise, PLACES.sunset].sort((x, y) => x.at - y.at);
+      sunline.innerHTML = `${svgOf(a === PLACES.sunrise ? 'sunrise' : 'sunset')}<span></span>`;
+      sunline.querySelector('span').textContent = `${a.name} ${clock(a.at, S.tz)}, ${lower(b.name)} ${clock(b.at, S.tz)}`;
+      sunline.hidden = false;
+    }
     const link = sheetBody.querySelector('[data-forecast-link]');
     if (link) link.href = `https://forecast.weather.gov/MapClick.php?lat=${S.viewer.lat.toFixed(4)}&lon=${S.viewer.lon.toFixed(4)}`;
     sheet.hidden = false;
@@ -1164,6 +1199,20 @@
   updateSun(true);
   route();
   loadAlerts();
-  if (!location.hash && !(wasLive && canCamera && returning)) openIntro();
+  // The launch screen shows for a moment when Horizon opens on the start screen, then fades into it.
+  const splash = $('#splash');
+  const coldStart = !location.hash && !(wasLive && canCamera && returning);
+  if (coldStart) {
+    openIntro();
+    const fade = () => {
+      if (splash.hidden) return;
+      splash.classList.add('out');
+      setTimeout(() => { splash.hidden = true; }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 400);
+    };
+    splash.addEventListener('click', fade);
+    setTimeout(fade, 1500);
+  } else {
+    splash.hidden = true;
+  }
   requestAnimationFrame(tick);
 })();
