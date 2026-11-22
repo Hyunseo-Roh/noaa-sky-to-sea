@@ -219,3 +219,31 @@
 }
 
 .dsc { scroll-margin-top: 0; }   /* the page keeps the room under the chapter bar now */
+
+/* Storms: each label is a point, a short line and its words, no pill. The words keep a patch of the colour
+   behind them so the drawing's lines don't run through them, the + says the label opens, and the open label
+   is underlined with its point filled. The office that does the work sits under its label. */
+@media (min-width: 761px) {
+  #ch2 .co-t { display: grid; justify-items: start; row-gap: 0; min-height: 0; padding: 0 var(--s-2); border: 0; border-radius: 0; background: none; color: var(--c-brand); }
+  #ch2 .co.dark .co-t { background: var(--c-brand); color: var(--c-ground); }
+  #ch2 .co[data-side="l"] .co-t { justify-items: end; text-align: right; }
+  #ch2 .co-m { display: inline-flex; align-items: center; gap: var(--s-2); font: var(--f-meta-b); }
+  #ch2 .co-m > svg:not(.co-plus) { width: 16px; height: 16px; flex: none; }
+  #ch2 .co-o { font: var(--f-meta); color: var(--c-ink-2); white-space: nowrap; text-align: inherit; }
+  #ch2 .co.dark .co-o { color: var(--c-on-dark-2); }
+  #ch2 .co-b { min-height: 48px; }
+  #ch2 .co-b:hover .co-t { border-color: transparent; }
+  #ch2 .co-b:hover .co-m, #ch2 .co-b[aria-expanded="true"] .co-m { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+  #ch2 .co-b[aria-expanded="true"] .co-t { background: none; color: var(--c-brand); }
+  #ch2 .co.dark .co-b[aria-expanded="true"] .co-t { background: var(--c-brand); color: var(--c-ground); }
+  #ch2 .co-t { text-align: left; }
+  #ch2 .co[data-side="l"] .co-t { text-align: right; }
+  #ch2 .co-b[aria-controls="card-hunters"] .co-line { width: 16px; }   /* keeps the office clear of the cloud */
+}
+@media (min-width: 761px) and (max-width: 1023px) { #ch2 .co-t .co-o { display: none; } }   /* on a small drawing the offices stay in the cards */
+#ch2 .co-k { border-color: transparent; border-radius: 0; background: none; padding-left: 0; }
+#ch2 .co-k[aria-expanded="true"] { background: none; }
+#ch2 .co-k[aria-expanded="true"] .co-kt { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+#ch2 .co-kt { display: grid; grid-template-columns: auto 1fr; column-gap: var(--s-2); align-items: center; }
+#ch2 .co-kt .co-o { grid-column: 1 / -1; font: var(--f-meta); }
+.org { margin-top: var(--s-4); font: var(--f-meta-b); color: var(--c-ink); }
