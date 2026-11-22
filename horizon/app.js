@@ -604,11 +604,16 @@
     return li;
   }
   // One Nearby card: the same parts as a row, on its own white card.
-  function card(id, p, title, line, live, { face = true, big = false, wait = false } = {}) {
+  function card(id, p, title, line, live, { face = true, big = false, wait = false, value = null } = {}) {
     const li = row(id, p, title, line, live, face);
     const b = li.querySelector('button');
     b.className = `nc${big ? ' big' : ''}${iconName(id, p) === 'alert' ? ' is-alert' : ''}`;
     if (wait) { const now = b.querySelector('.now'); if (now) now.classList.add('wait'); }
+    if (value) {   // a short reading, on the same line as the name: Sunset ... 4:48 PM
+      const v = document.createElement('span');
+      v.className = 'val'; v.textContent = value;
+      b.querySelector('.chev').before(v);
+    }
     return li;
   }
   // Today's sunrise and sunset where you stand, even after they have passed
@@ -622,22 +627,16 @@
     const day = SUN.day(Date.UTC(y, m - 1, d), v.lat, v.lon);
     return day ? { sunrise: { at: day.rise, az: day.riseAz }, sunset: { at: day.set, az: day.setAz } } : null;
   }
-  // Sunrise and sunset share one card: two halves, each opening its own preview.
-  function sunPair(ids) {
-    const li = document.createElement('li');
-    const pair = document.createElement('div');
-    pair.className = 'nc-pair';
+  // Sunrise and sunset: one row each, today's time on the right and the direction under the name.
+  // They come from the sun's position alone, so they read even when the forecast doesn't load.
+  function sunRows(ids) {
     const today = sunToday();
-    for (const id of ids) {
+    return ids.map((id) => {
       const p = PLACES[id];
       const t = today && today[id];
       const line = t ? `Today, toward the ${G.dir8(t.az)}` : `${capital(dayWord(p.at, S.tz))}, toward the ${G.dir8(p.bearing)}`;
-      const half = row(id, p, p.name, line, clock(t ? t.at : p.at, S.tz)).querySelector('button');
-      half.className = 'nc';
-      pair.append(half);
-    }
-    li.append(pair);
-    return li;
+      return card(id, p, p.name, line, null, { value: clock(t ? t.at : p.at, S.tz) });
+    });
   }
   function setLive(li, text) {
     const n = li.querySelector('.now');
@@ -687,11 +686,21 @@
 
     const alerts = S.alerts.map((a) => card(a.id, PLACES[a.id] || a, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, { face: false }));
 
-    const wx = NB.forecast || (NB.forecastFailed ? "The forecast didn't load. Open it for the full forecast." : 'Loading the forecast…');
-    const sky = [card('weather', PLACES.weather, 'Weather for this sky', `Forecast for ${v.name}`, wx, { big: true, wait: !NB.forecast })];
-    const sun = ['sunrise', 'sunset'].filter((k) => PLACES[k]).sort((a, b) => PLACES[a].at - PLACES[b].at);
-    if (sun.length === 2) sky.push(sunPair(sun));
-    else for (const id of sun) sky.push(card(id, PLACES[id], PLACES[id].name, `${capital(dayWord(PLACES[id].at, S.tz))}, toward the ${G.dir8(PLACES[id].bearing)}`, clock(PLACES[id].at, S.tz)));
+    const wx = NB.forecast || (NB.forecastFailed ? "The forecast didn't load." : 'Loading the forecast…');
+    const wxRow = card('weather', PLACES.weather, 'Weather for this sky', `Forecast for ${v.name}`, wx, { big: true, wait: !NB.forecast });
+    if (NB.forecastFailed && !NB.forecast) {   // say where the link goes: the official forecast for this spot
+      const a = document.createElement('a');
+      a.className = 'nb-out';
+      a.href = `https://forecast.weather.gov/MapClick.php?lat=${v.lat.toFixed(4)}&lon=${v.lon.toFixed(4)}`;
+      a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = 'View forecast on weather.gov';
+      wxRow.append(a);
+    }
+    const sky = [wxRow];
+    const sun = ['sunrise', 'sunset'].filter((k) => PLACES[k]);
+    const today = sunToday();
+    sun.sort((a, b) => (today ? today[a].at - today[b].at : PLACES[a].at - PLACES[b].at));
+    sky.push(...sunRows(sun));
 
     const instruments = entries
       .filter(([, p]) => p.found && (p.kind === 'station' || p.kind === 'radar'))
