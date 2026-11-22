@@ -18,18 +18,19 @@
 .intro { padding-top: var(--s-7); align-items: start; }
 .intro .t-lead { grid-column: 1 / 8; }
 .intro .offices { grid-column: 9 / 13; padding-top: var(--s-2); }
+.intro .intro-topics { margin-top: var(--s-2); }
 
 .places-nav { margin-top: var(--s-8); }
 .places-nav h2 { font: var(--f-meta-b); color: var(--c-ink-2); }
 .places-nav ol { margin-top: var(--s-4); }
 .places-nav li { grid-column: span 3; }
-.places-nav a { display: block; height: 100%; padding-top: var(--s-3); border-top: 1px solid var(--c-rule); text-decoration: none; }
+.places-nav a { display: block; height: 100%; padding-top: var(--s-4); border-top: 1px solid var(--c-rule); text-decoration: none; }
 .places-nav a .kicker { display: block; }
-.places-nav a .t-item { display: block; margin-top: var(--s-1); color: var(--c-brand); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.places-nav a .t-item { display: block; margin-top: var(--s-2); color: var(--c-brand); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
 .places-nav a:hover .t-item { text-decoration-thickness: 2px; }
 
 .sec { padding-top: var(--s-10); }
-.sec .kicker { margin-bottom: var(--s-3); }
+.sec .kicker { margin-bottom: var(--s-4); }
 .sec .text p.t-body + p.t-body { margin-top: var(--s-4); }
 .sec .office, .sec .offices { margin-top: var(--s-5); }
 .sec .offices .office { margin-top: 0; }
@@ -49,23 +50,23 @@
 .data { margin-top: var(--s-8); padding-top: var(--s-5); border-top: 2px solid var(--c-ink); }
 .data-head { align-items: end; }
 .data-head h3 { grid-column: 1 / 8; }
-.data-head .date { grid-column: 1 / 8; margin-top: var(--s-1); font: var(--f-item); color: var(--c-ink); }
+.data-head .date { grid-column: 1 / 8; margin-top: var(--s-2); font: var(--f-item); color: var(--c-ink); }
 .data-head .units { grid-column: 8 / 13; }
 .data-body { margin-top: var(--s-6); align-items: start; }
 .data table { grid-column: 1 / 5; width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums lining-nums; }
-.data th, .data td { padding: var(--s-3) var(--s-3) var(--s-3) 0; border-bottom: 1px solid var(--c-rule); font: var(--f-body); font-family: var(--font-ui); text-align: left; }
+.data th, .data td { padding: var(--s-4) var(--s-4) var(--s-4) 0; border-bottom: 1px solid var(--c-rule); font: var(--f-body); font-family: var(--font-ui); text-align: left; }
 .data thead th { font: var(--f-meta-b); color: var(--c-ink-2); padding-top: 0; }
 .data tbody th { color: var(--c-ink-2); }
 .data td.v, .data thead th.v { text-align: right; padding-right: 0; }
 .data td.v { font: var(--f-body-b); color: var(--c-ink); }
 .chart { grid-column: 5 / 13; }
-.legend { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-3); font: var(--f-meta); color: var(--c-ink-2); }
+.legend { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-4); font: var(--f-meta); color: var(--c-ink-2); }
 .legend i { display: inline-block; width: 24px; height: 3px; border-radius: var(--r-round); background: var(--c-state); }
 .tide-chart { display: block; width: 100%; height: auto; font-family: var(--font-ui); }
 .tide-chart-wrap.m { display: none; }
 .data-foot { margin-top: var(--s-5); padding-top: var(--s-4); border-top: 1px solid var(--c-rule); }
 .data-foot .note { font: var(--f-body-b); color: var(--c-ink); }
-.data-foot .cap { margin-top: var(--s-1); }
+.data-foot .cap { margin-top: var(--s-2); }
 
 .charts h2 { margin-bottom: var(--s-6); }
 .charts figure .ph { aspect-ratio: 2 / 1; }
@@ -76,7 +77,7 @@
 
 .reef-top h2 { margin-bottom: 0; }
 .reef-pair { margin-top: var(--s-6); align-items: start; }
-.reef-pair .label { margin-bottom: var(--s-3); }
+.reef-pair .label { margin-bottom: var(--s-4); }
 .reef-pair .work { grid-column: 1 / 9; }
 .reef-pair .work .ph { aspect-ratio: 3 / 2; }
 .reef-pair .side { grid-column: 9 / 13; }
@@ -86,14 +87,14 @@
 .reef-pair .side .office { margin-top: var(--s-5); }
 .app-link { margin-top: var(--s-9); align-items: center; }
 .app-link .text { grid-column: 1 / 7; }
-.app-link .text p { margin-top: var(--s-3); max-width: 30em; }
+.app-link .text p { margin-top: var(--s-4); max-width: 30em; }
 .app-link .text .link { display: inline-block; margin-top: var(--s-5); }
 .app-link figure { grid-column: 8 / 12; justify-self: center; }
 .app-link .ph { width: 280px; aspect-ratio: 390 / 844; border-radius: var(--r-pill); border: 1px solid var(--c-rule); }
 .app-link .cap { max-width: 280px; }
 
 .sources ol { counter-reset: src; margin-top: var(--s-5); max-width: 760px; }
-.sources li { display: grid; grid-template-columns: 28px minmax(0, 1fr); padding: var(--s-3) 0; border-top: 1px solid var(--c-rule); font: var(--f-body); }
+.sources li { display: grid; grid-template-columns: 28px minmax(0, 1fr); padding: var(--s-4) 0; border-top: 1px solid var(--c-rule); font: var(--f-body); }
 .sources li:last-child { border-bottom: 1px solid var(--c-rule); }
 .sources li::before { counter-increment: src; content: counter(src); font: var(--f-body-b); color: var(--c-ink-2); font-variant-numeric: tabular-nums; }
 .sources li b { font: var(--f-body-b); color: var(--c-ink); }
@@ -126,9 +127,9 @@
   .secnav summary b { grid-column: 1; font: var(--f-meta-b); color: var(--c-brand); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .secnav summary .chev { grid-column: 2; grid-row: 1 / 3; width: 20px; height: 20px; color: var(--c-brand); transition: transform .2s ease-out; }
   .secnav[open] summary .chev { transform: rotate(180deg); }
-  .secnav ol { position: absolute; left: 0; right: 0; top: 100%; z-index: 16; counter-reset: m; padding: 0 var(--margin) var(--s-3); background: var(--c-ground); border-bottom: 1px solid var(--c-rule); }
+  .secnav ol { position: absolute; left: 0; right: 0; top: 100%; z-index: 16; counter-reset: m; padding: 0 var(--margin) var(--s-4); background: var(--c-ground); border-bottom: 1px solid var(--c-rule); }
   .secnav:not([open]) ol { display: none; }
-  .secnav li a { display: flex; align-items: center; gap: var(--s-3); min-height: 48px; border-top: 1px solid var(--c-rule); font: var(--f-meta); color: var(--c-ink); text-decoration: none; }
+  .secnav li a { display: flex; align-items: center; gap: var(--s-4); min-height: 48px; border-top: 1px solid var(--c-rule); font: var(--f-meta); color: var(--c-ink); text-decoration: none; }
   .secnav li a::before { counter-increment: m; content: counter(m); font-weight: 700; color: var(--c-ink-2); min-width: 12px; }
   .secnav li.src a::before { content: ""; }
   .secnav li a[aria-current] { font: var(--f-meta-b); color: var(--c-brand); }
@@ -173,14 +174,13 @@
 </head>
 <body>
 
-<header class="site-head">
+<header class="site-head" id="site-head">
   <div class="wrap row">
     <a class="brand" href="index.html" aria-label="NOAA home"><img src="images/logo/NOAA_Symbol_NOAA_Primary.svg" alt="NOAA"></a>
-    <nav class="primary" aria-label="Main">
-      <a href="index.html#chapters" aria-current="page">Chapters</a><a href="#">Stories</a><a href="#">Offices</a><a href="#">About NOAA</a>
-    </nav>
-    <button class="icon-btn" aria-label="Search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg></button>
-    <button class="icon-btn menu-btn" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <nav class="primary" id="primary" aria-label="Main"><ul class="nav-list"><li class="nav-i"><button class="nav-b" type="button" aria-expanded="false" aria-controls="m-chapters">Chapters<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="mega" id="m-chapters" hidden><div class="wrap mega-in"><div class="mega-intro"><p class="mega-t">Sky to sea</p><p class="mega-p">NOAA’s work in seven chapters, from the upper air to the open sea.</p><a class="link" href="index.html#about">About this site</a></div><ul class="mega-list c4"><li><a href="index.html#ch1"><span class="mi-t"><span class="n">1</span>Upper air</span><span class="mi-d">Weather balloons, twice a day</span><span class="mi-k">Weather, Research</span></a></li><li><a href="index.html#ch2"><span class="mi-t"><span class="n">2</span>Storms</span><span class="mi-d">Storm watches and warnings</span><span class="mi-k">Weather, Marine and aviation</span></a></li><li><a href="ocean-and-sky.html"><span class="mi-t"><span class="n">3</span>Ocean and sky</span><span class="mi-d">Buoys, tide stations and charts</span><span class="mi-k">Ocean and coasts, Charting</span></a></li><li><a href="index.html#ch4"><span class="mi-t"><span class="n">4</span>Curiosity</span><span class="mi-d">A science camp on the shore</span><span class="mi-k">Education, Fisheries</span></a></li><li><a href="index.html#ch5"><span class="mi-t"><span class="n">5</span>Sanctuaries</span><span class="mi-d">Listening to a reef offshore</span><span class="mi-k">Sanctuaries</span></a></li><li><a href="index.html#ch6"><span class="mi-t"><span class="n">6</span>Sea turtles</span><span class="mi-d">Rescuing cold-stunned turtles</span><span class="mi-k">Fisheries</span></a></li><li><a href="index.html#ch7"><span class="mi-t"><span class="n">7</span>Whales</span><span class="mi-d">Watching humpbacks from afar</span><span class="mi-k">Sanctuaries, Fisheries</span></a></li></ul></div></div></li><li class="nav-i"><button class="nav-b" type="button" aria-expanded="false" aria-controls="m-topics">Topics<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="mega" id="m-topics" hidden><div class="wrap mega-in"><div class="mega-intro"><p class="mega-t">NOAA topics</p><p class="mega-p">The ten topics of noaa.gov. Each opens the NOAA site for that work.</p></div><ul class="mega-list c5"><li><a href="https://www.weather.gov/"><span class="mi-t">Weather</span><span class="mi-d">Forecasts and warnings from the National Weather Service</span><span class="mi-k">In chapters 1 and 2</span></a></li><li><a href="https://www.climate.gov/"><span class="mi-t">Climate</span><span class="mi-d">Climate data, outlooks and what is changing</span></a></li><li><a href="https://oceanservice.noaa.gov/"><span class="mi-t">Ocean and coasts</span><span class="mi-d">Tides, buoys and coastal science</span><span class="mi-k">In chapter 3</span></a></li><li><a href="https://www.fisheries.noaa.gov/"><span class="mi-t">Fisheries</span><span class="mi-d">Fish, marine mammals and sea turtles</span><span class="mi-k">In chapters 4, 6 and 7</span></a></li><li><a href="https://www.nesdis.noaa.gov/"><span class="mi-t">Satellites</span><span class="mi-d">The Earth, watched from orbit</span></a></li><li><a href="https://research.noaa.gov/"><span class="mi-t">Research</span><span class="mi-d">NOAA labs studying the air, the sea and the climate</span><span class="mi-k">In chapter 1</span></a></li><li><a href="https://www.omao.noaa.gov/"><span class="mi-t">Marine and aviation</span><span class="mi-d">NOAA ships, aircraft and the NOAA Corps</span><span class="mi-k">In chapter 2</span></a></li><li><a href="https://nauticalcharts.noaa.gov/"><span class="mi-t">Charting</span><span class="mi-d">Nautical charts and seafloor surveys</span><span class="mi-k">In chapter 3</span></a></li><li><a href="https://sanctuaries.noaa.gov/"><span class="mi-t">Sanctuaries</span><span class="mi-d">The national marine sanctuaries</span><span class="mi-k">In chapters 5 and 7</span></a></li><li><a href="https://www.noaa.gov/education"><span class="mi-t">Education</span><span class="mi-d">Lessons and programs for students and teachers</span><span class="mi-k">In chapter 4</span></a></li></ul></div></div></li><li class="nav-i"><button class="nav-b" type="button" aria-expanded="false" aria-controls="m-news">News<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="mega" id="m-news" hidden><div class="wrap mega-in"><div class="mega-intro"><p class="mega-t">News and features</p><p class="mega-p">Stories and announcements from every part of NOAA.</p></div><ul class="mega-list c3"><li><a href="https://www.noaa.gov/news-features"><span class="mi-t">Latest news and features</span><span class="mi-d">Announcements, research and stories from across NOAA</span></a></li><li><a href="index.html#about"><span class="mi-t">Seven stories on this site</span><span class="mi-d">From weather balloons in the upper air to whales in the open sea</span></a></li><li><a href="ocean-and-sky.html"><span class="mi-t">Ocean and sky, the full chapter</span><span class="mi-d">A buoy, a tide station, a chart survey and a reef</span></a></li></ul></div></div></li><li class="nav-i"><button class="nav-b" type="button" aria-expanded="false" aria-controls="m-data">Data<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="mega" id="m-data" hidden><div class="wrap mega-in"><div class="mega-intro"><p class="mega-t">Data</p><p class="mega-p">NOAA measures the air, the sea and the coasts every day. The data is free to use.</p></div><ul class="mega-list c3"><li><a href="https://www.noaa.gov/data"><span class="mi-t">Access NOAA data</span><span class="mi-d">Where NOAA’s data lives and how to get it</span></a></li><li><a href="https://www.ncei.noaa.gov/"><span class="mi-t">Past weather and climate</span><span class="mi-d">Records from the National Centers for Environmental Information</span></a></li><li><a href="https://www.ndbc.noaa.gov/"><span class="mi-t">Buoy readings</span><span class="mi-d">Wind, waves and water temperature from buoys at sea</span></a></li><li><a href="https://tidesandcurrents.noaa.gov/"><span class="mi-t">Tides and water levels</span><span class="mi-d">Readings and predictions from tide stations</span></a></li><li><a href="https://www.star.nesdis.noaa.gov/goes/"><span class="mi-t">Satellite images</span><span class="mi-d">Live images from the GOES weather satellites</span></a></li></ul></div></div></li><li class="nav-i"><button class="nav-b" type="button" aria-expanded="false" aria-controls="m-tools">Tools<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="mega" id="m-tools" hidden><div class="wrap mega-in"><div class="mega-intro"><p class="mega-t">Tools</p><p class="mega-p">Forecasts, maps and calculators for everyday use.</p></div><ul class="mega-list c3"><li><a href="https://www.weather.gov/"><span class="mi-t">Local forecast</span><span class="mi-d">The seven-day forecast for where you are</span></a></li><li><a href="https://radar.weather.gov/"><span class="mi-t">Radar</span><span class="mi-d">Rain and storms on the map, right now</span></a></li><li><a href="https://www.nhc.noaa.gov/"><span class="mi-t">Hurricanes</span><span class="mi-d">Forecasts from the National Hurricane Center</span></a></li><li><a href="https://nauticalcharts.noaa.gov/"><span class="mi-t">Nautical charts</span><span class="mi-d">Charts for U.S. coasts and the Great Lakes</span></a></li><li><a href="https://gml.noaa.gov/grad/solcalc/"><span class="mi-t">Solar calculator</span><span class="mi-d">Sunrise and sunset for any place and date</span></a></li><li><a href="horizon/index.html"><span class="mi-t">The Horizon app</span><span class="mi-d">NOAA’s work around you, on your phone</span></a></li></ul></div></div></li><li class="nav-i"><button class="nav-b" type="button" aria-expanded="false" aria-controls="m-about">About<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="mega" id="m-about" hidden><div class="wrap mega-in"><div class="mega-intro"><p class="mega-t">About NOAA</p><p class="mega-p">The National Oceanic and Atmospheric Administration is part of the U.S. Department of Commerce.</p></div><ul class="mega-list c4"><li><a href="https://www.noaa.gov/about-our-agency"><span class="mi-t">About our agency</span><span class="mi-d">Mission, leadership and history</span></a></li><li><a href="https://www.weather.gov/"><span class="mi-t">National Weather Service</span><span class="mi-d">Forecasts and warnings</span></a></li><li><a href="https://oceanservice.noaa.gov/"><span class="mi-t">National Ocean Service</span><span class="mi-d">Coasts, tides and charts</span></a></li><li><a href="https://www.fisheries.noaa.gov/"><span class="mi-t">Fisheries</span><span class="mi-d">Fish, marine mammals and sea turtles</span></a></li><li><a href="https://research.noaa.gov/"><span class="mi-t">Research</span><span class="mi-d">NOAA’s labs and research programs</span></a></li><li><a href="https://www.nesdis.noaa.gov/"><span class="mi-t">Satellites</span><span class="mi-d">NOAA’s satellites and data centers</span></a></li><li><a href="https://www.omao.noaa.gov/"><span class="mi-t">Marine and Aviation Operations</span><span class="mi-d">NOAA’s ships and aircraft</span></a></li><li><a href="index.html#about"><span class="mi-t">About this site</span><span class="mi-d">A student redesign of noaa.gov</span></a></li></ul></div></div></li></ul></nav>
+    <div class="sr"><button class="icon-btn search-btn" type="button" aria-label="Search this site" aria-expanded="false" aria-controls="m-search"><svg class="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L20 20"/></svg><svg class="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="mega search-panel" id="m-search" hidden><div class="wrap mega-in"><div class="mega-intro"><p class="mega-t">Search this site</p><p class="mega-p">Chapters, NOAA topics, data and tools.</p></div><div class="search-body"><form class="search-form" role="search" onsubmit="return false"><label for="q">What are you looking for</label><input id="q" type="search" autocomplete="off" placeholder="Tides, hurricanes, whales"></form><p class="search-note" id="search-note" aria-live="polite"></p><ul class="mega-list c3 search-results" id="search-results"></ul><script type="application/json" id="search-index">[{"t": "Upper air", "h": "index.html#ch1", "d": "Weather balloons, twice a day", "k": "Chapter 1", "x": "balloon radiosonde ozone upper air sounding atmosphere Weather Research"}, {"t": "Storms", "h": "index.html#ch2", "d": "Storm watches and warnings", "k": "Chapter 2", "x": "hurricane hunters tornado thunderstorm watch warning ship marine forecast Weather Marine and aviation"}, {"t": "Ocean and sky", "h": "ocean-and-sky.html", "d": "Buoys, tide stations and charts", "k": "Chapter 3", "x": "buoy tide station sonar chart lighthouse reef surface Ocean and coasts Charting"}, {"t": "Curiosity", "h": "index.html#ch4", "d": "A science camp on the shore", "k": "Chapter 4", "x": "plankton microscope science camp education student Education Fisheries"}, {"t": "Sanctuaries", "h": "index.html#ch5", "d": "Listening to a reef offshore", "k": "Chapter 5", "x": "sound hydrophone fish reef flower garden banks Sanctuaries"}, {"t": "Sea turtles", "h": "index.html#ch6", "d": "Rescuing cold-stunned turtles", "k": "Chapter 6", "x": "turtle rescue cold stunned release Fisheries"}, {"t": "Whales", "h": "index.html#ch7", "d": "Watching humpbacks from afar", "k": "Chapter 7", "x": "whale humpback binoculars distance hawaii Sanctuaries Fisheries"}, {"t": "A buoy that reports to everyone", "h": "ocean-and-sky.html#buoy", "d": "Buoy 44008, southeast of Nantucket", "k": "Ocean and sky", "x": "buoy wind waves ndbc data"}, {"t": "The water level, every six minutes", "h": "ocean-and-sky.html#tide", "d": "A tide station in Baltimore, Maryland", "k": "Ocean and sky", "x": "tide water level station"}, {"t": "Charts start with sound", "h": "ocean-and-sky.html#charts", "d": "A sonar survey on the Hudson River, New York", "k": "Ocean and sky", "x": "chart sonar survey seafloor"}, {"t": "Back to the reef", "h": "ocean-and-sky.html#reef", "d": "Carysfort Reef, Florida Keys", "k": "Ocean and sky", "x": "coral reef restoration"}, {"t": "Weather", "h": "https://www.weather.gov/", "d": "Forecasts and warnings from the National Weather Service", "k": "Topic on noaa.gov", "x": ""}, {"t": "Climate", "h": "https://www.climate.gov/", "d": "Climate data, outlooks and what is changing", "k": "Topic on noaa.gov", "x": ""}, {"t": "Ocean and coasts", "h": "https://oceanservice.noaa.gov/", "d": "Tides, buoys and coastal science", "k": "Topic on noaa.gov", "x": ""}, {"t": "Fisheries", "h": "https://www.fisheries.noaa.gov/", "d": "Fish, marine mammals and sea turtles", "k": "Topic on noaa.gov", "x": ""}, {"t": "Satellites", "h": "https://www.nesdis.noaa.gov/", "d": "The Earth, watched from orbit", "k": "Topic on noaa.gov", "x": ""}, {"t": "Research", "h": "https://research.noaa.gov/", "d": "NOAA labs studying the air, the sea and the climate", "k": "Topic on noaa.gov", "x": ""}, {"t": "Marine and aviation", "h": "https://www.omao.noaa.gov/", "d": "NOAA ships, aircraft and the NOAA Corps", "k": "Topic on noaa.gov", "x": ""}, {"t": "Charting", "h": "https://nauticalcharts.noaa.gov/", "d": "Nautical charts and seafloor surveys", "k": "Topic on noaa.gov", "x": ""}, {"t": "Sanctuaries", "h": "https://sanctuaries.noaa.gov/", "d": "The national marine sanctuaries", "k": "Topic on noaa.gov", "x": ""}, {"t": "Education", "h": "https://www.noaa.gov/education", "d": "Lessons and programs for students and teachers", "k": "Topic on noaa.gov", "x": ""}, {"t": "Latest news and features", "h": "https://www.noaa.gov/news-features", "d": "Announcements, research and stories from across NOAA", "k": "News", "x": ""}, {"t": "Seven stories on this site", "h": "index.html#about", "d": "From weather balloons in the upper air to whales in the open sea", "k": "News", "x": ""}, {"t": "Ocean and sky, the full chapter", "h": "ocean-and-sky.html", "d": "A buoy, a tide station, a chart survey and a reef", "k": "News", "x": ""}, {"t": "Access NOAA data", "h": "https://www.noaa.gov/data", "d": "Where NOAA’s data lives and how to get it", "k": "Data", "x": ""}, {"t": "Past weather and climate", "h": "https://www.ncei.noaa.gov/", "d": "Records from the National Centers for Environmental Information", "k": "Data", "x": ""}, {"t": "Buoy readings", "h": "https://www.ndbc.noaa.gov/", "d": "Wind, waves and water temperature from buoys at sea", "k": "Data", "x": ""}, {"t": "Tides and water levels", "h": "https://tidesandcurrents.noaa.gov/", "d": "Readings and predictions from tide stations", "k": "Data", "x": ""}, {"t": "Satellite images", "h": "https://www.star.nesdis.noaa.gov/goes/", "d": "Live images from the GOES weather satellites", "k": "Data", "x": ""}, {"t": "Local forecast", "h": "https://www.weather.gov/", "d": "The seven-day forecast for where you are", "k": "Tools", "x": ""}, {"t": "Radar", "h": "https://radar.weather.gov/", "d": "Rain and storms on the map, right now", "k": "Tools", "x": ""}, {"t": "Hurricanes", "h": "https://www.nhc.noaa.gov/", "d": "Forecasts from the National Hurricane Center", "k": "Tools", "x": ""}, {"t": "Nautical charts", "h": "https://nauticalcharts.noaa.gov/", "d": "Charts for U.S. coasts and the Great Lakes", "k": "Tools", "x": ""}, {"t": "Solar calculator", "h": "https://gml.noaa.gov/grad/solcalc/", "d": "Sunrise and sunset for any place and date", "k": "Tools", "x": ""}, {"t": "The Horizon app", "h": "horizon/index.html", "d": "NOAA’s work around you, on your phone", "k": "Tools", "x": ""}, {"t": "About our agency", "h": "https://www.noaa.gov/about-our-agency", "d": "Mission, leadership and history", "k": "About", "x": ""}, {"t": "National Weather Service", "h": "https://www.weather.gov/", "d": "Forecasts and warnings", "k": "About", "x": ""}, {"t": "National Ocean Service", "h": "https://oceanservice.noaa.gov/", "d": "Coasts, tides and charts", "k": "About", "x": ""}, {"t": "Fisheries", "h": "https://www.fisheries.noaa.gov/", "d": "Fish, marine mammals and sea turtles", "k": "About", "x": ""}, {"t": "Research", "h": "https://research.noaa.gov/", "d": "NOAA’s labs and research programs", "k": "About", "x": ""}, {"t": "Satellites", "h": "https://www.nesdis.noaa.gov/", "d": "NOAA’s satellites and data centers", "k": "About", "x": ""}, {"t": "Marine and Aviation Operations", "h": "https://www.omao.noaa.gov/", "d": "NOAA’s ships and aircraft", "k": "About", "x": ""}, {"t": "About this site", "h": "index.html#about", "d": "A student redesign of noaa.gov", "k": "About", "x": ""}, {"t": "Local weather", "h": "#", "d": "The forecast for your town, from the National Weather Service", "k": "Weather", "x": "forecast zip city temperature rain", "wx": 1}]</script></div></div></div></div>
+    <div class="wx"><button class="wx-b" type="button" aria-expanded="false" aria-controls="m-weather"><svg class="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.6 11.2A3.6 3.6 0 1 1 13 8.3"/><path d="M9.6 2.6v1.4M4.4 4.6l1 1M2.4 9.6h1.4M14.8 4.6l-1 1"/><path d="M8 20.5h9.5a3.6 3.6 0 0 0 .4-7.18 5 5 0 0 0-9.65.9A3.15 3.15 0 0 0 8 20.5z"/></svg><svg class="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Local weather</span></button><div class="mega wx-panel" id="m-weather" hidden><div class="wrap mega-in"><div class="mega-intro"><p class="mega-t">Local weather</p><p class="mega-p">The forecast for your town, from the National Weather Service.</p></div><div class="wx-body"><form class="wx-form" action="https://forecast.weather.gov/zipcity.php" method="get" target="_blank"><label for="wx-q">City, state or ZIP code</label><div class="wx-row"><input id="wx-q" name="inputstring" type="text" autocomplete="postal-code" placeholder="For example, Long Beach, CA"><button class="btn" type="submit">Get the forecast</button></div></form><ul class="mega-list c4 wx-links"><li><a href="https://www.weather.gov/alerts"><span class="mi-t">Weather alerts</span><span class="mi-d">Warnings, watches and advisories in effect</span></a></li><li><a href="https://radar.weather.gov/"><span class="mi-t">Radar</span><span class="mi-d">Rain and storms on the map</span></a></li><li><a href="https://www.nhc.noaa.gov/"><span class="mi-t">Hurricanes</span><span class="mi-d">The National Hurricane Center</span></a></li><li><a href="horizon/index.html"><span class="mi-t">Horizon</span><span class="mi-d">The weather above you, on your phone</span></a></li></ul></div></div></div></div>
+    <button class="icon-btn menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="primary"><svg class="i-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
 </header>
 
@@ -196,7 +196,7 @@
       <li><a href="index.html#ch6"><span class="n">6</span>Sea turtles</a></li>
       <li><a href="index.html#ch7"><span class="n">7</span>Whales</a></li>
     </ol>
-    <p class="cnav-here"><span class="num">3 of 7</span><b>Ocean and sky</b></p>
+    <p class="cnav-here"><span class="num">3 of 7</span><b>Ocean and&nbsp;sky</b></p>
     <details class="secnav" id="secnav">
       <summary><span class="where"><span class="num">3 of 7</span> Ocean and sky</span><b id="secnav-cur">Introduction</b><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></summary>
       <ol aria-label="In this chapter">
@@ -225,21 +225,22 @@
           <h1 id="intro-t" class="t-display">Where the sea meets the sky</h1>
         </div>
       </div>
-      <div class="plate-row"><div class="wrap"><p class="plate">Carysfort Lighthouse on a calm sea, Florida Keys National Marine Sanctuary, 2015. <span class="credit">Photo: Nancy Diersing/NOAA</span></p></div></div>
+      <div class="plate-row"><div class="wrap"><p class="plate">Carysfort Lighthouse on a calm sea, Florida Keys National Marine Sanctuary, 2015. <span class="credit">Photo: Nancy&nbsp;Diersing/NOAA</span></p></div></div>
     </div>
-    <p class="cap scene-cap">Carysfort Lighthouse on a calm sea, Florida Keys National Marine Sanctuary, 2015. <span class="credit">Photo: Nancy Diersing/NOAA</span></p>
+    <p class="cap scene-cap">Carysfort Lighthouse on a calm sea, Florida Keys National Marine Sanctuary, 2015. <span class="credit">Photo: Nancy&nbsp;Diersing/NOAA</span></p>
     <div class="wrap">
       <div class="g intro">
-        <p class="t-lead">Ocean and atmosphere share one name: the National Oceanic and Atmospheric Administration. At the surface, where the two meet, NOAA keeps instruments in the water and people on it.</p>
+        <p class="t-lead">Ocean and atmosphere share one name: the National Oceanic and Atmospheric Administration. At the surface, where the two meet, NOAA keeps instruments in the water and people on&nbsp;it.</p>
         <div class="offices">
-          <p class="office"><b>NOAA</b><i></i><span>National Ocean Service</span></p>
-          <p class="office"><b>NOAA</b><i></i><span>National Weather Service</span></p>
+          <p class="office"><b>NOAA</b><i></i><span>National Ocean&nbsp;Service</span></p>
+          <p class="office"><b>NOAA</b><i></i><span>National Weather&nbsp;Service</span></p>
+          <p class="topics intro-topics">On noaa.gov: <a href="https://oceanservice.noaa.gov/">Ocean and coasts</a>, <a href="https://nauticalcharts.noaa.gov/">Charting</a></p>
         </div>
       </div>
       <nav class="places-nav" aria-labelledby="pn-t">
         <h2 id="pn-t">Four places on this page</h2>
         <ol class="g">
-          <li><a href="#buoy"><span class="kicker">Southeast of Nantucket</span><span class="t-item">A buoy that reports to everyone</span></a></li>
+          <li><a href="#buoy"><span class="kicker">Southeast of Nantucket</span><span class="t-item">A buoy that reports to&nbsp;everyone</span></a></li>
           <li><a href="#tide"><span class="kicker">Baltimore, Maryland</span><span class="t-item">The water level, every six minutes</span></a></li>
           <li><a href="#charts"><span class="kicker">Hudson River, New York</span><span class="t-item">Charts start with sound</span></a></li>
           <li><a href="#reef"><span class="kicker">Carysfort Reef, Florida Keys</span><span class="t-item">Back to the reef</span></a></li>
@@ -258,9 +259,9 @@
         <div class="text">
           <p class="kicker">Southeast of Nantucket</p>
           <h2 id="buoy-t" class="t-sec">A buoy that reports to everyone</h2>
-          <p class="t-body">Southeast of Nantucket, NOAA weather buoy 44008 rides the open Atlantic. Like the other buoys of NOAA's National Data Buoy Center, it reports wind, waves and water temperature.</p>
-          <p class="t-body">The readings go online, where anyone can read them.</p>
-          <p class="office"><b>NOAA</b><i></i><span>National Weather Service</span></p>
+          <p class="t-body">Southeast of Nantucket, NOAA weather buoy 44008 rides the open Atlantic. Like the other buoys of NOAA's National Data Buoy Center, it reports wind, waves and water&nbsp;temperature.</p>
+          <p class="t-body">The readings go online, where anyone can read&nbsp;them.</p>
+          <p class="office"><b>NOAA</b><i></i><span>National Weather&nbsp;Service</span></p>
         </div>
       </div>
     </div>
@@ -272,9 +273,9 @@
         <div class="text">
           <p class="kicker">Baltimore, Maryland</p>
           <h2 id="tide-t" class="t-sec">The water level, every six minutes</h2>
-          <p class="t-body">On a pier in Baltimore, Maryland, a NOAA tide station measures the water level every six minutes. It is part of NOAA's National Water Level Observation Network, which has more than 200 long-term stations.</p>
-          <p class="t-body">NOAA also publishes tide predictions for the station. Here are its predictions for Sunday, October 18, 2026:</p>
-          <p class="office"><b>NOAA</b><i></i><span>National Ocean Service</span></p>
+          <p class="t-body">On a pier in Baltimore, Maryland, a NOAA tide station measures the water level every six minutes. It is part of NOAA's National Water Level Observation Network, which has more than 200 long-term&nbsp;stations.</p>
+          <p class="t-body">NOAA also publishes tide predictions for the station. Here are its predictions for Sunday, October 18,&nbsp;2026:</p>
+          <p class="office"><b>NOAA</b><i></i><span>National Ocean&nbsp;Service</span></p>
         </div>
         <figure>
           <div class="ph"><img src="images/tide-station-baltimore.jpg" alt="A white NOAA tide station enclosure with a solar panel on a raised frame at the edge of a pier, harbor behind"></div>
@@ -379,12 +380,12 @@
       </figure>
       <div class="g after">
         <div class="text">
-          <p class="t-body">Before a nautical chart is drawn, the seafloor is surveyed. NOAA's Office of Coast Survey uses hydrographic data, collected with sonar, to make the charts that ships navigate by.</p>
-          <p class="t-body">Here, NOAA Ship Thomas Jefferson brings its side scan sonar back aboard after a survey of the Hudson River.</p>
+          <p class="t-body">Before a nautical chart is drawn, the seafloor is surveyed. NOAA's Office of Coast Survey uses hydrographic data, collected with sonar, to make the charts that ships navigate&nbsp;by.</p>
+          <p class="t-body">Here, NOAA Ship Thomas Jefferson brings its side scan sonar back aboard after a survey of the Hudson&nbsp;River.</p>
         </div>
         <div class="offices">
-          <p class="office"><b>NOAA</b><i></i><span>National Ocean Service</span></p>
-          <p class="office"><b>NOAA</b><i></i><span>Marine and Aviation Operations</span></p>
+          <p class="office"><b>NOAA</b><i></i><span>National Ocean&nbsp;Service</span></p>
+          <p class="office"><b>NOAA</b><i></i><span>Marine and Aviation&nbsp;Operations</span></p>
         </div>
       </div>
     </div>
@@ -406,20 +407,20 @@
           <figure class="above">
             <p class="kicker label">Above the surface</p>
             <div class="ph"><img src="images/carysfort-lighthouse-close.jpg" alt="Carysfort Lighthouse and its reflection on a calm sea"></div>
-            <figcaption class="cap">Carysfort Lighthouse, 2015. <span class="credit">Photo: Nancy Diersing/NOAA</span></figcaption>
+            <figcaption class="cap">Carysfort Lighthouse, 2015. <span class="credit">Photo: Nancy&nbsp;Diersing/NOAA</span></figcaption>
           </figure>
           <div class="text">
-            <p class="t-body">Carysfort Lighthouse stands over Carysfort Reef, in the Florida Keys National Marine Sanctuary. Below the surface, nursery-grown corals go back onto Florida Keys reefs piece by piece, fixed in place with marine epoxy.</p>
-            <p class="t-body">NOAA and its partners grow and plant corals to help restore Florida's reefs. In 2018, divers replanted staghorn coral here.</p>
+            <p class="t-body">Carysfort Lighthouse stands over Carysfort Reef, in the Florida Keys National Marine Sanctuary. Below the surface, nursery-grown corals go back onto Florida Keys reefs piece by piece, fixed in place with marine&nbsp;epoxy.</p>
+            <p class="t-body">NOAA and its partners grow and plant corals to help restore Florida's reefs. In 2018, divers replanted staghorn coral&nbsp;here.</p>
           </div>
-          <p class="office"><b>NOAA</b><i></i><span>National Ocean Service, with partners</span></p>
+          <p class="office"><b>NOAA</b><i></i><span>National Ocean Service, with&nbsp;partners</span></p>
         </div>
       </div>
       <div class="g app-link">
         <div class="text">
           <h3 class="t-sub">Find Carysfort Reef from the shore</h3>
-          <p class="t-body">Point your phone east from Key Largo and open the reef in Horizon, the NOAA app.</p>
-          <a class="link" href="#">Get the Horizon app</a>
+          <p class="t-body">Point your phone east from Key Largo and open the reef in Horizon, the NOAA&nbsp;app.</p>
+          <a class="link" href="horizon/index.html">Get the Horizon app</a>
         </div>
         <figure>
           <div class="ph"><img src="images/horizon-reef.png" alt="The Horizon app with Carysfort Reef selected: a preview card over the camera view"></div>
@@ -433,11 +434,11 @@
     <div class="wrap">
       <h2 id="src-t" class="t-sub">Sources</h2>
       <ol>
-        <li><span><b>NOAA National Data Buoy Center.</b> Station 44008, and what NOAA buoys report.</span></li>
-        <li><span><b>NOAA Tides and Currents.</b> Tide predictions for Baltimore, Maryland, station 8574680, for October 18, 2026, read the same day.</span></li>
-        <li><span><b>NOAA National Ocean Service.</b> How tide stations measure the water level, and the National Water Level Observation Network.</span></li>
-        <li><span><b>NOAA Office of Coast Survey.</b> Hydrographic surveys and nautical charts.</span></li>
-        <li><span><b>Florida Keys National Marine Sanctuary and Coral Restoration Foundation.</b> Coral restoration on Florida Keys reefs.</span></li>
+        <li><span><b>NOAA National Data Buoy&nbsp;Center.</b> Station 44008, and what NOAA buoys report.</span></li>
+        <li><span><b>NOAA Tides and&nbsp;Currents.</b> Tide predictions for Baltimore, Maryland, station 8574680, for October 18, 2026, read the same day.</span></li>
+        <li><span><b>NOAA National Ocean&nbsp;Service.</b> How tide stations measure the water level, and the National Water Level Observation Network.</span></li>
+        <li><span><b>NOAA Office of Coast&nbsp;Survey.</b> Hydrographic surveys and nautical charts.</span></li>
+        <li><span><b>Florida Keys National Marine Sanctuary and Coral Restoration&nbsp;Foundation.</b> Coral restoration on Florida Keys reefs.</span></li>
       </ol>
       <p class="note cap">Photographs are credited under each image. This page is a student concept; its text is written from the sources above.</p>
     </div>
@@ -473,13 +474,13 @@
       <div class="foot-col c2">
         <h2>Offices</h2>
         <ul>
-          <li><a href="#">Satellites</a></li><li><a href="#">National Weather Service</a></li><li><a href="#">Research</a></li><li><a href="#">National Ocean Service</a></li><li><a href="#">Fisheries</a></li><li><a href="#">Marine and Aviation Operations</a></li>
+          <li><a href="https://www.nesdis.noaa.gov/">Satellites</a></li><li><a href="https://www.weather.gov/">National Weather Service</a></li><li><a href="https://research.noaa.gov/">Research</a></li><li><a href="https://oceanservice.noaa.gov/">National Ocean Service</a></li><li><a href="https://www.fisheries.noaa.gov/">Fisheries</a></li><li><a href="https://www.omao.noaa.gov/">Marine and Aviation Operations</a></li>
         </ul>
       </div>
       <div class="foot-col c3">
         <h2>About</h2>
         <ul>
-          <li><a href="#">About NOAA</a></li><li><a href="horizon/index.html">The Horizon app</a></li><li><a href="#">Photo credits</a></li><li><a href="#">Accessibility</a></li><li><a href="#">Contact</a></li>
+          <li><a href="https://www.noaa.gov/about-our-agency">About NOAA</a></li><li><a href="horizon/index.html">The Horizon app</a></li><li><a href="credits.txt">Photo credits</a></li>
         </ul>
       </div>
     </div>
@@ -489,6 +490,7 @@
     </div>
   </div>
 </footer>
+<script src="js/nav.js"></script>
 <script>
 /* Mobile "In this chapter": "Introduction" until the first section reaches the bar, then the section in view; close after a choice. */
 (() => {
@@ -497,7 +499,7 @@
   const secs = links.map(a => document.querySelector(a.getAttribute('href')));
   const bar = document.querySelector('.cnav');
   const update = () => {
-    const line = bar.getBoundingClientRect().bottom + 8;
+    const top = bar.getBoundingClientRect().bottom; const line = top + (innerHeight - top) * 0.4;
     let i = -1; secs.forEach((s, k) => { if (s && s.getBoundingClientRect().top <= line) i = k; });
     links.forEach((a, k) => k === i ? a.setAttribute('aria-current', 'location') : a.removeAttribute('aria-current'));
     cur.textContent = i < 0 ? 'Introduction' : links[i].textContent;
