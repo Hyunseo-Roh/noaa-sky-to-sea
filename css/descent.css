@@ -247,3 +247,7 @@
 #ch2 .co-kt { display: grid; grid-template-columns: auto 1fr; column-gap: var(--s-2); align-items: center; }
 #ch2 .co-kt .co-o { grid-column: 1 / -1; font: var(--f-meta); }
 .org { margin-top: var(--s-4); font: var(--f-meta-b); color: var(--c-ink); }
+/* the open panels keep their white face but lose the shadows */
+.card, .card-x:has(+ figure) { box-shadow: none; }
+@media (max-width: 760px) { .card, .co[data-card="l"] .card, .co.up .card { box-shadow: none; } }
+.ww3 { margin-top: var(--s-5); padding-top: 0; border-top: 0; }   /* space, not a rule, between the meaning and who issues it */
