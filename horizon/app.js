@@ -54,11 +54,6 @@
   const nbSub = $('#nb-sub');
   const nbState = $('#nb-state');
   const nbList = $('#nb-list');
-  // the Sea's lines run on under the sources line below it, so the sources line needs the Sea's height
-  new ResizeObserver(() => {
-    const sea = nbList.querySelector('.nb-sec[data-group="sea"]');
-    $('#nearby').style.setProperty('--sea-h', (sea ? sea.offsetHeight : 0) + 'px');
-  }).observe(nbList);
   const nbRetry = $('#nb-retry');
   const tabView = $('#tab-view');
   const tabNearby = $('#tab-nearby');

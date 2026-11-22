@@ -146,10 +146,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-groups { margin: var(--s-6) -24px 0; }
 .nb-sec { padding: var(--s-6) 24px var(--s-7); }
 .nb-sec[data-group="alerts"] { padding-top: 0; padding-bottom: var(--s-6); }
-/* One set of lines runs through the Sky, the Sea and the sources line under it: the sky's lines hang from the
-   Sky's bottom edge, the sea's start at the Sea's top edge, and both are drawn at the screen's width, so they meet */
-.nb-sec[data-group="sky"] { background: var(--c-data) url(../images/lines/nearby-sky.svg) center bottom / 100% auto no-repeat; }
-.nb-sec[data-group="sea"] { background: var(--c-brand) url(../images/lines/nearby-sea.svg) center top / 100% auto no-repeat; color: var(--c-ground); }
+/* Flat Sky and Sea, no line drawings: the rows sit straight on these colours, so nothing runs behind the words */
+.nb-sec[data-group="sky"] { background: var(--c-data); }
+.nb-sec[data-group="sea"] { background: var(--c-brand); color: var(--c-ground); }
 .nb-h { display: flex; align-items: baseline; gap: var(--s-2); font: 700 24px/30px var(--font-ui); color: var(--c-ink); }
 .nb-sec[data-group="sea"] .nb-h { color: var(--c-ground); }
 .nb-note { margin-top: 2px; color: var(--c-ink-2); }
@@ -180,7 +179,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-state { margin-top: var(--s-4); color: var(--c-ink-2); }
 .nb-retry { margin-top: var(--s-4); }
 .nb-retry[hidden] { display: none; }
-.nb-source { margin: 0 -24px calc(-1 * var(--s-6)); padding: 0 24px var(--s-6); background: var(--c-brand) url(../images/lines/nearby-sea.svg) center calc(-1 * var(--sea-h, 0px)) / 100% auto no-repeat; color: var(--c-on-dark-2); }
+.nb-source { margin: 0 -24px calc(-1 * var(--s-6)); padding: 0 24px var(--s-6); background: var(--c-brand); color: var(--c-on-dark-2); }
 #nearby { padding-bottom: var(--s-6); }
 .sv-empty { margin-top: var(--s-5); color: var(--c-ink-2); }
 
