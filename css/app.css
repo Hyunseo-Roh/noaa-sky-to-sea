@@ -229,9 +229,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .splash[hidden], .no-splash .splash { display: none; }
 .sp-sea { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--art-h) * 374 / 564); background: var(--c-brand); }
 .sp-art { position: absolute; left: 0; bottom: 0; width: 100%; height: var(--art-h); overflow: visible; }
-.sp-words { position: absolute; top: calc(env(safe-area-inset-top) + 56px); left: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.sp-logo { display: block; width: auto; height: 40px; }
-.sp-name { margin-top: var(--s-3); font: 700 48px/52px var(--font-ui); color: var(--c-ink); }
-.sp-tag { margin-top: var(--s-1); font: var(--f-body); color: var(--c-ink); }
+.sp-words { position: absolute; top: calc(env(safe-area-inset-top) + 48px); left: 20px; right: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.sp-logo { display: block; width: auto; height: 28px; }
+.sp-name { margin-top: var(--s-5); font: 700 64px/64px var(--font-ui); color: var(--c-ink); }
+.sp-tag { margin-top: var(--s-2); font: var(--f-body); color: var(--c-ink-2); }
 .sp-note { position: absolute; left: 20px; right: 20px; bottom: calc(var(--s-5) + env(safe-area-inset-bottom)); font: var(--f-meta); color: var(--c-on-dark-2); text-align: center; }
 @media (prefers-reduced-motion: reduce) { .splash { transition: none; } }
