@@ -537,6 +537,7 @@
   const CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
   const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
   const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const keep2 = (s) => String(s).replace(/ (\S+)$/, '\u00a0$1');   // no one-word last line
   const readingText = (r) => `${r.text}${r.age ? `, ${r.age}` : ''}`;
   const forecastText = (f) => `${f.short}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit}`;
 
@@ -596,7 +597,7 @@
     const name = iconName(id, p);
     b.innerHTML = `<span class="ic${name === 'alert' ? ' is-alert' : ''}">${svgOf(name)}</span><span class="tx"><b class="t-body b"></b><span class="t t-meta"></span>${live ? '<span class="t t-meta now"></span>' : ''}</span>${CHEV}`;
     b.querySelector('b').textContent = title;
-    b.querySelector('.t').textContent = line;
+    b.querySelector('.t').textContent = keep2(line);
     if (live) b.querySelector('.now').textContent = live;
     b.addEventListener('click', () => { if (face) faceToward(id); select(id); });
     li.append(b);

@@ -18,8 +18,8 @@
 <style>
 html { background: var(--c-ground); }
 body { padding-bottom: var(--tab-h); }
-.nav { display: flex; align-items: center; justify-content: space-between; height: calc(52px + max(env(safe-area-inset-top), 20px)); padding: max(env(safe-area-inset-top), 20px) var(--s-2) 0 var(--s-1); }
-.back { display: inline-flex; align-items: center; gap: 2px; height: 48px; padding: 0 var(--s-3) 0 6px; font: var(--f-app-body-b); color: var(--c-brand); text-decoration: none; }
+.nav { display: flex; align-items: center; justify-content: space-between; height: calc(52px + max(env(safe-area-inset-top), 20px)); padding: max(env(safe-area-inset-top), 24px) var(--s-2) 0 var(--s-2); }
+.back { display: inline-flex; align-items: center; gap: 2px; height: 48px; padding: 0 var(--s-4) 0 var(--s-2); font: var(--f-app-body-b); color: var(--c-brand); text-decoration: none; }
 .back svg { width: 24px; height: 24px; }
 .acts { display: flex; }
 .ib { width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; color: var(--c-brand); }
@@ -32,12 +32,12 @@ body { padding-bottom: var(--tab-h); }
 .loc b { display: block; font: var(--f-meta-b); color: var(--c-ink); }
 .loc [data-icon] { flex: none; margin-top: 2px; color: var(--c-ink); }
 .loc svg { display: block; width: 16px; height: 16px; }
-.head h1 { margin-top: var(--s-3); color: var(--c-ink); }
+.head h1 { margin-top: var(--s-4); color: var(--c-ink); }
 .photo { margin: var(--s-4) 0 0; }
 .photo img { width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; object-position: 50% 45%; }
 .photo figcaption { padding: var(--s-2) var(--l-page-margin) 0; color: var(--c-ink-2); }
 .lede { padding: var(--s-4) var(--l-page-margin) 0; }
-.lede p + p { margin-top: var(--s-3); }
+.lede p + p { margin-top: var(--s-4); }
 .lede .office { margin-top: var(--s-4); }
 /* from nursery to reef: the coral tree, then the reef; staghorn coral is golden brown, drawn in Sunlight */
 .grow { margin-top: var(--s-7); }
@@ -48,11 +48,11 @@ body { padding-bottom: var(--tab-h); }
 .grow + .next { padding-top: var(--s-6); }
 .next { padding: var(--s-5) var(--l-page-margin) 0; }
 .next .btn { width: 100%; }
-.also { margin-top: var(--s-7); padding: var(--s-5) 20px 0; border-top: 1px solid var(--c-rule); }
+.also { margin-top: var(--s-7); padding: var(--s-5) 24px 0; border-top: 1px solid var(--c-rule); }
 .also h2 { color: var(--c-ink); }
-.rows { margin-top: var(--s-3); }
+.rows { margin-top: var(--s-4); }
 .rows { border-top: 1px solid var(--c-rule); }
-.rows a { display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; gap: var(--s-4); align-items: start; padding: 14px 0; border-bottom: 1px solid var(--c-rule); text-decoration: none; }
+.rows a { display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; gap: var(--s-4); align-items: start; padding: var(--s-4) 0; border-bottom: 1px solid var(--c-rule); text-decoration: none; }
 .rows .ic { width: 24px; height: 24px; color: var(--c-brand); }
 .rows .ic svg { display: block; width: 24px; height: 24px; }
 .rows b { display: block; color: var(--c-ink); }
@@ -105,12 +105,12 @@ body { padding-bottom: var(--tab-h); }
       <ul class="rows">
         <li><a href="index.html#florida-keys-sanctuary">
           <span class="ic" data-icon="care"></span>
-          <span><b class="t-body b">Florida Keys sanctuary</b><span class="t t-meta">Marine sanctuary, the water around the reef</span></span>
+          <span><b class="t-body b">Florida Keys sanctuary</b><span class="t t-meta">Marine sanctuary, the water around the&nbsp;reef</span></span>
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
         </a></li>
         <li><a href="index.html#weather">
           <span class="ic" data-icon="weather"></span>
-          <span><b class="t-body b">Weather for this sky</b><span class="t t-meta">Forecast, National Weather Service</span></span>
+          <span><b class="t-body b">Weather for this sky</b><span class="t t-meta">Forecast, National Weather&nbsp;Service</span></span>
           <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
         </a></li>
       </ul>
