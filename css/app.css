@@ -231,6 +231,5 @@ ul { margin: 0; padding: 0; list-style: none; }
 .sp-logo { display: block; width: auto; height: 28px; }
 .sp-name { margin-top: var(--s-5); font: 700 64px/64px var(--font-ui); color: var(--c-ink); }
 .sp-tag { margin-top: var(--s-2); font: var(--f-body); color: var(--c-ink-2); }
-.sp-note { position: absolute; left: 24px; right: 24px; bottom: calc(var(--s-5) + env(safe-area-inset-bottom)); font: var(--f-meta); color: var(--c-on-dark-2); text-align: center; }
 @media (prefers-reduced-motion: reduce) { .splash { transition: none; } }
 .nb-sec[data-group="sea"] .nc:focus-visible { outline-color: var(--c-ground); }

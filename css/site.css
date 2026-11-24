@@ -306,5 +306,4 @@ html.no-scroll { overflow: hidden; }
 }
 
 
-.hero-note { margin-top: var(--s-5); font: var(--f-meta-b); }
 html { scroll-padding-top: calc(var(--l-chapter-bar-height) + var(--s-4)); }
