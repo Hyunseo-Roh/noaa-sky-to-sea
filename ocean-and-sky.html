@@ -66,7 +66,6 @@
 .tide-chart-wrap.m { display: none; }
 .data-foot { margin-top: var(--s-6); }
 .data-foot .note { font: var(--f-body-b); color: var(--c-ink); }
-.data-foot .cap { margin-top: var(--s-2); }
 
 .charts h2 { margin-bottom: var(--s-6); }
 .charts figure .ph { aspect-ratio: 2 / 1; }
@@ -93,12 +92,6 @@
 .app-link .ph { width: 280px; aspect-ratio: 390 / 844; border-radius: var(--r-pill); border: 1px solid var(--c-rule); }
 .app-link .cap { max-width: 280px; }
 
-.sources ol { counter-reset: src; margin-top: var(--s-5); max-width: 760px; }
-.sources li { display: grid; grid-template-columns: 28px minmax(0, 1fr); font: var(--f-body); }
-.sources li + li { margin-top: var(--s-4); }
-.sources li::before { counter-increment: src; content: counter(src); font: var(--f-body-b); color: var(--c-ink-2); font-variant-numeric: tabular-nums; }
-.sources li b { font: var(--f-body-b); color: var(--c-ink); }
-.sources .note { margin-top: var(--s-6); max-width: 760px; }
 
 .pn { display: grid; grid-template-columns: 1fr 1fr; margin-top: var(--s-10); }
 .pn a { display: flex; flex-direction: column; justify-content: center; gap: var(--s-2); min-height: 200px; padding: var(--s-7) var(--margin); text-decoration: none; color: var(--c-brand); }
@@ -131,7 +124,6 @@
   .secnav:not([open]) ol { display: none; }
   .secnav li a { display: flex; align-items: center; gap: var(--s-4); min-height: 48px; font: var(--f-meta); color: var(--c-ink); text-decoration: none; }
   .secnav li a::before { counter-increment: m; content: counter(m); font-weight: 700; color: var(--c-ink-2); min-width: 12px; }
-  .secnav li.src a::before { content: ""; }
   .secnav li a[aria-current] { font: var(--f-meta-b); color: var(--c-brand); }
 
   .sub-scene { height: 480px; }
@@ -204,7 +196,6 @@
         <li><a href="#tide">The water level, every six minutes</a></li>
         <li><a href="#charts">Charts start with sound</a></li>
         <li><a href="#reef">Back to the reef</a></li>
-        <li class="src"><a href="#sources">Sources</a></li>
       </ol>
     </details>
     <div class="cnav-dir">
@@ -364,7 +355,6 @@
         </div>
         <figcaption class="data-foot">
           <p class="note">These are predictions, not measured water levels.</p>
-          <p class="cap">Source: NOAA Tides and Currents, read October 18, 2026.</p>
         </figcaption>
       </figure>
     </div>
@@ -427,20 +417,6 @@
           <figcaption class="cap">Horizon, Carysfort Reef selected. Positions and distances are samples.</figcaption>
         </figure>
       </div>
-    </div>
-  </section>
-
-  <section class="sec sources" id="sources" aria-labelledby="src-t">
-    <div class="wrap">
-      <h2 id="src-t" class="t-sub">Sources</h2>
-      <ol>
-        <li><span><b>NOAA National Data Buoy&nbsp;Center.</b> Station 44008, and what NOAA buoys report.</span></li>
-        <li><span><b>NOAA Tides and&nbsp;Currents.</b> Tide predictions for Baltimore, Maryland, station 8574680, for October 18, 2026, read the same day.</span></li>
-        <li><span><b>NOAA National Ocean&nbsp;Service.</b> How tide stations measure the water level, and the National Water Level Observation Network.</span></li>
-        <li><span><b>NOAA Office of Coast&nbsp;Survey.</b> Hydrographic surveys and nautical charts.</span></li>
-        <li><span><b>Florida Keys National Marine Sanctuary and Coral Restoration&nbsp;Foundation.</b> Coral restoration on Florida Keys reefs.</span></li>
-      </ol>
-      <p class="note cap">Photographs are credited under each image. This page is a student concept; its text is written from the sources above.</p>
     </div>
   </section>
 

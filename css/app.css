@@ -175,12 +175,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 /* on Deep ocean the rows turn white */
 .nb-sec[data-group="sea"] .nc, .nb-sec[data-group="sea"] .nc .ic, .nb-sec[data-group="sea"] .nc .now { color: var(--c-ground); }
 .nb-sec[data-group="sea"] .nc .t, .nb-sec[data-group="sea"] .nc .chev, .nb-sec[data-group="sea"] .nc .now.wait { color: var(--c-on-dark-2); }
-.nb-sec[data-group="sea"] + .nb-source, .nb-groups + .nb-state + .nb-retry + .nb-source { margin-top: 0; }
 .nb-state { margin-top: var(--s-4); color: var(--c-ink-2); }
 .nb-retry { margin-top: var(--s-4); }
 .nb-retry[hidden] { display: none; }
-.nb-source { margin: 0 -24px calc(-1 * var(--s-6)); padding: 0 24px var(--s-6); background: var(--c-brand); color: var(--c-on-dark-2); }
-#nearby { padding-bottom: var(--s-6); }
+/* the last group runs to the bottom of the panel; a loading note keeps its own space below */
+#nearby { padding-bottom: 0; }
+.nb-state:not([hidden]) { margin-bottom: var(--s-6); }
 .sv-empty { margin-top: var(--s-5); color: var(--c-ink-2); }
 
 /* on a wide screen, the app sits in a phone-width column */
@@ -233,4 +233,4 @@ ul { margin: 0; padding: 0; list-style: none; }
 .sp-tag { margin-top: var(--s-2); font: var(--f-body); color: var(--c-ink-2); }
 .sp-note { position: absolute; left: 24px; right: 24px; bottom: calc(var(--s-5) + env(safe-area-inset-bottom)); font: var(--f-meta); color: var(--c-on-dark-2); text-align: center; }
 @media (prefers-reduced-motion: reduce) { .splash { transition: none; } }
-.nb-sec[data-group="sea"] .nc:focus-visible, .nb-source a:focus-visible { outline-color: var(--c-ground); }
+.nb-sec[data-group="sea"] .nc:focus-visible { outline-color: var(--c-ground); }

@@ -533,6 +533,8 @@
   const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
   const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const keep2 = (s) => String(s).replace(/ (\S+)$/, '\u00a0$1');   // no one-word last line
+  // a number stays with its unit (14 mi, 3.9 ft, 8:52 PM), and the last two words stay together
+  const tie = (s) => keep2(String(s).replace(/(\d) (mi|ft|AM|PM|mph|min|h)\b/g, '$1\u00a0$2'));
   const readingText = (r) => `${r.text}${r.age ? `, ${r.age}` : ''}`;
   const forecastText = (f) => `${f.short}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit}`;
 
@@ -591,9 +593,9 @@
     b.type = 'button'; b.className = 'row';
     const name = iconName(id, p);
     b.innerHTML = `<span class="ic${name === 'alert' ? ' is-alert' : ''}">${svgOf(name)}</span><span class="tx"><b class="t-body b"></b><span class="t t-meta"></span>${live ? '<span class="t t-meta now"></span>' : ''}</span>${CHEV}`;
-    b.querySelector('b').textContent = title;
-    b.querySelector('.t').textContent = keep2(line);
-    if (live) b.querySelector('.now').textContent = live;
+    b.querySelector('b').textContent = keep2(title);
+    b.querySelector('.t').textContent = tie(line);
+    if (live) b.querySelector('.now').textContent = tie(live);
     b.addEventListener('click', () => { if (face) faceToward(id); select(id); });
     li.append(b);
     return li;
