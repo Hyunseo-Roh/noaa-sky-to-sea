@@ -60,7 +60,8 @@
   const tabSaved = $('#tab-saved');
   const alertRow = $('#alert-row');
   const alertBtn = $('#alert');
-  const alertLabel = $('#alert-label');
+  const alertName = $('#alert-name');
+  const alertUntil = $('#alert-until');
   const alertMore = $('#alert-more');
   const topBlock = $('.top');
   const hintBlock = $('.hint');
@@ -1082,10 +1083,12 @@
     if (Number.isNaN(+d)) return '';
     let zone = tz || undefined;
     const fmt = (o) => { try { return new Intl.DateTimeFormat('en-US', { ...o, timeZone: zone }).format(d); } catch (_) { zone = undefined; return new Intl.DateTimeFormat('en-US', o).format(d); } };
-    const time = fmt(short ? { hour: 'numeric', minute: '2-digit' } : { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).replace(':00', '');
+    // the time always carries its zone ("5 AM EST"), so a demo seen elsewhere still reads in the place's own time
+    const time = fmt({ hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).replace(':00', '');
     const day = (x) => new Intl.DateTimeFormat('en-US', { timeZone: zone, year: 'numeric', month: 'numeric', day: 'numeric' }).format(x);
     if (day(d) === day(new Date())) return `until ${time}`;
-    if (day(d) === day(new Date(Date.now() + 864e5))) return `until tomorrow ${time}`;
+    // the banner names the weekday ("until Fri 5 AM EST"): shorter, and it reads the same from any time zone
+    if (!short && day(d) === day(new Date(Date.now() + 864e5))) return `until tomorrow ${time}`;
     return `until ${fmt({ weekday: short ? 'short' : 'long' })} ${time}`;
   }
   async function loadAlerts() {
@@ -1094,19 +1097,44 @@
     try { list = await NWS.alerts(v); } catch (_) { failed = true; }
     if (NWS.spot(S.viewer) !== key) return;
     for (const id of Object.keys(PLACES)) if (PLACES[id].alert) delete PLACES[id];
+    list = list.filter(inEffect);
     for (const a of list) PLACES[a.id] = { ...a, alert: true };
     S.alerts = list; S.alertsKey = key; S.alertsFailed = failed;
     renderAlerts();
     alertsLine();
     renderNearby();
+    expireLater();
     const id = decodeURIComponent(location.hash.slice(1));
     if (id.startsWith('alert-') && PLACES[id] && sheet.hidden && !anyPanel()) route();
   }
+  // An alert leaves the view the moment it ends, not at the next five-minute check.
+  const inEffect = (a) => { const t = Date.parse(a.ends); return Number.isNaN(t) || t > Date.now(); };
+  let expiry = 0;
+  function expireLater() {
+    clearTimeout(expiry);
+    const ends = S.alerts.map((a) => Date.parse(a.ends)).filter((t) => !Number.isNaN(t));
+    if (ends.length) expiry = setTimeout(dropEnded, Math.min(Math.max(0, Math.min(...ends) - Date.now()) + 1000, 2147483647));
+  }
+  function dropEnded() {
+    const left = S.alerts.filter(inEffect);
+    if (left.length !== S.alerts.length) {
+      for (const a of S.alerts) if (!left.includes(a)) delete PLACES[a.id];
+      S.alerts = left;
+      const open = sheet.dataset.place;
+      if (open && open.startsWith('alert-') && !PLACES[open]) dismiss();
+      renderAlerts();
+      alertsLine();
+      renderNearby();
+    }
+    expireLater();
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) dropEnded(); });
   function renderAlerts() {
     const a = S.alerts[0];
     alertRow.hidden = !a;
     if (!a) return;
-    alertLabel.textContent = a.ends ? `${a.name} ${untilText(a.ends, a.tz, true)}` : a.name;
+    alertName.textContent = a.name;
+    alertUntil.textContent = a.ends ? ` ${untilText(a.ends, a.tz, true)}` : '';
     const more = S.alerts.length - 1;
     alertMore.hidden = more < 1;
     alertMore.textContent = `+${more}`;

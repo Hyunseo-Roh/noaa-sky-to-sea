@@ -65,7 +65,10 @@ ul { margin: 0; padding: 0; list-style: none; }
 .alert-row[hidden] { display: none; }
 .alert { pointer-events: auto; display: inline-flex; align-items: center; gap: var(--s-2); max-width: 100%; height: 36px; padding: 0 var(--s-4) 0 var(--s-2); border-radius: var(--r-round); background: var(--c-alert); color: var(--c-ground); font: var(--f-meta-b); }
 .alert svg { width: 18px; height: 18px; flex: none; }
-.alert #alert-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* a long name gives way first, so the time and its zone stay readable */
+.alert #alert-label { display: flex; min-width: 0; white-space: nowrap; }
+.alert .an { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.alert .au { flex: none; white-space: pre; }
 .alert .more { flex: none; min-width: 24px; height: 20px; padding: 0 var(--s-2); border-radius: var(--r-round); background: var(--c-ground); color: var(--c-alert); text-align: center; }
 .alert .more[hidden] { display: none; }
 
