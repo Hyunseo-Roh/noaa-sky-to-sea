@@ -285,7 +285,7 @@
 
   function updateText() {
     placeName.textContent = S.viewer.name;
-    if (S.mode === 'sample') note.textContent = 'Demo location, sample view';
+    if (S.mode === 'sample') note.textContent = 'A photo, not your camera';
     else note.textContent = S.viewer.real ? 'Your location' : 'Demo location';
 
     let t;
@@ -331,7 +331,7 @@
       updateText();
       return true;
     } catch (_) {
-      if (!auto) { S.hintOverride = 'Camera is off. Showing a sample view.'; updateText(); }
+      if (!auto) { S.hintOverride = 'Camera is off. Showing the photo.'; updateText(); }
       return false;
     }
   }
@@ -1128,7 +1128,7 @@
     screen.classList.add('has-intro');
     const cam = canCamera && isTouch;
     $('#intro-go').hidden = !cam;
-    $('#intro-sample').textContent = cam ? 'Try the sample view first' : 'See the sample view';
+    $('#intro-sample').textContent = cam ? 'Try it on a photo first' : 'Try it on a photo';
     $('#intro-sample').className = cam ? 'btn secondary' : 'btn';
     $('#in-t').focus({ preventScroll: true });
   }
@@ -1146,6 +1146,18 @@
     (startBtn.hidden ? screen : startBtn).focus({ preventScroll: true });
   });
   for (const pill of intro.querySelectorAll('[data-icon]')) pill.insertAdjacentHTML('afterbegin', svgOf(pill.dataset.icon));
+  // The labels on the start drawing work like the view's: a tap opens the photo with that label's preview.
+  // Tides waits for the tide station near the demo spot; if none comes back, Nearby lists what was found.
+  for (const b of intro.querySelectorAll('.st-mk[data-go]')) {
+    b.addEventListener('click', async () => {
+      closeIntro();
+      const go = b.dataset.go;
+      if (go !== 'tide') { select(go); return; }
+      await Promise.race([loadNearby(), new Promise((r) => setTimeout(r, 4000))]).catch(() => {});
+      const t = Object.entries(PLACES).find(([, p]) => p.kind === 'tide');
+      if (t) select(t[0]); else goTab('nearby');
+    });
+  }
 
   async function loadForecast() {
     const what = sheetBody.querySelector('[data-forecast]');
