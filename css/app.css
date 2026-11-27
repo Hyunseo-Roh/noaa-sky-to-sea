@@ -227,7 +227,6 @@ ul { margin: 0; padding: 0; list-style: none; }
 .st-steps li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: var(--s-2); }
 .st-steps .n { font: var(--f-meta-b); color: var(--c-brand); font-variant-numeric: tabular-nums; }
 .st-note { margin-top: var(--s-5); font: var(--f-meta); color: var(--c-ink-2); }
-.st-small { margin-top: var(--s-2); font: var(--f-meta); color: var(--c-ink-2); }
 .screen.has-intro .tabs { visibility: hidden; }
 
 /* The launch screen: the website's drawings from sky to sea (balloon, Hurricane Hunter, lighthouse, buoy,
