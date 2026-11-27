@@ -60,7 +60,8 @@
   const tabSaved = $('#tab-saved');
   const alertRow = $('#alert-row');
   const alertBtn = $('#alert');
-  const alertLabel = $('#alert-label');
+  const alertName = $('#alert-name');
+  const alertUntil = $('#alert-until');
   const alertMore = $('#alert-more');
   const topBlock = $('.top');
   const hintBlock = $('.hint');
@@ -285,7 +286,7 @@
 
   function updateText() {
     placeName.textContent = S.viewer.name;
-    if (S.mode === 'sample') note.textContent = 'Demo location, sample view';
+    if (S.mode === 'sample') note.textContent = 'A photo, not your camera';
     else note.textContent = S.viewer.real ? 'Your location' : 'Demo location';
 
     let t;
@@ -327,11 +328,12 @@
       S.mode = 'live';
       screen.dataset.mode = 'live';
       S.hintOverride = '';
+      renderAlerts();
       try { sessionStorage.setItem('horizon:live', '1'); } catch (_) { /* private mode */ }
       updateText();
       return true;
     } catch (_) {
-      if (!auto) { S.hintOverride = 'Camera is off. Showing a sample view.'; updateText(); }
+      if (!auto) { S.hintOverride = 'Camera is off. Showing the photo.'; updateText(); }
       return false;
     }
   }
@@ -343,6 +345,7 @@
     video.srcObject = null;
     S.mode = 'sample';
     screen.dataset.mode = 'sample';
+    renderAlerts();
     S.compass = false;
     S.p = 0; S.tp = 0;
     S.h = S.th = REEF_FROM_DEMO - LIGHTHOUSE_OFFSET;
@@ -533,6 +536,8 @@
   const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
   const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const keep2 = (s) => String(s).replace(/ (\S+)$/, '\u00a0$1');   // no one-word last line
+  // a number stays with its unit (14 mi, 3.9 ft, 8:52 PM), and the last two words stay together
+  const tie = (s) => keep2(String(s).replace(/(\d) (mi|ft|AM|PM|mph|min|h)\b/g, '$1\u00a0$2'));
   const readingText = (r) => `${r.text}${r.age ? `, ${r.age}` : ''}`;
   const forecastText = (f) => `${f.short}, ${f.day ? 'high' : 'low'} ${f.temp}°${f.unit}`;
 
@@ -591,9 +596,9 @@
     b.type = 'button'; b.className = 'row';
     const name = iconName(id, p);
     b.innerHTML = `<span class="ic${name === 'alert' ? ' is-alert' : ''}">${svgOf(name)}</span><span class="tx"><b class="t-body b"></b><span class="t t-meta"></span>${live ? '<span class="t t-meta now"></span>' : ''}</span>${CHEV}`;
-    b.querySelector('b').textContent = title;
-    b.querySelector('.t').textContent = keep2(line);
-    if (live) b.querySelector('.now').textContent = live;
+    b.querySelector('b').textContent = keep2(title);
+    b.querySelector('.t').textContent = tie(line);
+    if (live) b.querySelector('.now').textContent = tie(live);
     b.addEventListener('click', () => { if (face) faceToward(id); select(id); });
     li.append(b);
     return li;
@@ -806,7 +811,16 @@
       const a = sheetBody.querySelector('[data-link]');
       if (pl.link) { a.href = pl.link; a.textContent = pl.linkText; } else a.remove();
     }
-    if (!pl.alert && !pl.sun) { sheetBody.append(actions()); syncActs(); }
+    // Save and Share sit at the right of the office line, so the main button is the one wide button
+    if (!pl.alert && !pl.sun) {
+      const off = sheetBody.querySelector('.office');
+      const row = document.createElement('div');
+      row.className = 'orow';
+      if (off) off.replaceWith(row); else sheetBody.querySelector('.btn, a[data-link]')?.before(row);
+      if (off) row.append(off);
+      row.append(actions());
+      syncActs();
+    }
     const d = sheetBody.querySelector('[data-distance]');
     if (d && pl.lat != null) d.textContent = isHere(pl) ? 'Where you are' : G.distanceText(S.viewer, pl);
     const when = sheetBody.querySelector('[data-period]');
@@ -1009,13 +1023,14 @@
 
   const ACT_ICONS = {
     save: '<path d="M6.5 4h11v16l-5.5-4-5.5 4z"/>',
+    done: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
     share: '<path d="M12 14.5V3.5"/><path d="M7.8 7.7L12 3.5l4.2 4.2"/><path d="M8 10.5H6.5A1.5 1.5 0 0 0 5 12v7.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V12a1.5 1.5 0 0 0-1.5-1.5H16"/>',
   };
   const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
   function actions() {
     const d = document.createElement('div');
     d.className = 'acts';
-    d.innerHTML = `<button class="btn secondary" type="button" data-save aria-pressed="false">${svg(ACT_ICONS.save)}<span>Save</span></button><button class="btn secondary" type="button" data-share>${svg(ACT_ICONS.share)}<span>Share</span></button>`;
+    d.innerHTML = `<button type="button" data-save aria-pressed="false">${svg(ACT_ICONS.save)}<span class="visually-hidden">Save</span></button><button type="button" data-share>${svg(ACT_ICONS.share)}<span class="visually-hidden">Share</span></button>`;
     d.querySelector('[data-save]').addEventListener('click', () => toggleSave(sheet.dataset.place));
     d.querySelector('[data-share]').addEventListener('click', (e) => share(sheet.dataset.place, e.currentTarget));
     return d;
@@ -1041,9 +1056,11 @@
     }
     let ok = false;
     try { await navigator.clipboard.writeText(url); ok = true; } catch (_) { /* no clipboard */ }
+    // the icon turns into a tick for a moment, and the button's name says what happened
     const label = btn.querySelector('span');
     label.textContent = ok ? 'Link copied' : "Couldn't copy the link";
-    setTimeout(() => { if (label.isConnected) label.textContent = 'Share'; }, 2000);
+    if (ok) btn.querySelector('svg').innerHTML = ACT_ICONS.done;
+    setTimeout(() => { if (label.isConnected) { label.textContent = 'Share'; btn.querySelector('svg').innerHTML = ACT_ICONS.share; } }, 2000);
   }
 
   function renderSaved() {
@@ -1068,10 +1085,12 @@
     if (Number.isNaN(+d)) return '';
     let zone = tz || undefined;
     const fmt = (o) => { try { return new Intl.DateTimeFormat('en-US', { ...o, timeZone: zone }).format(d); } catch (_) { zone = undefined; return new Intl.DateTimeFormat('en-US', o).format(d); } };
-    const time = fmt(short ? { hour: 'numeric', minute: '2-digit' } : { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).replace(':00', '');
+    // the time always carries its zone ("5 AM EST"), so a demo seen elsewhere still reads in the place's own time
+    const time = fmt({ hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }).replace(':00', '');
     const day = (x) => new Intl.DateTimeFormat('en-US', { timeZone: zone, year: 'numeric', month: 'numeric', day: 'numeric' }).format(x);
     if (day(d) === day(new Date())) return `until ${time}`;
-    if (day(d) === day(new Date(Date.now() + 864e5))) return `until tomorrow ${time}`;
+    // the banner names the weekday ("until Fri 5 AM EST"): shorter, and it reads the same from any time zone
+    if (!short && day(d) === day(new Date(Date.now() + 864e5))) return `until tomorrow ${time}`;
     return `until ${fmt({ weekday: short ? 'short' : 'long' })} ${time}`;
   }
   async function loadAlerts() {
@@ -1080,19 +1099,46 @@
     try { list = await NWS.alerts(v); } catch (_) { failed = true; }
     if (NWS.spot(S.viewer) !== key) return;
     for (const id of Object.keys(PLACES)) if (PLACES[id].alert) delete PLACES[id];
+    list = list.filter(inEffect);
     for (const a of list) PLACES[a.id] = { ...a, alert: true };
     S.alerts = list; S.alertsKey = key; S.alertsFailed = failed;
     renderAlerts();
     alertsLine();
     renderNearby();
+    expireLater();
     const id = decodeURIComponent(location.hash.slice(1));
     if (id.startsWith('alert-') && PLACES[id] && sheet.hidden && !anyPanel()) route();
   }
+  // An alert leaves the view the moment it ends, not at the next five-minute check.
+  const inEffect = (a) => { const t = Date.parse(a.ends); return Number.isNaN(t) || t > Date.now(); };
+  let expiry = 0;
+  function expireLater() {
+    clearTimeout(expiry);
+    const ends = S.alerts.map((a) => Date.parse(a.ends)).filter((t) => !Number.isNaN(t));
+    if (ends.length) expiry = setTimeout(dropEnded, Math.min(Math.max(0, Math.min(...ends) - Date.now()) + 1000, 2147483647));
+  }
+  function dropEnded() {
+    const left = S.alerts.filter(inEffect);
+    if (left.length !== S.alerts.length) {
+      for (const a of S.alerts) if (!left.includes(a)) delete PLACES[a.id];
+      S.alerts = left;
+      const open = sheet.dataset.place;
+      if (open && open.startsWith('alert-') && !PLACES[open]) dismiss();
+      renderAlerts();
+      alertsLine();
+      renderNearby();
+    }
+    expireLater();
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) dropEnded(); });
+  // The red banner is for where you stand. On the Key Largo photo the alert stays one tap away,
+  // in the weather preview and in Nearby, instead of sitting over the view.
   function renderAlerts() {
     const a = S.alerts[0];
-    alertRow.hidden = !a;
+    alertRow.hidden = !a || S.mode !== 'live';
     if (!a) return;
-    alertLabel.textContent = a.ends ? `${a.name} ${untilText(a.ends, a.tz, true)}` : a.name;
+    alertName.textContent = a.name;
+    alertUntil.textContent = a.ends ? ` ${untilText(a.ends, a.tz, true)}` : '';
     const more = S.alerts.length - 1;
     alertMore.hidden = more < 1;
     alertMore.textContent = `+${more}`;
@@ -1105,7 +1151,14 @@
     if (!el || S.alertsKey !== NWS.spot(S.viewer) || S.alertsFailed) return;
     el.hidden = false;
     const n = S.alerts.length;
-    el.textContent = n ? `${n} weather alert${n > 1 ? 's' : ''} in effect` : 'No weather alerts here right now';
+    el.textContent = '';
+    if (!n) { el.textContent = 'No weather alerts here right now'; return; }
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'alink';
+    b.textContent = `${n} weather alert${n > 1 ? 's' : ''} in effect`;
+    b.addEventListener('click', () => select(n > 1 ? 'nearby' : S.alerts[0].id));
+    el.append(b);
   }
   function fillAlert(a) {
     sheetBody.querySelector('[data-name]').textContent = a.name;
@@ -1126,7 +1179,7 @@
     screen.classList.add('has-intro');
     const cam = canCamera && isTouch;
     $('#intro-go').hidden = !cam;
-    $('#intro-sample').textContent = cam ? 'Try the sample view first' : 'See the sample view';
+    $('#intro-sample').textContent = cam ? 'Try it on a photo first' : 'Try it on a photo';
     $('#intro-sample').className = cam ? 'btn secondary' : 'btn';
     $('#in-t').focus({ preventScroll: true });
   }
@@ -1144,6 +1197,18 @@
     (startBtn.hidden ? screen : startBtn).focus({ preventScroll: true });
   });
   for (const pill of intro.querySelectorAll('[data-icon]')) pill.insertAdjacentHTML('afterbegin', svgOf(pill.dataset.icon));
+  // The labels on the start drawing work like the view's: a tap opens the photo with that label's preview.
+  // Tides waits for the tide station near the demo spot; if none comes back, Nearby lists what was found.
+  for (const b of intro.querySelectorAll('.st-mk[data-go]')) {
+    b.addEventListener('click', async () => {
+      closeIntro();
+      const go = b.dataset.go;
+      if (go !== 'tide') { select(go); return; }
+      await Promise.race([loadNearby(), new Promise((r) => setTimeout(r, 4000))]).catch(() => {});
+      const t = Object.entries(PLACES).find(([, p]) => p.kind === 'tide');
+      if (t) select(t[0]); else goTab('nearby');
+    });
+  }
 
   async function loadForecast() {
     const what = sheetBody.querySelector('[data-forecast]');
