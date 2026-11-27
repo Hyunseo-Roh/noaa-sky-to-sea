@@ -808,7 +808,16 @@
       const a = sheetBody.querySelector('[data-link]');
       if (pl.link) { a.href = pl.link; a.textContent = pl.linkText; } else a.remove();
     }
-    if (!pl.alert && !pl.sun) { sheetBody.append(actions()); syncActs(); }
+    // Save and Share sit at the right of the office line, so the main button is the one wide button
+    if (!pl.alert && !pl.sun) {
+      const off = sheetBody.querySelector('.office');
+      const row = document.createElement('div');
+      row.className = 'orow';
+      if (off) off.replaceWith(row); else sheetBody.querySelector('.btn, a[data-link]')?.before(row);
+      if (off) row.append(off);
+      row.append(actions());
+      syncActs();
+    }
     const d = sheetBody.querySelector('[data-distance]');
     if (d && pl.lat != null) d.textContent = isHere(pl) ? 'Where you are' : G.distanceText(S.viewer, pl);
     const when = sheetBody.querySelector('[data-period]');
@@ -1011,13 +1020,14 @@
 
   const ACT_ICONS = {
     save: '<path d="M6.5 4h11v16l-5.5-4-5.5 4z"/>',
+    done: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
     share: '<path d="M12 14.5V3.5"/><path d="M7.8 7.7L12 3.5l4.2 4.2"/><path d="M8 10.5H6.5A1.5 1.5 0 0 0 5 12v7.5A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V12a1.5 1.5 0 0 0-1.5-1.5H16"/>',
   };
   const svg = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
   function actions() {
     const d = document.createElement('div');
     d.className = 'acts';
-    d.innerHTML = `<button class="btn secondary" type="button" data-save aria-pressed="false">${svg(ACT_ICONS.save)}<span>Save</span></button><button class="btn secondary" type="button" data-share>${svg(ACT_ICONS.share)}<span>Share</span></button>`;
+    d.innerHTML = `<button type="button" data-save aria-pressed="false">${svg(ACT_ICONS.save)}<span class="visually-hidden">Save</span></button><button type="button" data-share>${svg(ACT_ICONS.share)}<span class="visually-hidden">Share</span></button>`;
     d.querySelector('[data-save]').addEventListener('click', () => toggleSave(sheet.dataset.place));
     d.querySelector('[data-share]').addEventListener('click', (e) => share(sheet.dataset.place, e.currentTarget));
     return d;
@@ -1043,9 +1053,11 @@
     }
     let ok = false;
     try { await navigator.clipboard.writeText(url); ok = true; } catch (_) { /* no clipboard */ }
+    // the icon turns into a tick for a moment, and the button's name says what happened
     const label = btn.querySelector('span');
     label.textContent = ok ? 'Link copied' : "Couldn't copy the link";
-    setTimeout(() => { if (label.isConnected) label.textContent = 'Share'; }, 2000);
+    if (ok) btn.querySelector('svg').innerHTML = ACT_ICONS.done;
+    setTimeout(() => { if (label.isConnected) { label.textContent = 'Share'; btn.querySelector('svg').innerHTML = ACT_ICONS.share; } }, 2000);
   }
 
   function renderSaved() {

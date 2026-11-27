@@ -96,12 +96,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 .screen .tabs { position: absolute; left: 0; transform: none; max-width: none; }
 
 /* place preview: a sheet over the view */
-.sheet { position: absolute; z-index: 20; left: 0; right: 0; bottom: var(--tab-h); background: var(--c-ground); color: var(--c-ink); border-radius: var(--r-pill) var(--r-pill) 0 0; padding: var(--s-2) 24px var(--s-5); box-shadow: inset 0 3px 0 var(--c-state); }
+/* It holds the place in a few lines and stays in the lower half, so the photo and the label you opened stay in view above it. */
+.sheet { position: absolute; z-index: 20; left: 0; right: 0; bottom: var(--tab-h); max-height: calc((100% - var(--tab-h)) / 2); overflow-y: auto; overscroll-behavior: contain; background: var(--c-ground); color: var(--c-ink); border-radius: var(--r-pill) var(--r-pill) 0 0; padding: var(--s-5) 24px var(--s-5); }
 .sheet[hidden] { display: none; }
-.grab { width: 36px; height: 4px; border-radius: var(--r-round); background: var(--c-rule); margin: 0 auto var(--s-2); }
 .pv { display: grid; grid-template-columns: minmax(0, 1fr) 72px; gap: var(--s-4); align-items: start; padding-right: 40px; }
 .pv.no-img { grid-template-columns: minmax(0, 1fr); }
-.pv h2 { margin-top: 2px; outline: none; }
+.pv h2 { font: 700 24px/32px var(--font-ui); outline: none; }
 .pv .what { margin-top: var(--s-2); color: var(--c-ink); }
 .pv .dist { margin-top: 2px; color: var(--c-ink-2); }
 .pv .sunline { display: flex; align-items: center; gap: var(--s-2); margin-top: var(--s-2); color: var(--c-ink); }
@@ -109,17 +109,20 @@ ul { margin: 0; padding: 0; list-style: none; }
 .pv .sunline svg { width: 20px; height: 20px; flex: none; color: var(--c-brand); }
 .pv img { width: 72px; height: 72px; object-fit: cover; border-radius: var(--r-thumb); }
 .sheet .office { margin-top: var(--s-4); }
+/* the office, with Save and Share at its right */
+.orow { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); margin-top: var(--s-2); }
+.orow .office { flex: 1 1 auto; margin-top: 0; }
 .sheet .btn { margin-top: var(--s-4); width: 100%; }
-/* Save and Share under the main button */
-.acts { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-2); margin-top: var(--s-2); }
-.sheet .acts .btn { margin-top: 0; width: auto; padding: 0 var(--s-4); }
-.sheet .office + .acts { margin-top: var(--s-4); }
-.acts svg { width: 20px; height: 20px; flex: none; }
+/* Save and Share as two icons; their names are read out, and the bookmark fills once saved */
+.acts { flex: none; display: flex; gap: 0; margin-right: -10px; }
+.acts button { width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-round); color: var(--c-brand); }
+.acts button:active { background: var(--c-data); }
+.acts svg { width: 24px; height: 24px; flex: none; }
 .acts [aria-pressed="true"] svg { fill: currentColor; }
 .sheet[data-kind="alert"] { box-shadow: inset 0 3px 0 var(--c-alert); }
 .pv .area { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .alert-text { margin-top: var(--s-4); color: var(--c-ink); display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-.close { position: absolute; top: var(--s-3); right: 10px; width: 44px; height: 44px; border-radius: var(--r-round); display: inline-flex; align-items: center; justify-content: center; color: var(--c-ink-2); }
+.close { position: absolute; top: var(--s-4); right: 10px; width: 44px; height: 44px; border-radius: var(--r-round); display: inline-flex; align-items: center; justify-content: center; color: var(--c-ink-2); }
 .close svg { width: 18px; height: 18px; }
 
 /* Nearby: a list over the view, above the tab bar */
