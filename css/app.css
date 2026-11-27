@@ -65,6 +65,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .alert-row[hidden] { display: none; }
 .alert { pointer-events: auto; display: inline-flex; align-items: center; gap: var(--s-2); max-width: 100%; height: 36px; padding: 0 var(--s-4) 0 var(--s-2); border-radius: var(--r-round); background: var(--c-alert); color: var(--c-ground); font: var(--f-meta-b); }
 .alert svg { width: 18px; height: 18px; flex: none; }
+/* in the weather preview, the alerts line opens the alert; a 44 px target around the 20 px line */
+.alink { margin: -12px 0; padding: 12px 0; color: var(--c-alert); font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 /* a long name gives way first, so the time and its zone stay readable */
 .alert #alert-label { display: flex; min-width: 0; white-space: nowrap; }
 .alert .an { min-width: 0; overflow: hidden; text-overflow: ellipsis; }

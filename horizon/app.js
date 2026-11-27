@@ -328,6 +328,7 @@
       S.mode = 'live';
       screen.dataset.mode = 'live';
       S.hintOverride = '';
+      renderAlerts();
       try { sessionStorage.setItem('horizon:live', '1'); } catch (_) { /* private mode */ }
       updateText();
       return true;
@@ -344,6 +345,7 @@
     video.srcObject = null;
     S.mode = 'sample';
     screen.dataset.mode = 'sample';
+    renderAlerts();
     S.compass = false;
     S.p = 0; S.tp = 0;
     S.h = S.th = REEF_FROM_DEMO - LIGHTHOUSE_OFFSET;
@@ -1129,9 +1131,11 @@
     expireLater();
   }
   document.addEventListener('visibilitychange', () => { if (!document.hidden) dropEnded(); });
+  // The red banner is for where you stand. On the Key Largo photo the alert stays one tap away,
+  // in the weather preview and in Nearby, instead of sitting over the view.
   function renderAlerts() {
     const a = S.alerts[0];
-    alertRow.hidden = !a;
+    alertRow.hidden = !a || S.mode !== 'live';
     if (!a) return;
     alertName.textContent = a.name;
     alertUntil.textContent = a.ends ? ` ${untilText(a.ends, a.tz, true)}` : '';
@@ -1147,7 +1151,14 @@
     if (!el || S.alertsKey !== NWS.spot(S.viewer) || S.alertsFailed) return;
     el.hidden = false;
     const n = S.alerts.length;
-    el.textContent = n ? `${n} weather alert${n > 1 ? 's' : ''} in effect` : 'No weather alerts here right now';
+    el.textContent = '';
+    if (!n) { el.textContent = 'No weather alerts here right now'; return; }
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'alink';
+    b.textContent = `${n} weather alert${n > 1 ? 's' : ''} in effect`;
+    b.addEventListener('click', () => select(n > 1 ? 'nearby' : S.alerts[0].id));
+    el.append(b);
   }
   function fillAlert(a) {
     sheetBody.querySelector('[data-name]').textContent = a.name;
