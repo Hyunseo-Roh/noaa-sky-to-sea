@@ -100,3 +100,20 @@
     show(head.querySelector('.wx-b'));
   });
 })();
+
+/* On phones, text marked as more (data-more names it) folds behind a row with a plus; the row opens it.
+   The row exists on every screen but shows only on phones, where the box is closed by the stylesheet. */
+(() => {
+  const PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5"/><path d="M12 7.5v9M7.5 12h9"/></svg>';
+  document.querySelectorAll('.more[data-more]').forEach((box) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'more-b';
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-controls', box.id);
+    b.innerHTML = '<span></span>' + PLUS;
+    b.querySelector('span').textContent = box.dataset.more;
+    b.addEventListener('click', () => b.setAttribute('aria-expanded', String(box.classList.toggle('open'))));
+    box.before(b);
+  });
+})();

@@ -8,6 +8,7 @@
 <link rel="icon" href="horizon/icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="horizon/icons/apple-touch-icon.png">
 <title>Where the sea meets the sky | Sky to sea | NOAA</title>
+<script>document.documentElement.classList.add('js')</script>
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/site.css">
 <style>
@@ -53,6 +54,7 @@
 .data-head .date { grid-column: 1 / 8; margin-top: var(--s-2); font: var(--f-item); color: var(--c-ink); }
 .data-head .units { grid-column: 8 / 13; }
 .data-body { margin-top: var(--s-6); align-items: start; }
+.data .more { grid-column: 1 / 5; }
 .data table { grid-column: 1 / 5; width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums lining-nums; }
 .data th, .data td { padding: var(--s-4) var(--s-4) var(--s-4) 0; border-bottom: 1px solid var(--c-rule); font: var(--f-body); font-family: var(--font-ui); text-align: left; }
 .data thead th { font: var(--f-meta-b); color: var(--c-ink-2); padding-top: 0; }
@@ -147,7 +149,9 @@
   .data-head h3, .data-head .date, .data-head .units { grid-column: 1 / -1; }
   .data-head .units { margin-top: var(--s-2); }
   .data-body { margin-top: var(--s-5); row-gap: var(--s-6); }
-  .data table, .chart { grid-column: 1 / -1; }
+  .data table, .data .more, .data .more-b, .chart { grid-column: 1 / -1; }
+  .data-body .chart { order: -1; }   /* the chart first; the table folds under it */
+  .data .more-b { margin-top: 0; }
   .tide-chart-wrap.d { display: none; }
   .tide-chart-wrap.m { display: block; }
   .charts h2 { margin-bottom: var(--s-5); }
@@ -265,7 +269,7 @@
           <p class="kicker">Baltimore, Maryland</p>
           <h2 id="tide-t" class="t-sec">The water level, every six minutes</h2>
           <p class="t-body">On a pier in Baltimore, Maryland, a NOAA tide station measures the water level every six minutes. It is part of NOAA's National Water Level Observation Network, which has more than 200 long-term&nbsp;stations.</p>
-          <p class="t-body">NOAA also publishes tide predictions for the station. Here are its predictions for Sunday, October 18,&nbsp;2026:</p>
+          <p class="t-body m-hide">NOAA also publishes tide predictions for the station. Here are its predictions for Sunday, October 18,&nbsp;2026:</p>
           <p class="office"><b>NOAA</b><i></i><span>National Ocean&nbsp;Service</span></p>
         </div>
         <figure>
@@ -281,6 +285,7 @@
           <p class="units cap">Station 8574680. Heights in feet above mean lower low water (MLLW). Times are local (EDT).</p>
         </div>
         <div class="g data-body">
+          <div class="more" id="more-tide" data-more="Tide times and heights">
           <table>
             <caption class="visually-hidden">High and low tide predictions</caption>
             <thead><tr><th scope="col">Tide</th><th scope="col">Time</th><th scope="col" class="v">Height, ft</th></tr></thead>
@@ -291,6 +296,7 @@
               <tr><th scope="row">Low</th><td>6:21 PM</td><td class="v">0.59</td></tr>
             </tbody>
           </table>
+          </div>
           <div class="chart">
             <p class="legend"><i></i>Predicted water level, hourly and at each high and low</p>
             <div class="tide-chart-wrap d"><svg class="tide-chart" viewBox="0 0 845 320" width="845" height="320" role="img" fill="none" aria-labelledby="tc-t-845">
@@ -371,7 +377,7 @@
       <div class="g after">
         <div class="text">
           <p class="t-body">Before a nautical chart is drawn, the seafloor is surveyed. NOAA's Office of Coast Survey uses hydrographic data, collected with sonar, to make the charts that ships navigate&nbsp;by.</p>
-          <p class="t-body">Here, NOAA Ship Thomas Jefferson brings its side scan sonar back aboard after a survey of the Hudson&nbsp;River.</p>
+          <p class="t-body m-hide">Here, NOAA Ship Thomas Jefferson brings its side scan sonar back aboard after a survey of the Hudson&nbsp;River.</p>
         </div>
         <div class="offices">
           <p class="office"><b>NOAA</b><i></i><span>National Ocean&nbsp;Service</span></p>
@@ -401,7 +407,7 @@
           </figure>
           <div class="text">
             <p class="t-body">Carysfort Lighthouse stands over Carysfort Reef, in the Florida Keys National Marine Sanctuary. Below the surface, nursery-grown corals go back onto Florida Keys reefs piece by piece, fixed in place with marine&nbsp;epoxy.</p>
-            <p class="t-body">NOAA and its partners grow and plant corals to help restore Florida's reefs. In 2018, divers replanted staghorn coral&nbsp;here.</p>
+            <p class="t-body m-hide">NOAA and its partners grow and plant corals to help restore Florida's reefs. In 2018, divers replanted staghorn coral&nbsp;here.</p>
           </div>
           <p class="office"><b>NOAA</b><i></i><span>National Ocean Service, with&nbsp;partners</span></p>
         </div>

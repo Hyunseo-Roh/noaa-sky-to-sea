@@ -8,6 +8,7 @@
 <link rel="icon" href="horizon/icons/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="horizon/icons/apple-touch-icon.png">
 <title>Sky to sea | NOAA</title>
+<script>document.documentElement.classList.add('js')</script>
 <link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/site.css">
 <link rel="stylesheet" href="css/descent.css">
@@ -97,6 +98,7 @@
   .about { padding: var(--s-8) 0; }
   .about-text, .about-groups { grid-column: 1 / -1; }
   .about-groups { grid-template-columns: 1fr; row-gap: var(--s-7); margin-top: var(--s-7); }
+  .ov-k { display: none; }   /* on phones a chapter in the list is its name and one line; its topics are in the chapter */
 }
 
 </style>
@@ -135,8 +137,10 @@
     <div class="about-text">
       <h2 id="about-t" class="t-sec">What NOAA does, from the sky to the sea</h2>
       <p class="t-lead">The National Oceanic and Atmospheric Administration forecasts the weather, charts the coasts, manages fisheries and protects&nbsp;marine sanctuaries.</p>
+      <div class="more" id="more-about" data-more="About this site">
       <p class="t-body">This redesign of noaa.gov follows that work down through seven chapters, from weather balloons in the upper air to whales in the open sea. Each chapter names the NOAA office behind the work and the noaa.gov topic it&nbsp;belongs to.</p>
       <p class="t-body about-find">Your local weather, news, data and tools are in the menu at the top of every page.</p>
+      </div>
     </div>
     <div class="about-groups">
       <div class="ov-group"><h3 class="ov-h">In the sky, chapters 1 to 3</h3><ol class="about-list"><li><a class="ov-a" href="#ch1"><span class="ov-n">1</span><span class="ov-name">Upper air</span><span class="ov-d">Weather balloons, twice a day</span><span class="ov-k">Weather, Research</span></a></li><li><a class="ov-a" href="#ch2"><span class="ov-n">2</span><span class="ov-name">Storms</span><span class="ov-d">Storm watches and warnings</span><span class="ov-k">Weather, Marine and aviation</span></a></li><li><a class="ov-a" href="ocean-and-sky.html"><span class="ov-n">3</span><span class="ov-name">Ocean and sky</span><span class="ov-d">Buoys, tide stations and charts</span><span class="ov-k">Ocean and coasts, Charting</span></a></li></ol></div>
