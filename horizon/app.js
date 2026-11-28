@@ -300,7 +300,7 @@
     startBtn.hidden = !(canCamera && isTouch) || (S.mode === 'live' && !needCompass);
     startLabel.textContent = S.mode === 'live' ? 'Turn on the compass' : 'Turn on the camera';
     stopBtn.hidden = S.mode !== 'live';
-    nbSub.textContent = S.viewer.real ? `Around ${S.viewer.name}` : `Around ${S.viewer.name}, the demo location`;
+    nbSub.textContent = `Around ${S.viewer.name}`;
   }
 
   function onOrient(e) {
