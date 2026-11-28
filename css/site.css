@@ -307,3 +307,18 @@ html.no-scroll { overflow: hidden; }
 
 
 html { scroll-padding-top: calc(var(--l-chapter-bar-height) + var(--s-4)); }
+
+/* Text that folds away on phones (crit item 22). On wider screens the box takes no part in the layout and
+   its text reads in place; on phones it closes behind a row with a plus, and the row opens it. Without
+   script nothing folds. */
+.more { display: contents; }
+.more-b { display: none; }
+@media (max-width: 760px) {
+  .js .more:not(.open) { display: none; }
+  .more-b { display: flex; align-items: center; justify-content: space-between; gap: var(--s-4); width: 100%; min-height: 48px;
+    margin-top: var(--s-2); font: 600 16px/24px var(--font-ui); color: var(--c-brand); text-align: left; }
+  .more-b svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; transition: transform .2s ease-out; }
+  .more-b[aria-expanded="true"] svg { transform: rotate(45deg); }
+  .m-hide { display: none; }   /* a line that repeats what sits beside it, left out on phones */
+}
+@media (max-width: 760px) and (prefers-reduced-motion: reduce) { .more-b svg { transition: none; } }
