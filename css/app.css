@@ -151,18 +151,18 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nb-photo[hidden] { display: none; }
 .nb-photo img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 45%; border-radius: var(--r-thumb); }
 .nb-photo figcaption { margin-top: var(--s-2); color: var(--c-ink-2); }
-.nb-groups { margin: var(--s-6) -24px 0; }
-.nb-sec { padding: var(--s-6) 24px var(--s-7); }
-.nb-sec[data-group="alerts"] { padding-top: 0; padding-bottom: var(--s-6); }
+.nb-groups { margin: var(--s-7) -24px 0; }
+/* groups apart by more space than anything inside them: 48 above a group's heading, 64 below its last row */
+.nb-sec { padding: var(--s-7) 24px var(--s-8); }
+.nb-sec[data-group="alerts"] { padding-top: 0; padding-bottom: var(--s-7); }
 /* Flat Sky and Sea, no line drawings: the rows sit straight on these colours, so nothing runs behind the words */
 .nb-sec[data-group="sky"] { background: var(--c-data); }
 .nb-sec[data-group="sea"] { background: var(--c-brand); color: var(--c-ground); }
-.nb-h { display: flex; align-items: baseline; gap: var(--s-2); font: 700 24px/30px var(--font-ui); color: var(--c-ink); }
+.nb-h { font: 700 24px/32px var(--font-ui); letter-spacing: -0.01em; color: var(--c-ink); }
 .nb-sec[data-group="sea"] .nb-h { color: var(--c-ground); }
-.nb-note { margin-top: 2px; color: var(--c-ink-2); }
-.nb-sec[data-group="sea"] .nb-note { color: var(--c-on-dark-2); }
-.nb-sub2 { margin-top: var(--s-6); color: var(--c-ink); }
-.nb-cards { display: grid; gap: var(--s-2); margin-top: var(--s-4); }
+/* a part inside a group (the instruments) gets its own heading, a step below the group's */
+.nb-sub2 { margin-top: var(--s-7); font: var(--f-app-row); color: var(--c-ink); }
+.nb-cards { display: grid; gap: var(--s-4); margin-top: var(--s-4); }
 .nb-failed { margin-top: var(--s-4); color: var(--c-ink-2); }
 /* a place, as a plain row on the section's own colour: the icon (outline for instruments, solid for public
    information), what it is, one line, and its reading; a short reading such as a time sits on the name's line */
@@ -173,12 +173,22 @@ ul { margin: 0; padding: 0; list-style: none; }
 .nc .ic.is-alert { color: var(--c-alert); }
 .nc b { display: block; color: inherit; }
 .nc .t { display: block; color: var(--c-ink-2); }
-.nc .now { display: block; margin-top: var(--s-2); font: var(--f-app-body-b); color: var(--c-brand); }
+.nc .now { display: block; margin-top: var(--s-2); font: var(--f-app-body); color: var(--c-ink); }   /* a reading: plain, under the name and line */
 .nc .now.wait, .nc.big .now.wait { font: var(--f-meta); color: var(--c-ink-2); }   /* waiting or failed: a note, not the reading */
 .nc .val { grid-column: 3; font: var(--f-body-b); color: inherit; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .nc .chev { grid-column: 4; width: 20px; height: 20px; margin-top: 4px; color: var(--c-ink-2); }
 /* the forecast: the first row, with the forecast as a sentence under it */
-.nc.big .now { font: var(--f-app-body); color: var(--c-ink); }
+.nc.big .now { font: 400 20px/28px var(--font-read); color: var(--c-ink); }
+/* sunrise and sunset, side by side under the forecast: the name, the time, the direction, and a chevron on
+   the name's line, as each opens its preview */
+.nb-sun { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--s-4); margin-top: var(--s-5); }
+.ns { width: 100%; min-height: 48px; display: grid; grid-template-columns: 24px minmax(0, 1fr) 20px; column-gap: var(--s-4); align-items: start; padding: var(--s-2) 0; text-align: left; color: var(--c-ink); }
+.ns .ic { width: 24px; height: 24px; margin-top: 2px; color: var(--c-brand); }
+.ns .ic svg { display: block; width: 24px; height: 24px; }
+.ns b, .ns .val, .ns .t { display: block; }
+.ns .val { font: var(--f-body-b); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ns .t { color: var(--c-ink-2); }
+.ns .chev { width: 20px; height: 20px; margin-top: 4px; color: var(--c-ink-2); }
 .nb-out { display: inline-flex; align-items: center; min-height: 48px; margin-left: 40px; font: var(--f-meta-b); color: var(--c-brand); text-decoration: underline; text-underline-offset: 3px; }
 /* on Deep ocean the rows turn white */
 .nb-sec[data-group="sea"] .nc, .nb-sec[data-group="sea"] .nc .ic, .nb-sec[data-group="sea"] .nc .now { color: var(--c-ground); }
