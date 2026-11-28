@@ -554,8 +554,8 @@
     if (f(date) === f(new Date(Date.now() + 864e5))) return 'tomorrow';
     try { return new Intl.DateTimeFormat('en-US', { timeZone: tz || undefined, weekday: 'long' }).format(date); } catch (_) { return ''; }
   }
-  // "Rising. High tide 6.7 ft at 9:56 AM, then low tide 1.8 ft at 4:10 PM"
-  function tideText(p) {
+  // "Rising. High tide 6.7 ft at 9:56 AM, then low tide 1.8 ft at 4:10 PM"; short: the next tide only
+  function tideText(p, short = false) {
     const now = Date.now();
     const next = (p.predictions || []).filter((x) => Date.parse(x.t) > now);
     if (!next.length) return null;
@@ -566,7 +566,7 @@
       return `${x.type === 'H' ? 'high' : 'low'} tide ${x.v} ft at ${clock(d, tz, zone)}${dw === 'today' ? '' : ` ${dw}`}`;
     };
     const [a, b] = next;
-    return `${a.type === 'H' ? 'Rising' : 'Falling'}. ${capital(w(a))}${b ? `, then ${w(b)}` : ''}`;
+    return `${a.type === 'H' ? 'Rising' : 'Falling'}. ${capital(w(a))}${b && !short ? `, then ${w(b)}` : ''}`;
   }
 
   // Sunrise and sunset sit on the horizon in their real direction, with their time.
@@ -595,9 +595,9 @@
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'row';
     const name = iconName(id, p);
-    b.innerHTML = `<span class="ic${name === 'alert' ? ' is-alert' : ''}">${svgOf(name)}</span><span class="tx"><b class="t-body b"></b><span class="t t-meta"></span>${live ? '<span class="t t-meta now"></span>' : ''}</span>${CHEV}`;
+    b.innerHTML = `<span class="ic${name === 'alert' ? ' is-alert' : ''}">${svgOf(name)}</span><span class="tx"><b class="t-body b"></b>${line ? '<span class="t t-meta"></span>' : ''}${live ? '<span class="t t-meta now"></span>' : ''}</span>${CHEV}`;
     b.querySelector('b').textContent = keep2(title);
-    b.querySelector('.t').textContent = tie(line);
+    if (line) b.querySelector('.t').textContent = tie(line);
     if (live) b.querySelector('.now').textContent = tie(live);
     b.addEventListener('click', () => { if (face) faceToward(id); select(id); });
     li.append(b);
@@ -627,16 +627,29 @@
     const day = SUN.day(Date.UTC(y, m - 1, d), v.lat, v.lon);
     return day ? { sunrise: { at: day.rise, az: day.riseAz }, sunset: { at: day.set, az: day.setAz } } : null;
   }
-  // Sunrise and sunset: one row each, today's time on the right and the direction under the name.
+  // Sunrise and sunset: a pair side by side, each with today's time and the direction it sits in.
   // They come from the sun's position alone, so they read even when the forecast doesn't load.
-  function sunRows(ids) {
+  function sunPair(ids) {
+    if (!ids.length) return null;
     const today = sunToday();
-    return ids.map((id) => {
+    const ul = document.createElement('ul');
+    ul.className = 'nb-sun';
+    ul.append(...ids.map((id) => {
       const p = PLACES[id];
       const t = today && today[id];
-      const line = t ? `Today, toward the ${G.dir8(t.az)}` : `${capital(dayWord(p.at, S.tz))}, toward the ${G.dir8(p.bearing)}`;
-      return card(id, p, p.name, line, null, { value: clock(t ? t.at : p.at, S.tz) });
-    });
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'ns';
+      b.innerHTML = `<span class="ic">${svgOf(iconName(id, p))}</span><span class="tx"><b class="t-body b"></b><span class="val"></span><span class="t t-meta"></span></span>${CHEV}`;
+      b.querySelector('b').textContent = p.name;
+      b.querySelector('.val').textContent = clock(t ? t.at : p.at, S.tz);
+      // today's, even after it has passed; a time from another day says which
+      b.querySelector('.t').textContent = t ? capital(G.dir8(t.az)) : `${capital(dayWord(p.at, S.tz))}, ${G.dir8(p.bearing)}`;
+      b.addEventListener('click', () => { faceToward(id); select(id); });
+      li.append(b);
+      return li;
+    }));
+    return ul;
   }
   function setLive(li, text) {
     const n = li.querySelector('.now');
@@ -644,18 +657,27 @@
   }
 
   // A section of Nearby: Weather alerts, then the Sky on Atmospheric haze, then the Sea on Deep ocean.
-  function group(key, title, note, cards, extra) {
-    if (!cards.length && !extra) return null;
+  // Each is a heading and its parts; a part is a list of rows, the sun pair, or a smaller heading.
+  function group(key, title, parts) {
+    parts = parts.filter(Boolean);
+    if (!parts.length) return null;
     const sec = document.createElement('section');
     sec.className = 'nb-sec';
     sec.dataset.group = key;
-    sec.innerHTML = `<h2 class="nb-h t-title"></h2>${note ? '<p class="nb-note t-meta"></p>' : ''}${cards.length ? '<ul class="nb-cards"></ul>' : ''}`;
-    sec.querySelector('h2').textContent = title;
-    if (note) sec.querySelector('.nb-note').textContent = note;
-    if (cards.length) sec.querySelector('ul').append(...cards);
-    if (extra) sec.append(...[].concat(extra));
+    const h = document.createElement('h2');
+    h.className = 'nb-h';
+    h.textContent = title;
+    sec.append(h, ...parts);
     return sec;
   }
+  function list(cards) {
+    if (!cards.length) return null;
+    const ul = document.createElement('ul');
+    ul.className = 'nb-cards';
+    ul.append(...cards);
+    return ul;
+  }
+  const tempOf = (r) => { const m = r && /^-?\d+°F/.exec(r.text); return m ? m[0] : null; };
   // A photo of the horizon where you are, when there is one: the demo spot, and Los Angeles.
   const LOCAL = [
     { lat: DEMO.lat, lon: DEMO.lon, radius: 40, src: '../images/carysfort-lighthouse.jpg', alt: 'A calm sea with Carysfort Lighthouse on the horizon', cap: 'Your horizon from Key Largo, facing east. Photo: Nancy Diersing/NOAA' },
@@ -684,10 +706,12 @@
     const byMiles = (a, b) => (a[1].miles ?? 0) - (b[1].miles ?? 0);
     const entries = Object.entries(PLACES);
 
-    const alerts = S.alerts.map((a) => card(a.id, PLACES[a.id] || a, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National Weather Service`, null, { face: false }));
+    // the issuer's name stays on one line
+    const alerts = S.alerts.map((a) => card(a.id, PLACES[a.id] || a, a.name, `${a.ends ? capital(untilText(a.ends, a.tz)) : 'In effect now'}, National\u00a0Weather\u00a0Service`, null, { face: false }));
 
+    // the Sky leads with the forecast, then the sun, then the instruments under their own heading
     const wx = NB.forecast || (NB.forecastFailed ? "The forecast didn't load." : 'Loading the forecast…');
-    const wxRow = card('weather', PLACES.weather, 'Weather for this sky', `Forecast for ${v.name}`, wx, { big: true, wait: !NB.forecast });
+    const wxRow = card('weather', PLACES.weather, 'Weather for this sky', null, wx, { big: true, wait: !NB.forecast });
     if (NB.forecastFailed && !NB.forecast) {   // say where the link goes: the official forecast for this spot
       const a = document.createElement('a');
       a.className = 'nb-out';
@@ -696,54 +720,50 @@
       a.textContent = 'View forecast on weather.gov';
       wxRow.append(a);
     }
-    const sky = [wxRow];
     const sun = ['sunrise', 'sunset'].filter((k) => PLACES[k]);
     const today = sunToday();
     sun.sort((a, b) => (today ? today[a].at - today[b].at : PLACES[a].at - PLACES[b].at));
-    sky.push(...sunRows(sun));
 
+    // under their own heading, each instrument says only how far it is; a station's temperature sits on
+    // its name's line, and the full reading, with its time, is in its preview
     const instruments = entries
       .filter(([, p]) => p.found && (p.kind === 'station' || p.kind === 'radar'))
       .sort(byMiles)
-      .map(([id, p]) => (p.kind === 'station'
-        ? card(id, p, p.name, `Weather station, ${where(p)}`, p.reading ? readingText(p.reading) : 'No recent reading')
-        : card(id, p, p.name, `${p.what}, ${where(p)}`, null)));
-    const extra = [];
-    if (instruments.length || (NB.status === 'ready' && NB.error)) {
-      const h = document.createElement('h3');
-      h.className = 'nb-sub2 t-body b';
-      h.textContent = 'Measuring the weather near you';
-      extra.push(h);
+      .map(([id, p]) => {
+        if (p.kind !== 'station') return card(id, p, p.name, capital(where(p)), null);
+        const r = p.reading, t = tempOf(r);
+        const line = !r ? `${capital(where(p))}, no recent reading` : t ? capital(where(p)) : `${capital(where(p))}, ${r.text}`;
+        return card(id, p, p.name, line, null, { value: t });
+      });
+    const failed = NB.status === 'ready' && NB.error;
+    let head = null, note = null;
+    if (instruments.length || failed) {
+      head = document.createElement('h3');
+      head.className = 'nb-sub2';
+      head.textContent = 'Weather stations and radar';
     }
-    if (instruments.length) {
-      const ul = document.createElement('ul');
-      ul.className = 'nb-cards';
-      ul.append(...instruments);
-      extra.push(ul);
-    }
-    if (NB.status === 'ready' && NB.error) {
-      const failed = document.createElement('div');
-      failed.className = 'nb-failed';
-      failed.innerHTML = '<p class="t-meta">Weather stations and radar didn\'t load.</p>';
+    if (failed) {
+      note = document.createElement('div');
+      note.className = 'nb-failed';
+      note.innerHTML = '<p class="t-meta">Weather stations and radar didn\'t load.</p>';
       nbRetry.hidden = false;
-      failed.append(nbRetry);
-      extra.push(failed);
+      note.append(nbRetry);
     } else nbRetry.hidden = true;
 
     const sea = entries
       .filter(([id, p]) => !p.away && !p.far && ((p.found && SEA.has(p.kind)) || id === 'carysfort-reef' || id === 'florida-keys-sanctuary'))
       .sort(byMiles)
       .map(([id, p]) => {
-        if (id === 'florida-keys-sanctuary') return card(id, p, p.name, 'Marine sanctuary, the water in front of you', null);
-        if (p.kind === 'tide') return card(id, p, p.name, `Tide station, ${where(p)}`, tideText(p) || 'No tide predictions right now');
+        if (id === 'florida-keys-sanctuary') return card(id, p, p.name, 'Marine sanctuary, the water you see', null);
+        if (p.kind === 'tide') return card(id, p, p.name, `Tide station, ${where(p)}`, tideText(p, true) || 'No tide predictions right now');
         if (p.kind === 'sanctuary') return card(id, p, p.name, `Marine sanctuary, ${where(p)}`, null);
         return card(id, p, p.name, `${p.what}, ${where(p)}`, null);
       });
 
     nbList.replaceChildren(...[
-      group('alerts', 'Weather alerts', null, alerts),
-      group('sky', 'Sky', 'The forecast, the sun and the instruments, for where you are', sky, extra),
-      group('sea', 'Sea', "NOAA's work on the water closest to you", sea),
+      group('alerts', 'Weather alerts', [list(alerts)]),
+      group('sky', 'Sky', [list([wxRow]), sunPair(sun), head, list(instruments), note]),
+      group('sea', 'Sea', [list(sea)]),
     ].filter(Boolean));
   }
   nbRetry.addEventListener('click', () => loadNearby(true));
